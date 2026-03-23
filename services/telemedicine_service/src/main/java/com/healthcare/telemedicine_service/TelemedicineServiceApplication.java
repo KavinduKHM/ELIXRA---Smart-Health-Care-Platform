@@ -1,13 +1,17 @@
-// package com.healthcare.telemedicine_service;
+package com.healthcare.telemedicine_service;
 
-// import org.springframework.boot.SpringApplication;
-// import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-// @SpringBootApplication
-// public class TelemedicineServiceApplication {
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableScheduling
+public class TelemedicineServiceApplication {
 
-// 	public static void main(String[] args) {
-// 		SpringApplication.run(TelemedicineServiceApplication.class, args);
-// 	}
+	public static void main(String[] args) {
+		SpringApplication.run(TelemedicineServiceApplication.class, args);
+	}
 
-// }
+}
