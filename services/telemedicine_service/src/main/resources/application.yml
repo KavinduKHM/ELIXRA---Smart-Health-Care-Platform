@@ -1,0 +1,53 @@
+# Server Configuration
+server:
+  port: 8085
+
+# Spring Application Configuration
+spring:
+  application:
+    name: telemedicine-service
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/telemedicine_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update  # Auto-create tables
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+# Agora Configuration (Replace with your actual credentials from agora.io)
+agora:
+  app-id: YOUR_AGORA_APP_ID          # Get from Agora Console
+  app-certificate: YOUR_AGORA_CERTIFICATE  # Get from Agora Console
+  token-expiration: 3600              # Token validity in seconds (1 hour)
+
+# Logging
+logging:
+  level:
+    com.healthcare.telemedicine: DEBUG
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
