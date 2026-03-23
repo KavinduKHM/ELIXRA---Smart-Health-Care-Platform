@@ -333,14 +333,5 @@ public class TelemedicineService {
                 })
                 .orElse(false);
     }
-
-
-
-    /**
-     * Gets the Agora App ID for client-side SDK initialization.
-     * This is sent to the frontend so the Agora SDK can be initialized.
-     */
-    public String getAppId() {
-        return this.appId;
-    }
 }
+

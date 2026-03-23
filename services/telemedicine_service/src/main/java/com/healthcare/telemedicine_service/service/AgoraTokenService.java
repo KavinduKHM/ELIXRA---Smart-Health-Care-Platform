@@ -139,4 +139,13 @@ public class AgoraTokenService {
         }
         return null;
     }
+
+    /**
+     * Returns the configured Agora App ID.
+     * Used by clients to initialize the Agora SDK.
+     */
+    public String getAppId() {
+        return appId;
+    }
 }
+

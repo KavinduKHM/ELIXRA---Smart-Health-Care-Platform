@@ -5,21 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infrastructure/service-discovery/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/io/agora/media/DynamicKey5.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/io/agora/media/RtcTokenBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ELIXRA---Smart-Health-Care-Platform.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/src/main/java/com/healthcare/discovery/DiscoveryApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/src/main/java/com/healthcare/discovery/DiscoveryApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/TelemedicineServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/TelemedicineServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/controller/VideoSessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/controller/VideoSessionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/model/VideoSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/model/VideoSession.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/AgoraTokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/AgoraTokenService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/TelemedicineService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/TelemedicineService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +44,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Telemedicine__Service",
     "kotlin-language-version-configured": "true",
     "vue.rearranger.settings.migration": "true"
   }
