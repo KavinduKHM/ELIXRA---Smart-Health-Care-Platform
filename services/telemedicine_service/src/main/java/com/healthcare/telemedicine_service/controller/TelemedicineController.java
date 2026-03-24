@@ -36,13 +36,6 @@ public class TelemedicineController {
 
     private final TelemedicineService telemedicineService;
 
-    /**
-     * Quick smoke-test endpoint.
-     */
-    @GetMapping
-    public ResponseEntity<String> base() {
-        return ResponseEntity.ok("Telemedicine service is running");
-    }
 
     /**
      * Creates a new video session for an appointment.
@@ -171,7 +164,7 @@ public class TelemedicineController {
 
     @GetMapping
     public ResponseEntity<String> welcome() {
-        return ResponseEntity.ok("✅ Telemedicine Service is running!\n\n" +
+        return ResponseEntity.ok("✅ Telemedicine Service is running!" +
                 "Available endpoints:\n" +
                 "- POST /api/video/sessions - Create a session\n" +
                 "- POST /api/video/sessions/join - Join a session\n" +
@@ -181,8 +174,5 @@ public class TelemedicineController {
                 "- GET /api/video/doctors/{doctorId}/active - Doctor's active sessions");
     }
 
-    @GetMapping
-    public ResponseEntity<String> welcome() {
-        return ResponseEntity.ok("✅ Telemedicine Service is running!");
-    }
+
 }

@@ -1,5 +1,5 @@
 package com.healthcare.telemedicine_service.service;
-
+import com.healthcare.telemedicine_service.service.AgoraTokenService;
 import com.healthcare.telemedicine_service.dto.*;
 import com.healthcare.telemedicine_service.model.VideoSession;
 import com.healthcare.telemedicine_service.repository.VideoSessionRepository;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class TelemedicineService {
 
     private final VideoSessionRepository sessionRepository;
-    private final com.healthcare.telemedicine.service.AgoraTokenService agoraTokenService;
+    private final com.healthcare.telemedicine_service.service.AgoraTokenService agoraTokenService;
 
     // Constants for Agora user roles
     private static final int AGORA_ROLE_PUBLISHER = 1;  // Can send audio/video
