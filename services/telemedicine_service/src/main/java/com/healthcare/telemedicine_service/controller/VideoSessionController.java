@@ -1,5 +1,3 @@
-package com.healthcare.telemedicine.controller;
+package com.healthcare.telemedicine_service.controller;
 
-public class VideoSessionController {
-    
-}
+// Placeholder removed. This file intentionally left empty; delete if not needed.

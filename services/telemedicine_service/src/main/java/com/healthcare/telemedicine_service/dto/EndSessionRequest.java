@@ -1,4 +1,4 @@
-package com.healthcare.telemedicine.dto;
+package com.healthcare.telemedicine_service.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

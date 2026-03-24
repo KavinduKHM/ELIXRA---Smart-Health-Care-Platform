@@ -5,10 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/AgoraTokenService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/TelemedicineService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/TelemedicineServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/TelemedicineServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/AgoraTokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/AgoraTokenService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/controller/TelemedicineController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/controller/TelemedicineController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/controller/VideoSessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/controller/VideoSessionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/CreateSessionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/CreateSessionRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/EndSessionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/EndSessionRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/JoinSessionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/JoinSessionRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/JoinSessionResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/JoinSessionResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/SessionDetailsDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/dto/SessionDetailsDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/model/SessionRecording.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/model/SessionRecording.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/model/VideoSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/model/VideoSession.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/repository/VideoSessionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/repository/VideoSessionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/scheduler/SessionScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/scheduler/SessionScheduler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/TelemedicineService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/TelemedicineService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -46,9 +59,15 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "Telemedicine__Service",
     "kotlin-language-version-configured": "true",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.healthcare.telemedicine_service.dto" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @EnableDiscoveryClient - Registers this service with Eureka
  * @EnableScheduling - Enables scheduled tasks (e.g., checking missed sessions)
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.healthcare.telemedicine"})
 @EnableDiscoveryClient
 @EnableScheduling
 public class TelemedicineServiceApplication {

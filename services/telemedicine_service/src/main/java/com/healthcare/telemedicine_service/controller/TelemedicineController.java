@@ -1,7 +1,11 @@
-package com.healthcare.telemedicine.controller;
+package com.healthcare.telemedicine_service.controller;
 
-import com.healthcare.telemedicine.dto.*;
-import com.healthcare.telemedicine.service.TelemedicineService;
+import com.healthcare.telemedicine_service.dto.CreateSessionRequest;
+import com.healthcare.telemedicine_service.dto.EndSessionRequest;
+import com.healthcare.telemedicine_service.dto.JoinSessionRequest;
+import com.healthcare.telemedicine_service.dto.JoinSessionResponse;
+import com.healthcare.telemedicine_service.dto.SessionDetailsDTO;
+import com.healthcare.telemedicine_service.service.TelemedicineService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,14 @@ import java.util.List;
 public class TelemedicineController {
 
     private final TelemedicineService telemedicineService;
+
+    /**
+     * Quick smoke-test endpoint.
+     */
+    @GetMapping
+    public ResponseEntity<String> base() {
+        return ResponseEntity.ok("Telemedicine service is running");
+    }
 
     /**
      * Creates a new video session for an appointment.
@@ -155,5 +167,22 @@ public class TelemedicineController {
 
         boolean canJoin = telemedicineService.canJoinSession(id, userId, userRole);
         return ResponseEntity.ok(canJoin);
+    }
+
+    @GetMapping
+    public ResponseEntity<String> welcome() {
+        return ResponseEntity.ok("✅ Telemedicine Service is running!\n\n" +
+                "Available endpoints:\n" +
+                "- POST /api/video/sessions - Create a session\n" +
+                "- POST /api/video/sessions/join - Join a session\n" +
+                "- POST /api/video/sessions/end - End a session\n" +
+                "- GET /api/video/sessions/{id} - Get session details\n" +
+                "- GET /api/video/patients/{patientId}/active - Patient's active sessions\n" +
+                "- GET /api/video/doctors/{doctorId}/active - Doctor's active sessions");
+    }
+
+    @GetMapping
+    public ResponseEntity<String> welcome() {
+        return ResponseEntity.ok("✅ Telemedicine Service is running!");
     }
 }
