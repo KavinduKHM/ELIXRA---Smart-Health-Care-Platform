@@ -1,0 +1,11 @@
+# Ignore these files when building Docker image
+# NOTE: we keep target/*.jar so Docker can copy the built artifact.
+target/*
+!target/*.jar
+
+*.log
+.git
+.gitignore
+README.md
+.idea/
+*.iml

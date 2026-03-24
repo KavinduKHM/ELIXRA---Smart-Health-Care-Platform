@@ -1,0 +1,36 @@
+# Docker-specific configuration
+server:
+  port: 8085
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql-telemedicine:3306/telemedicine_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:rootpassword}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:telemedicine-service}
+
+agora:
+  app-id: ${AGORA_APP_ID}
+  app-certificate: ${AGORA_APP_CERTIFICATE}
+  token-expiration: ${AGORA_TOKEN_EXPIRATION:3600}
+
+logging:
+  level:
+    com.healthcare.telemedicine: INFO
