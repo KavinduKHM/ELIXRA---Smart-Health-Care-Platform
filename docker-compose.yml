@@ -1,22 +1,22 @@
 services:
   # MySQL Database for Telemedicine Service
-  mysql-telemedicine:
-    image: mysql:8.0
-    container_name: mysql-telemedicine
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: telemedicine_db
-    ports:
-      - "3310:3306"        # Host port 3310 maps to container port 3306
-    volumes:
-      - mysql-telemedicine-data:/var/lib/mysql
-    networks:
-      - healthcare-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+#  mysql-telemedicine:
+#    image: mysql:8.0
+#    container_name: mysql-telemedicine
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: telemedicine_db
+#    ports:
+#      - "3310:3306"        # Host port 3310 maps to container port 3306
+#    volumes:
+#      - mysql-telemedicine-data:/var/lib/mysql
+#    networks:
+#      - healthcare-network
+#    healthcheck:
+#      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
 
   # Service Discovery (Eureka)
   service-discovery:
@@ -43,16 +43,16 @@ services:
     ports:
       - "8085:8085"
     depends_on:
-      mysql-telemedicine:
-        condition: service_healthy
+#      mysql-telemedicine:
+#        condition: service_healthy
       service-discovery:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       # Add allowPublicKeyRetrieval=true and useSSL=false
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-telemedicine:3306/telemedicine_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/telemedicine_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: rootpassword
+      SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
       AGORA_APP_ID: ${AGORA_APP_ID:-0285c138d0d34d71ba6b7a6a0440cc1b}
       AGORA_APP_CERTIFICATE: ${AGORA_APP_CERTIFICATE:-a26ef39826a24a3599b281f64b60207f}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-telemedicine
+  namespace: healthcare
+  labels:
+    app: mysql-telemedicine
+spec:
+  selector:
+    app: mysql-telemedicine
+  ports:
+  - port: 3306
+    targetPort: 3306
+  type: ClusterIP

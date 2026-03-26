@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="" />
+    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kubernetes/configmaps/db-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/kubernetes/configmaps/db-config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kubernetes/deployments/service-discovery-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/kubernetes/deployments/service-discovery-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kubernetes/deployments/telemedicine-service-deployment.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/kubernetes/namespace.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/kubernetes/namespace.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kubernetes/services/service-discovery-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/kubernetes/services/service-discovery-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/resources/application-docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/resources/application-docker.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/resources/application.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
