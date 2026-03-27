@@ -1,0 +1,49 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: patient-service
+  
+  # Database Configuration - Using MySQL Workbench "Patient" connection
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/patient_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: Shaini8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: true
+  
+  # File Upload Configuration
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+
+# Disable Eureka for now
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+# File Storage Configuration
+app:
+  file:
+    upload-dir: ./uploads/patients
+  base-url: http://localhost:8082
+
+# Logging
+logging:
+  level:
+    com.healthcare.patient: DEBUG
+    org.hibernate.SQL: DEBUG
