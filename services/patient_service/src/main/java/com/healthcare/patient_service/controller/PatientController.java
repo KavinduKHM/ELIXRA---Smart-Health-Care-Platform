@@ -133,4 +133,62 @@ public class PatientController {
         MedicalHistoryDTO history = patientService.getMedicalHistory(patientId);
         return ResponseEntity.ok(history);
     }
+
+
+// ==================== DELETE ENDPOINTS ====================
+
+/**
+ * Delete a specific document (Patient can delete their own documents)
+ * 
+ * @param patientId - Patient ID
+ * @param documentId - Document ID to delete
+ * @return 204 No Content on success
+ */
+@DeleteMapping("/{patientId}/documents/{documentId}")
+public ResponseEntity<Void> deleteDocument(
+        @PathVariable Long patientId,
+        @PathVariable Long documentId) {
+    System.out.println("DELETE /api/patients/" + patientId + "/documents/" + documentId);
+    patientService.deleteDocument(patientId, documentId);
+    return ResponseEntity.noContent().build();
+}
+
+/**
+ * Delete all documents for a patient (Admin only)
+ * 
+ * @param patientId - Patient ID
+ * @return 204 No Content on success
+ */
+@DeleteMapping("/{patientId}/documents/all")
+public ResponseEntity<Void> deleteAllDocuments(@PathVariable Long patientId) {
+    System.out.println("DELETE /api/patients/" + patientId + "/documents/all");
+    patientService.deleteAllDocuments(patientId);
+    return ResponseEntity.noContent().build();
+}
+
+/**
+ * Delete patient account (Soft delete - deactivate account)
+ * 
+ * @param patientId - Patient ID
+ * @return 204 No Content on success
+ */
+@DeleteMapping("/{patientId}/account")
+public ResponseEntity<Void> deletePatientAccount(@PathVariable Long patientId) {
+    System.out.println("DELETE /api/patients/" + patientId + "/account");
+    patientService.deletePatientAccount(patientId);
+    return ResponseEntity.noContent().build();
+}
+
+/**
+ * Hard delete patient account (Admin only - permanently remove from database)
+ * 
+ * @param patientId - Patient ID
+ * @return 204 No Content on success
+ */
+@DeleteMapping("/admin/{patientId}/permanent")
+public ResponseEntity<Void> permanentlyDeletePatient(@PathVariable Long patientId) {
+    System.out.println("DELETE /api/patients/admin/" + patientId + "/permanent");
+    patientService.permanentlyDeletePatient(patientId);
+    return ResponseEntity.noContent().build();
+}
 }
