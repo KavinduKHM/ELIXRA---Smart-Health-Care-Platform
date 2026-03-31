@@ -5,14 +5,18 @@ spring:
   application:
     name: patient-service
   
-  # Database Configuration - Using MySQL Workbench "Patient" connection
+  # Database Configuration - For Docker (MySQL in container)
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/patient_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://mysql-patient:3306/patient_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: Shaini8
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
   
-  # JPA Configuration
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -28,6 +32,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
       enabled: true
+      file-size-threshold: 2KB
 
 # Disable Eureka for now
 eureka:
@@ -36,8 +41,16 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
 
+# Cloudinary Configuration
+cloudinary:
+  cloud-name: dwona3xzj
+  api-key: 541144828641826
+  api-secret: RoOFJQi-nLfT0_ExZewiJ_TsOak
+
 # File Storage Configuration
 app:
+  storage:
+    type: cloudinary
   file:
     upload-dir: ./uploads/patients
   base-url: http://localhost:8082
@@ -47,3 +60,5 @@ logging:
   level:
     com.healthcare.patient: DEBUG
     org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

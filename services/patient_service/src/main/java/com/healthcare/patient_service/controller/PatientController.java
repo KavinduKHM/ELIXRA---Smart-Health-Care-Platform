@@ -1,20 +1,14 @@
 package com.healthcare.patient_service.controller;
 
 import com.healthcare.patient_service.dto.*;
-import com.healthcare.patient_service.service.FileStorageService;
 import com.healthcare.patient_service.service.PatientService;
 import jakarta.validation.Valid;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.MalformedURLException;
-import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -22,11 +16,9 @@ import java.util.List;
 public class PatientController {
     
     private final PatientService patientService;
-    private final FileStorageService fileStorageService;
     
-    public PatientController(PatientService patientService, FileStorageService fileStorageService) {
+    public PatientController(PatientService patientService) {
         this.patientService = patientService;
-        this.fileStorageService = fileStorageService;
     }
     
     // ==================== PATIENT REGISTRATION ====================
@@ -63,6 +55,17 @@ public class PatientController {
         return ResponseEntity.ok(updated);
     }
     
+    // ==================== PROFILE PICTURE ENDPOINTS ====================
+    
+    @PostMapping(value = "/{patientId}/profile-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PatientDTO> uploadProfilePicture(
+            @PathVariable Long patientId,
+            @RequestParam("file") MultipartFile file) {
+        System.out.println("POST /api/patients/" + patientId + "/profile-picture");
+        PatientDTO updatedPatient = patientService.uploadProfilePicture(patientId, file);
+        return ResponseEntity.ok(updatedPatient);
+    }
+    
     // ==================== DOCUMENT ENDPOINTS ====================
     
     @PostMapping(value = "/{patientId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -90,32 +93,6 @@ public class PatientController {
         return ResponseEntity.ok(documents);
     }
     
-    @GetMapping("/{patientId}/documents/{fileName}")
-    public ResponseEntity<Resource> downloadDocument(
-            @PathVariable Long patientId,
-            @PathVariable String fileName) {
-        
-        System.out.println("GET /api/patients/" + patientId + "/documents/" + fileName);
-        
-        try {
-            Path filePath = fileStorageService.getFilePath(patientId, fileName);
-            Resource resource = new UrlResource(filePath.toUri());
-            
-            if (!resource.exists()) {
-                return ResponseEntity.notFound().build();
-            }
-            
-            return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, 
-                    "attachment; filename=\"" + fileName + "\"")
-                .body(resource);
-                
-        } catch (MalformedURLException e) {
-            System.err.println("Error downloading document: " + e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-    }
-    
     // ==================== PRESCRIPTION ENDPOINTS ====================
     
     @GetMapping("/{patientId}/prescriptions")
@@ -126,69 +103,89 @@ public class PatientController {
     }
     
     // ==================== MEDICAL HISTORY ENDPOINTS ====================
-    
-    @GetMapping("/{patientId}/medical-history")
-    public ResponseEntity<MedicalHistoryDTO> getMedicalHistory(@PathVariable Long patientId) {
-        System.out.println("GET /api/patients/" + patientId + "/medical-history");
-        MedicalHistoryDTO history = patientService.getMedicalHistory(patientId);
-        return ResponseEntity.ok(history);
-    }
 
+@GetMapping("/{patientId}/medical-history")
+public ResponseEntity<MedicalHistoryDTO> getMedicalHistory(@PathVariable Long patientId) {
+    System.out.println("GET /api/patients/" + patientId + "/medical-history");
+    MedicalHistoryDTO history = patientService.getMedicalHistory(patientId);
+    return ResponseEntity.ok(history);
+}
 
-// ==================== DELETE ENDPOINTS ====================
+// Get all medical history records
+@GetMapping("/{patientId}/medical-history/all")
+public ResponseEntity<List<MedicalHistoryDTO>> getAllMedicalHistory(@PathVariable Long patientId) {
+    System.out.println("GET /api/patients/" + patientId + "/medical-history/all");
+    List<MedicalHistoryDTO> historyList = patientService.getAllMedicalHistoryRecords(patientId);
+    return ResponseEntity.ok(historyList);
+}
 
-/**
- * Delete a specific document (Patient can delete their own documents)
- * 
- * @param patientId - Patient ID
- * @param documentId - Document ID to delete
- * @return 204 No Content on success
- */
-@DeleteMapping("/{patientId}/documents/{documentId}")
-public ResponseEntity<Void> deleteDocument(
+// Get medical history by type
+@GetMapping("/{patientId}/medical-history/type/{historyType}")
+public ResponseEntity<List<MedicalHistoryDTO>> getMedicalHistoryByType(
         @PathVariable Long patientId,
-        @PathVariable Long documentId) {
-    System.out.println("DELETE /api/patients/" + patientId + "/documents/" + documentId);
-    patientService.deleteDocument(patientId, documentId);
-    return ResponseEntity.noContent().build();
+        @PathVariable String historyType) {
+    System.out.println("GET /api/patients/" + patientId + "/medical-history/type/" + historyType);
+    List<MedicalHistoryDTO> historyList = patientService.getMedicalHistoryByType(patientId, historyType);
+    return ResponseEntity.ok(historyList);
 }
 
-/**
- * Delete all documents for a patient (Admin only)
- * 
- * @param patientId - Patient ID
- * @return 204 No Content on success
- */
-@DeleteMapping("/{patientId}/documents/all")
-public ResponseEntity<Void> deleteAllDocuments(@PathVariable Long patientId) {
-    System.out.println("DELETE /api/patients/" + patientId + "/documents/all");
-    patientService.deleteAllDocuments(patientId);
-    return ResponseEntity.noContent().build();
+// Add medical history record
+@PostMapping("/{patientId}/medical-history")
+public ResponseEntity<MedicalHistoryDTO> addMedicalHistory(
+        @PathVariable Long patientId,
+        @Valid @RequestBody MedicalHistoryRequest request) {
+    System.out.println("POST /api/patients/" + patientId + "/medical-history");
+    MedicalHistoryDTO history = patientService.addMedicalHistory(patientId, request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(history);
 }
 
-/**
- * Delete patient account (Soft delete - deactivate account)
- * 
- * @param patientId - Patient ID
- * @return 204 No Content on success
- */
-@DeleteMapping("/{patientId}/account")
-public ResponseEntity<Void> deletePatientAccount(@PathVariable Long patientId) {
-    System.out.println("DELETE /api/patients/" + patientId + "/account");
-    patientService.deletePatientAccount(patientId);
-    return ResponseEntity.noContent().build();
+// Update medical history record
+@PutMapping("/medical-history/{historyId}")
+public ResponseEntity<MedicalHistoryDTO> updateMedicalHistory(
+        @PathVariable Long historyId,
+        @Valid @RequestBody MedicalHistoryRequest request) {
+    System.out.println("PUT /api/patients/medical-history/" + historyId);
+    MedicalHistoryDTO history = patientService.updateMedicalHistory(historyId, request);
+    return ResponseEntity.ok(history);
 }
 
-/**
- * Hard delete patient account (Admin only - permanently remove from database)
- * 
- * @param patientId - Patient ID
- * @return 204 No Content on success
- */
-@DeleteMapping("/admin/{patientId}/permanent")
-public ResponseEntity<Void> permanentlyDeletePatient(@PathVariable Long patientId) {
-    System.out.println("DELETE /api/patients/admin/" + patientId + "/permanent");
-    patientService.permanentlyDeletePatient(patientId);
+// Delete medical history record
+@DeleteMapping("/medical-history/{historyId}")
+public ResponseEntity<Void> deleteMedicalHistory(@PathVariable Long historyId) {
+    System.out.println("DELETE /api/patients/medical-history/" + historyId);
+    patientService.deleteMedicalHistory(historyId);
     return ResponseEntity.noContent().build();
 }
+    
+    // ==================== DELETE ENDPOINTS ====================
+    
+    @DeleteMapping("/{patientId}/documents/{documentId}")
+    public ResponseEntity<Void> deleteDocument(
+            @PathVariable Long patientId,
+            @PathVariable Long documentId) {
+        System.out.println("DELETE /api/patients/" + patientId + "/documents/" + documentId);
+        patientService.deleteDocument(patientId, documentId);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @DeleteMapping("/{patientId}/documents/all")
+    public ResponseEntity<Void> deleteAllDocuments(@PathVariable Long patientId) {
+        System.out.println("DELETE /api/patients/" + patientId + "/documents/all");
+        patientService.deleteAllDocuments(patientId);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @DeleteMapping("/{patientId}/account")
+    public ResponseEntity<Void> deletePatientAccount(@PathVariable Long patientId) {
+        System.out.println("DELETE /api/patients/" + patientId + "/account");
+        patientService.deletePatientAccount(patientId);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @DeleteMapping("/{patientId}/account/permanent")
+    public ResponseEntity<Void> permanentlyDeleteOwnAccount(@PathVariable Long patientId) {
+        System.out.println("DELETE /api/patients/" + patientId + "/account/permanent");
+        patientService.permanentlyDeletePatient(patientId);
+        return ResponseEntity.noContent().build();
+    }
 }

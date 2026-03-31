@@ -17,11 +17,12 @@
     <artifactId>patient-service</artifactId>
     <version>1.0.0</version>
     <name>Patient Service</name>
-    <description>Patient Management Service</description>
+    <description>Patient Management Service with Cloudinary File Storage</description>
     
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2022.0.4</spring-cloud.version>
+        <cloudinary.version>1.33.0</cloudinary.version>
     </properties>
     
     <dependencies>
@@ -75,6 +76,14 @@
             <optional>true</optional>
         </dependency>
         
+        <!-- ==================== CLOUDINARY - CLOUD FILE STORAGE ==================== -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>${cloudinary.version}</version>
+        </dependency>
+        <!-- ======================================================================== -->
+        
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -110,5 +119,6 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>patient-service</finalName>
     </build>
 </project>

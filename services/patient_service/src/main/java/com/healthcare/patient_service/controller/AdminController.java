@@ -93,7 +93,8 @@ public class AdminController {
     }
 
 /**
- * Permanently delete patient (Admin only)
+ * Permanently delete patient (Hard delete - removes from database)
+ * This is an ADMIN ONLY operation
  */
 @DeleteMapping("/patients/{patientId}/permanent")
 public ResponseEntity<Void> permanentlyDeletePatient(@PathVariable Long patientId) {

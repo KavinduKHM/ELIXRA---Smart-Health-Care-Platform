@@ -23,7 +23,10 @@ public class MedicalDocument {
     private String fileName;
     
     @Column(name = "file_path", nullable = false, unique = true)
-    private String filePath;
+    private String filePath;  // Stores Cloudinary public ID or local file path
+    
+    @Column(name = "file_url")
+    private String fileUrl;   // Cloudinary secure URL (NEW)
     
     @Column(name = "file_type")
     private String fileType;
@@ -55,11 +58,12 @@ public class MedicalDocument {
         return new MedicalDocumentBuilder();
     }
     
-    // Getters
+    // ==================== GETTERS ====================
     public Long getId() { return id; }
     public Patient getPatient() { return patient; }
     public String getFileName() { return fileName; }
     public String getFilePath() { return filePath; }
+    public String getFileUrl() { return fileUrl; }      
     public String getFileType() { return fileType; }
     public Long getFileSize() { return fileSize; }
     public String getDocumentType() { return documentType; }
@@ -70,11 +74,12 @@ public class MedicalDocument {
     public LocalDateTime getDocumentDate() { return documentDate; }
     public boolean isVerified() { return verified; }
     
-    // Setters
+    // ==================== SETTERS ====================
     public void setId(Long id) { this.id = id; }
     public void setPatient(Patient patient) { this.patient = patient; }
     public void setFileName(String fileName) { this.fileName = fileName; }
     public void setFilePath(String filePath) { this.filePath = filePath; }
+    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }     
     public void setFileType(String fileType) { this.fileType = fileType; }
     public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
     public void setDocumentType(String documentType) { this.documentType = documentType; }
@@ -85,7 +90,7 @@ public class MedicalDocument {
     public void setDocumentDate(LocalDateTime documentDate) { this.documentDate = documentDate; }
     public void setVerified(boolean verified) { this.verified = verified; }
     
-    // Builder Pattern
+    // ==================== BUILDER PATTERN ====================
     public static class MedicalDocumentBuilder {
         private MedicalDocument document = new MedicalDocument();
         
@@ -93,6 +98,7 @@ public class MedicalDocument {
         public MedicalDocumentBuilder patient(Patient patient) { document.patient = patient; return this; }
         public MedicalDocumentBuilder fileName(String fileName) { document.fileName = fileName; return this; }
         public MedicalDocumentBuilder filePath(String filePath) { document.filePath = filePath; return this; }
+        public MedicalDocumentBuilder fileUrl(String fileUrl) { document.fileUrl = fileUrl; return this; }      
         public MedicalDocumentBuilder fileType(String fileType) { document.fileType = fileType; return this; }
         public MedicalDocumentBuilder fileSize(Long fileSize) { document.fileSize = fileSize; return this; }
         public MedicalDocumentBuilder documentType(String documentType) { document.documentType = documentType; return this; }
@@ -106,6 +112,7 @@ public class MedicalDocument {
         public MedicalDocument build() { return document; }
     }
     
+    // ==================== DOCUMENT TYPE CONSTANTS ====================
     public static class DocumentType {
         public static final String LAB_REPORT = "LAB_REPORT";
         public static final String PRESCRIPTION = "PRESCRIPTION";

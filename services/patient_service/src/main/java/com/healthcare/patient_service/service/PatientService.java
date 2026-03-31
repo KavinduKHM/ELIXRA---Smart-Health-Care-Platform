@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ public class PatientService {
     private final MedicalHistoryRepository medicalHistoryRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final FileStorageService fileStorageService;
+    private final CloudinaryService cloudinaryService;
     
     @Value("${app.base-url}")
     private String baseUrl;
@@ -40,12 +40,14 @@ public class PatientService {
                           MedicalDocumentRepository medicalDocumentRepository,
                           MedicalHistoryRepository medicalHistoryRepository,
                           PrescriptionRepository prescriptionRepository,
-                          FileStorageService fileStorageService) {
+                          FileStorageService fileStorageService,
+                          CloudinaryService cloudinaryService) {
         this.patientRepository = patientRepository;
         this.medicalDocumentRepository = medicalDocumentRepository;
         this.medicalHistoryRepository = medicalHistoryRepository;
         this.prescriptionRepository = prescriptionRepository;
         this.fileStorageService = fileStorageService;
+        this.cloudinaryService = cloudinaryService;
     }
     
     // ==================== PATIENT REGISTRATION ====================
@@ -60,7 +62,6 @@ public class PatientService {
         
         if (patientRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email", request.getEmail());
-
         }
         
         if (request.getPhoneNumber() != null && 
@@ -99,7 +100,7 @@ public class PatientService {
         return mapToPatientDTO(savedPatient);
     }
     
-    // ==================== PATIENT PROFILE METHODS (Patient Role) ====================
+    // ==================== PATIENT PROFILE METHODS ====================
     
     public PatientDTO getPatientProfile(Long patientId) {
         Patient patient = patientRepository.findById(patientId)
@@ -152,6 +153,32 @@ public class PatientService {
         return mapToPatientDTO(updatedPatient);
     }
     
+    // ==================== PROFILE PICTURE METHODS ====================
+    
+    @Transactional
+    public PatientDTO uploadProfilePicture(Long patientId, MultipartFile file) {
+        System.out.println("Uploading profile picture for patient ID: " + patientId);
+        
+        Patient patient = patientRepository.findById(patientId)
+            .orElseThrow(() -> new PatientNotFoundException(patientId));
+        
+        try {
+            // Upload to Cloudinary
+            Map<String, String> uploadResult = cloudinaryService.uploadProfilePicture(file, patientId);
+            
+            // Update patient with new profile picture URL
+            patient.setProfilePictureUrl(uploadResult.get("url"));
+            Patient updatedPatient = patientRepository.save(patient);
+            
+            System.out.println("Profile picture uploaded successfully: " + uploadResult.get("url"));
+            return mapToPatientDTO(updatedPatient);
+            
+        } catch (IOException e) {
+            System.err.println("Failed to upload profile picture: " + e.getMessage());
+            throw new DocumentUploadException("Failed to upload profile picture: " + e.getMessage(), e);
+        }
+    }
+    
     // ==================== DOCUMENT METHODS ====================
     
     @Transactional
@@ -164,27 +191,18 @@ public class PatientService {
             .orElseThrow(() -> new PatientNotFoundException(patientId));
         
         try {
-            String storedFileName = fileStorageService.storeFile(file, patientId);
-            String fileUrl = baseUrl + "/api/patients/" + patientId + "/documents/" + storedFileName;
+            // Store file in Cloudinary
+            MedicalDocument document = fileStorageService.storeFile(
+                file, patientId, documentType, description, notes, uploadedBy);
             
-            MedicalDocument document = MedicalDocument.builder()
-                .patient(patient)
-                .fileName(file.getOriginalFilename())
-                .filePath(storedFileName)
-                .fileType(file.getContentType())
-                .fileSize(file.getSize())
-                .documentType(documentType)
-                .description(description)
-                .notes(notes)
-                .uploadedBy(uploadedBy)
-                .uploadedAt(LocalDateTime.now())
-                .verified(false)
-                .build();
+            // Set patient reference
+            document.setPatient(patient);
             
+            // Save to database
             MedicalDocument savedDocument = medicalDocumentRepository.save(document);
             System.out.println("Document uploaded successfully with ID: " + savedDocument.getId());
             
-            return mapToDocumentDTO(savedDocument, fileUrl);
+            return mapToDocumentDTO(savedDocument, savedDocument.getFileUrl());
             
         } catch (IOException e) {
             System.err.println("Failed to upload document: " + e.getMessage());
@@ -198,18 +216,8 @@ public class PatientService {
         }
         
         return medicalDocumentRepository.findByPatientId(patientId).stream()
-            .map(doc -> {
-                String fileUrl = baseUrl + "/api/patients/" + patientId + "/documents/" + doc.getFilePath();
-                return mapToDocumentDTO(doc, fileUrl);
-            })
+            .map(doc -> mapToDocumentDTO(doc, doc.getFileUrl()))
             .collect(Collectors.toList());
-    }
-    
-    public Path getDocumentFilePath(Long patientId, String fileName) {
-        if (!patientRepository.existsById(patientId)) {
-            throw new PatientNotFoundException(patientId);
-        }
-        return fileStorageService.getFilePath(patientId, fileName);
     }
     
     // ==================== PRESCRIPTION METHODS ====================
@@ -219,24 +227,170 @@ public class PatientService {
         return List.of();
     }
     
-    // ==================== MEDICAL HISTORY METHODS ====================
+   // ==================== MEDICAL HISTORY METHODS ====================
+
+/**
+ * Get medical history for a patient
+ * Returns the most recent medical history record
+ */
+public MedicalHistoryDTO getMedicalHistory(Long patientId) {
+    System.out.println("Fetching medical history for patient ID: " + patientId);
     
-    public MedicalHistoryDTO getMedicalHistory(Long patientId) {
-        System.out.println("Fetching medical history for patient ID: " + patientId);
+    // Verify patient exists
+    Patient patient = patientRepository.findById(patientId)
+        .orElseThrow(() -> new PatientNotFoundException(patientId));
+    
+    // Get all medical history records for the patient
+    List<MedicalHistory> historyList = medicalHistoryRepository.findByPatientIdOrderByEventDateDesc(patientId);
+    
+    if (historyList.isEmpty()) {
+        // Return empty medical history if none exists
         return MedicalHistoryDTO.builder()
             .patientId(patientId)
             .historyType("MEDICAL_HISTORY")
             .title("No Medical History Records")
-            .description("No medical history records found.")
+            .description("No medical history records found for this patient.")
             .status("EMPTY")
             .build();
     }
     
+    // Return the most recent record
+    MedicalHistory mostRecent = historyList.get(0);
+    
+    return MedicalHistoryDTO.builder()
+        .id(mostRecent.getId())
+        .patientId(mostRecent.getPatient().getId())
+        .historyType(mostRecent.getHistoryType())
+        .title(mostRecent.getTitle())
+        .description(mostRecent.getDescription())
+        .eventDate(mostRecent.getEventDate())
+        .doctorName(mostRecent.getDoctorName())
+        .facilityName(mostRecent.getFacilityName())
+        .status(mostRecent.getStatus())
+        .createdAt(mostRecent.getCreatedAt())
+        .build();
+}
+
+/**
+ * Get all medical history records for a patient
+ */
+public List<MedicalHistoryDTO> getAllMedicalHistoryRecords(Long patientId) {
+    System.out.println("Fetching all medical history records for patient ID: " + patientId);
+    
+    // Verify patient exists
+    if (!patientRepository.existsById(patientId)) {
+        throw new PatientNotFoundException(patientId);
+    }
+    
+    List<MedicalHistory> historyList = medicalHistoryRepository.findByPatientIdOrderByEventDateDesc(patientId);
+    
+    return historyList.stream()
+        .map(this::mapToMedicalHistoryDTO)
+        .collect(Collectors.toList());
+}
+
+/**
+ * Get medical history by type
+ */
+public List<MedicalHistoryDTO> getMedicalHistoryByType(Long patientId, String historyType) {
+    System.out.println("Fetching medical history for patient ID: " + patientId + ", type: " + historyType);
+    
+    // Verify patient exists
+    if (!patientRepository.existsById(patientId)) {
+        throw new PatientNotFoundException(patientId);
+    }
+    
+    List<MedicalHistory> historyList = medicalHistoryRepository.findByPatientIdAndHistoryType(patientId, historyType);
+    
+    return historyList.stream()
+        .map(this::mapToMedicalHistoryDTO)
+        .collect(Collectors.toList());
+}
+
+/**
+ * Add medical history record
+ */
+@Transactional
+public MedicalHistoryDTO addMedicalHistory(Long patientId, MedicalHistoryRequest request) {
+    System.out.println("Adding medical history for patient ID: " + patientId);
+    
+    Patient patient = patientRepository.findById(patientId)
+        .orElseThrow(() -> new PatientNotFoundException(patientId));
+    
+    MedicalHistory history = MedicalHistory.builder()
+        .patient(patient)
+        .historyType(request.getHistoryType())
+        .title(request.getTitle())
+        .description(request.getDescription())
+        .eventDate(request.getEventDate())
+        .doctorName(request.getDoctorName())
+        .facilityName(request.getFacilityName())
+        .status(request.getStatus())
+        .build();
+    
+    MedicalHistory savedHistory = medicalHistoryRepository.save(history);
+    System.out.println("Medical history added with ID: " + savedHistory.getId());
+    
+    return mapToMedicalHistoryDTO(savedHistory);
+}
+
+/**
+ * Update medical history record
+ */
+@Transactional
+public MedicalHistoryDTO updateMedicalHistory(Long historyId, MedicalHistoryRequest request) {
+    System.out.println("Updating medical history ID: " + historyId);
+    
+    MedicalHistory history = medicalHistoryRepository.findById(historyId)
+        .orElseThrow(() -> new RuntimeException("Medical history not found with ID: " + historyId));
+    
+    if (request.getHistoryType() != null) history.setHistoryType(request.getHistoryType());
+    if (request.getTitle() != null) history.setTitle(request.getTitle());
+    if (request.getDescription() != null) history.setDescription(request.getDescription());
+    if (request.getEventDate() != null) history.setEventDate(request.getEventDate());
+    if (request.getDoctorName() != null) history.setDoctorName(request.getDoctorName());
+    if (request.getFacilityName() != null) history.setFacilityName(request.getFacilityName());
+    if (request.getStatus() != null) history.setStatus(request.getStatus());
+    
+    MedicalHistory updatedHistory = medicalHistoryRepository.save(history);
+    
+    return mapToMedicalHistoryDTO(updatedHistory);
+}
+
+/**
+ * Delete medical history record
+ */
+@Transactional
+public void deleteMedicalHistory(Long historyId) {
+    System.out.println("Deleting medical history ID: " + historyId);
+    
+    MedicalHistory history = medicalHistoryRepository.findById(historyId)
+        .orElseThrow(() -> new RuntimeException("Medical history not found with ID: " + historyId));
+    
+    medicalHistoryRepository.delete(history);
+    System.out.println("Medical history deleted");
+}
+
+/**
+ * Map MedicalHistory entity to DTO
+ */
+private MedicalHistoryDTO mapToMedicalHistoryDTO(MedicalHistory history) {
+    return MedicalHistoryDTO.builder()
+        .id(history.getId())
+        .patientId(history.getPatient().getId())
+        .historyType(history.getHistoryType())
+        .title(history.getTitle())
+        .description(history.getDescription())
+        .eventDate(history.getEventDate())
+        .doctorName(history.getDoctorName())
+        .facilityName(history.getFacilityName())
+        .status(history.getStatus())
+        .createdAt(history.getCreatedAt())
+        .build();
+}
+    
     // ==================== ADMIN METHODS ====================
     
-    /**
-     * Get all patients (Admin only)
-     */
     public List<PatientDTO> getAllPatients() {
         System.out.println("Fetching all patients (Admin)");
         List<Patient> patients = patientRepository.findAll();
@@ -245,9 +399,6 @@ public class PatientService {
             .collect(Collectors.toList());
     }
     
-    /**
-     * Search patients by name (first name or last name) - Admin
-     */
     public List<PatientDTO> searchPatientsByName(String name) {
         System.out.println("Searching patients by name: " + name);
         
@@ -261,9 +412,6 @@ public class PatientService {
             .collect(Collectors.toList());
     }
     
-    /**
-     * Update patient account status (activate/deactivate) - Admin
-     */
     @Transactional
     public PatientDTO updatePatientStatus(Long patientId, boolean active) {
         System.out.println("Updating patient status: ID=" + patientId + ", active=" + active);
@@ -278,9 +426,6 @@ public class PatientService {
         return mapToPatientDTO(updatedPatient);
     }
     
-    /**
-     * Get patient statistics for admin dashboard
-     */
     public PatientStatsDTO getPatientStats() {
         System.out.println("Fetching patient statistics");
         
@@ -289,7 +434,6 @@ public class PatientService {
         LocalDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
         LocalDateTime startOfDay = now.withHour(0).withMinute(0).withSecond(0);
         
-        // Count statistics
         long totalPatients = allPatients.size();
         long activePatients = allPatients.stream().filter(Patient::isActive).count();
         long inactivePatients = totalPatients - activePatients;
@@ -302,12 +446,10 @@ public class PatientService {
             .filter(p -> p.getCreatedAt() != null && p.getCreatedAt().isAfter(startOfDay))
             .count();
         
-        // Gender distribution
         long maleCount = allPatients.stream().filter(p -> "MALE".equalsIgnoreCase(p.getGender())).count();
         long femaleCount = allPatients.stream().filter(p -> "FEMALE".equalsIgnoreCase(p.getGender())).count();
         long otherCount = totalPatients - maleCount - femaleCount;
         
-        // Blood group distribution
         Map<String, Long> bloodGroupCounts = allPatients.stream()
             .filter(p -> p.getBloodGroup() != null && !p.getBloodGroup().isEmpty())
             .collect(Collectors.groupingBy(Patient::getBloodGroup, Collectors.counting()));
@@ -334,25 +476,150 @@ public class PatientService {
             .build();
     }
     
-    /**
-     * Get total patient count - Admin
-     */
     public long getPatientCount() {
         return patientRepository.count();
     }
     
-    /**
-     * Get total documents count (helper for stats)
-     */
     private long getTotalDocuments() {
         return medicalDocumentRepository.count();
     }
     
-    /**
-     * Get total prescriptions count (helper for stats)
-     */
     private long getTotalPrescriptions() {
         return prescriptionRepository.count();
+    }
+    
+    // ==================== DELETE METHODS ====================
+    
+    @Transactional
+    public void deleteDocument(Long patientId, Long documentId) {
+        System.out.println("Deleting document ID: " + documentId + " for patient ID: " + patientId);
+        
+        // Verify patient exists
+        patientRepository.findById(patientId)
+            .orElseThrow(() -> new PatientNotFoundException(patientId));
+        
+        // Find document
+        MedicalDocument document = medicalDocumentRepository.findById(documentId)
+            .orElseThrow(() -> new RuntimeException("Document not found with ID: " + documentId));
+        
+        if (!document.getPatient().getId().equals(patientId)) {
+            throw new RuntimeException("Document does not belong to this patient");
+        }
+        
+        try {
+            // Delete from Cloudinary
+            fileStorageService.deleteFile(document);
+            
+            // Delete database record
+            medicalDocumentRepository.delete(document);
+            System.out.println("Document deleted successfully");
+            
+        } catch (IOException e) {
+            System.err.println("Failed to delete document: " + e.getMessage());
+            throw new RuntimeException("Failed to delete document", e);
+        }
+    }
+    
+    @Transactional
+    public void deleteAllDocuments(Long patientId) {
+        System.out.println("Deleting all documents for patient ID: " + patientId);
+        
+        // Verify patient exists
+        patientRepository.findById(patientId)
+            .orElseThrow(() -> new PatientNotFoundException(patientId));
+        
+        // Get all documents
+        List<MedicalDocument> documents = medicalDocumentRepository.findByPatientId(patientId);
+        
+        // Delete from Cloudinary
+        for (MedicalDocument doc : documents) {
+            try {
+                fileStorageService.deleteFile(doc);
+            } catch (IOException e) {
+                System.err.println("Failed to delete file: " + doc.getFilePath());
+            }
+        }
+        
+        // Delete all database records
+        medicalDocumentRepository.deleteByPatientId(patientId);
+        System.out.println("All documents deleted for patient ID: " + patientId);
+    }
+    
+    @Transactional
+    public void deletePatientAccount(Long patientId) {
+        System.out.println("Soft deleting patient account ID: " + patientId);
+        
+        Patient patient = patientRepository.findById(patientId)
+            .orElseThrow(() -> new PatientNotFoundException(patientId));
+        
+        // Soft delete - just deactivate account
+        patient.setActive(false);
+        patientRepository.save(patient);
+        System.out.println("Patient account deactivated");
+    }
+    
+    @Transactional
+    public void permanentlyDeletePatient(Long patientId) {
+        System.out.println("PERMANENTLY deleting patient ID: " + patientId);
+        
+        // Find patient
+        Patient patient = patientRepository.findById(patientId)
+            .orElseThrow(() -> new PatientNotFoundException(patientId));
+        
+        // Delete all documents from Cloudinary first
+        List<MedicalDocument> documents = medicalDocumentRepository.findByPatientId(patientId);
+        for (MedicalDocument doc : documents) {
+            try {
+                fileStorageService.deleteFile(doc);
+            } catch (IOException e) {
+                System.err.println("Failed to delete file: " + doc.getFilePath());
+            }
+        }
+        
+        // Delete profile picture from Cloudinary if exists
+        if (patient.getProfilePictureUrl() != null) {
+            try {
+                String publicId = extractPublicIdFromUrl(patient.getProfilePictureUrl());
+                if (publicId != null) {
+                    cloudinaryService.deleteFile(publicId);
+                }
+            } catch (IOException e) {
+                System.err.println("Failed to delete profile picture: " + e.getMessage());
+            }
+        }
+        
+        // Delete medical history records
+        medicalHistoryRepository.deleteByPatientId(patientId);
+        
+        // Delete prescriptions
+        List<Prescription> prescriptions = prescriptionRepository.findByPatientId(patientId);
+        prescriptionRepository.deleteAll(prescriptions);
+        
+        // Delete all document records
+        medicalDocumentRepository.deleteByPatientId(patientId);
+        
+        // Finally delete the patient
+        patientRepository.delete(patient);
+        
+        System.out.println("Patient permanently deleted from database");
+    }
+    
+    private String extractPublicIdFromUrl(String url) {
+        if (url == null) return null;
+        try {
+            String[] parts = url.split("/upload/");
+            if (parts.length > 1) {
+                String afterUpload = parts[1];
+                if (afterUpload.contains("/")) {
+                    String[] subParts = afterUpload.split("/", 2);
+                    return subParts.length > 1 ? subParts[1] : afterUpload;
+                }
+                return afterUpload;
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to extract public ID: " + e.getMessage());
+        }
+        return null;
     }
     
     // ==================== MAPPING METHODS ====================
@@ -406,116 +673,4 @@ public class PatientService {
             .verified(document.isVerified())
             .build();
     }
-
-
-// ==================== DELETE METHODS ====================
-
-/**
- * Delete a specific document
- * 
- * @param patientId - Patient ID
- * @param documentId - Document ID to delete
- */
-@Transactional
-public void deleteDocument(Long patientId, Long documentId) {
-    System.out.println("Deleting document ID: " + documentId + " for patient ID: " + patientId);
-    
-    // Verify patient exists
-    Patient patient = patientRepository.findById(patientId)
-        .orElseThrow(() -> new PatientNotFoundException(patientId));
-    
-    // Find document and verify it belongs to the patient
-    MedicalDocument document = medicalDocumentRepository.findById(documentId)
-        .orElseThrow(() -> new RuntimeException("Document not found with ID: " + documentId));
-    
-    if (!document.getPatient().getId().equals(patientId)) {
-        throw new RuntimeException("Document does not belong to this patient");
-    }
-    
-    // Delete physical file from disk
-    try {
-        Path filePath = fileStorageService.getFilePath(patientId, document.getFilePath());
-        java.nio.file.Files.deleteIfExists(filePath);
-        System.out.println("Physical file deleted: " + filePath);
-    } catch (IOException e) {
-        System.err.println("Failed to delete physical file: " + e.getMessage());
-        // Continue to delete database record even if file deletion fails
-    }
-    
-    // Delete database record
-    medicalDocumentRepository.delete(document);
-    System.out.println("Document record deleted successfully");
-}
-
-/**
- * Delete all documents for a patient (Admin only)
- * 
- * @param patientId - Patient ID
- */
-@Transactional
-public void deleteAllDocuments(Long patientId) {
-    System.out.println("Deleting all documents for patient ID: " + patientId);
-    
-    // Verify patient exists
-    Patient patient = patientRepository.findById(patientId)
-        .orElseThrow(() -> new PatientNotFoundException(patientId));
-    
-    // Get all documents
-    List<MedicalDocument> documents = medicalDocumentRepository.findByPatientId(patientId);
-    
-    // Delete physical files
-    for (MedicalDocument doc : documents) {
-        try {
-            Path filePath = fileStorageService.getFilePath(patientId, doc.getFilePath());
-            java.nio.file.Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            System.err.println("Failed to delete file: " + doc.getFilePath());
-        }
-    }
-    
-    // Delete all database records
-    medicalDocumentRepository.deleteByPatientId(patientId);
-    System.out.println("All documents deleted for patient ID: " + patientId);
-}
-
-/**
- * Delete patient account (Soft delete - just deactivate)
- * 
- * @param patientId - Patient ID
- */
-@Transactional
-public void deletePatientAccount(Long patientId) {
-    System.out.println("Soft deleting patient account ID: " + patientId);
-    
-    Patient patient = patientRepository.findById(patientId)
-        .orElseThrow(() -> new PatientNotFoundException(patientId));
-    
-    // Soft delete - just deactivate account
-    patient.setActive(false);
-    patientRepository.save(patient);
-    System.out.println("Patient account deactivated");
-}
-
-/**
- * Permanently delete patient (Hard delete - Admin only)
- * 
- * @param patientId - Patient ID
- */
-@Transactional
-public void permanentlyDeletePatient(Long patientId) {
-    System.out.println("Permanently deleting patient ID: " + patientId);
-    
-    Patient patient = patientRepository.findById(patientId)
-        .orElseThrow(() -> new PatientNotFoundException(patientId));
-    
-    // First delete all physical files
-    deleteAllDocuments(patientId);
-    
-    // Delete related records (medical history, prescriptions) will cascade
-    // due to CascadeType.ALL in Patient entity
-    
-    // Finally delete the patient
-    patientRepository.delete(patient);
-    System.out.println("Patient permanently deleted");
-}
 }

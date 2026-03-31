@@ -1,55 +1,60 @@
 package com.healthcare.patient_service.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.healthcare.patient_service.model.MedicalDocument;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.Map;
 
-/**
- * File Storage Service - Handles storing and retrieving uploaded files
- */
 @Service
 public class FileStorageService {
     
-    @Value("${app.file.upload-dir:./uploads/patients}")
-    private String uploadDir;
+    private final CloudinaryService cloudinaryService;
     
-    /**
-     * Store uploaded file on disk
-     */
-    public String storeFile(MultipartFile file, Long patientId) throws IOException {
-        // Create directory if not exists
-        Path patientDir = Paths.get(uploadDir, patientId.toString());
-        if (!Files.exists(patientDir)) {
-            Files.createDirectories(patientDir);
-        }
-        
-        // Generate unique filename
-        String originalFilename = file.getOriginalFilename();
-        String fileExtension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
-        
-        String storedFileName = UUID.randomUUID().toString() + fileExtension;
-        
-        // Save file
-        Path targetPath = patientDir.resolve(storedFileName);
-        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-        
-        return storedFileName;
+    public FileStorageService(CloudinaryService cloudinaryService) {
+        this.cloudinaryService = cloudinaryService;
     }
     
     /**
-     * Get file path for a stored file
+     * Store uploaded file in Cloudinary
      */
-    public Path getFilePath(Long patientId, String fileName) {
-        return Paths.get(uploadDir, patientId.toString(), fileName);
+    public MedicalDocument storeFile(MultipartFile file, Long patientId, String documentType,
+                                      String description, String notes, String uploadedBy) throws IOException {
+        
+        System.out.println("Uploading file to Cloudinary for patient: " + patientId + ", type: " + documentType);
+        
+        // Upload to Cloudinary
+        Map<String, String> uploadResult = cloudinaryService.uploadFile(file, patientId, documentType);
+        
+        // Create document record
+        MedicalDocument document = MedicalDocument.builder()
+            .fileName(file.getOriginalFilename())
+            .filePath(uploadResult.get("publicId"))
+            .fileUrl(uploadResult.get("url"))
+            .fileType(uploadResult.get("format"))
+            .fileSize(Long.parseLong(uploadResult.get("bytes")))
+            .documentType(documentType)
+            .description(description)
+            .notes(notes)
+            .uploadedBy(uploadedBy)
+            .uploadedAt(LocalDateTime.now())
+            .verified(false)
+            .build();
+        
+        System.out.println("File stored in Cloudinary: " + uploadResult.get("url"));
+        
+        return document;
+    }
+    
+    /**
+     * Delete file from Cloudinary
+     */
+    public void deleteFile(MedicalDocument document) throws IOException {
+        if (document.getFilePath() != null) {
+            cloudinaryService.deleteFile(document.getFilePath());
+            System.out.println("Deleted from Cloudinary: " + document.getFilePath());
+        }
     }
 }
