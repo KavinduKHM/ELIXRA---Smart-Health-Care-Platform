@@ -4,6 +4,11 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
+        <option value="$PROJECT_DIR$/services/doctor_service/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_26" project-jdk-name="temurin-17" project-jdk-type="JavaSDK">
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
