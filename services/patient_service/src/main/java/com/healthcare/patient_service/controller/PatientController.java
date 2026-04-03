@@ -92,6 +92,32 @@ public class PatientController {
         List<MedicalDocumentDTO> documents = patientService.getPatientDocuments(patientId);
         return ResponseEntity.ok(documents);
     }
+//Update document 
+ @PutMapping(value = "/{patientId}/documents/{documentId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MedicalDocumentDTO> updateDocument(
+            @PathVariable Long patientId,
+            @PathVariable Long documentId,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "documentType", required = false) String documentType,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "notes", required = false) String notes,
+            @RequestHeader(value = "X-User-Id", required = false) String uploadedBy) {
+        
+        System.out.println("========== UPDATE DOCUMENT REQUEST ==========");
+        System.out.println("PUT /api/patients/" + patientId + "/documents/" + documentId);
+        System.out.println("File provided: " + (file != null && !file.isEmpty()));
+        System.out.println("Document Type: " + documentType);
+        System.out.println("Description: " + description);
+        System.out.println("Notes: " + notes);
+        
+        String uploader = uploadedBy != null ? "PATIENT:" + uploadedBy : "PATIENT:" + patientId;
+        MedicalDocumentDTO document = patientService.updateDocument(
+            patientId, documentId, file, documentType, description, notes, uploader);
+        
+        System.out.println("========== UPDATE DOCUMENT COMPLETED ==========");
+        return ResponseEntity.ok(document);
+    }
+    
     
     // ==================== PRESCRIPTION ENDPOINTS ====================
     

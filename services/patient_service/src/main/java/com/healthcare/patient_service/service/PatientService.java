@@ -219,7 +219,117 @@ public class PatientService {
             .map(doc -> mapToDocumentDTO(doc, doc.getFileUrl()))
             .collect(Collectors.toList());
     }
+
+    // ==================== DOCUMENT UPDATE METHODS ====================
+
+@Transactional
+public MedicalDocumentDTO updateDocument(Long patientId, Long documentId, 
+                                          MultipartFile file, 
+                                          String documentType,
+                                          String description, 
+                                          String notes,
+                                          String uploadedBy) {
     
+    System.out.println("========== UPDATE DOCUMENT SERVICE STARTED ==========");
+    System.out.println("Patient ID: " + patientId);
+    System.out.println("Document ID: " + documentId);
+    System.out.println("Has new file: " + (file != null && !file.isEmpty()));
+    System.out.println("New Document Type: " + documentType);
+    System.out.println("New Description: " + description);
+    System.out.println("New Notes: " + notes);
+    
+    // Verify patient exists
+    Patient patient = patientRepository.findById(patientId)
+        .orElseThrow(() -> new PatientNotFoundException(patientId));
+    System.out.println("Patient verified: " + patient.getFirstName() + " " + patient.getLastName());
+    
+    // Find existing document
+    MedicalDocument document = medicalDocumentRepository.findById(documentId)
+        .orElseThrow(() -> new RuntimeException("Document not found with ID: " + documentId));
+    
+    System.out.println("Before update:");
+    System.out.println("  - Document Type: " + document.getDocumentType());
+    System.out.println("  - Description: " + document.getDescription());
+    System.out.println("  - Notes: " + document.getNotes());
+    System.out.println("  - File Name: " + document.getFileName());
+    
+    if (!document.getPatient().getId().equals(patientId)) {
+        throw new RuntimeException("Document does not belong to this patient");
+    }
+    
+    try {
+        // ========== UPDATE FILE IF PROVIDED ==========
+        if (file != null && !file.isEmpty()) {
+            System.out.println("Updating file...");
+            
+            // Delete old file from Cloudinary
+            if (document.getFilePath() != null) {
+                cloudinaryService.deleteFile(document.getFilePath());
+                System.out.println("Old file deleted from Cloudinary: " + document.getFilePath());
+            }
+            
+            // Upload new file
+            String finalDocumentType = (documentType != null && !documentType.isEmpty()) 
+                ? documentType : document.getDocumentType();
+            
+            Map<String, String> uploadResult = cloudinaryService.uploadFile(file, patientId, finalDocumentType);
+            
+            // Update file fields
+            document.setFileName(file.getOriginalFilename());
+            document.setFilePath(uploadResult.get("publicId"));
+            document.setFileUrl(uploadResult.get("url"));
+            document.setFileType(uploadResult.get("format"));
+            document.setFileSize(Long.parseLong(uploadResult.get("bytes")));
+            
+            System.out.println("New file uploaded: " + uploadResult.get("url"));
+        } else {
+            System.out.println("No new file provided - keeping existing file");
+        }
+        
+        // ========== UPDATE DOCUMENT TYPE IF PROVIDED ==========
+        if (documentType != null && !documentType.trim().isEmpty()) {
+            document.setDocumentType(documentType);
+            System.out.println("Document type updated to: " + documentType);
+        }
+        
+        // ========== UPDATE DESCRIPTION IF PROVIDED ==========
+        if (description != null) {
+            document.setDescription(description);
+            System.out.println("Description updated to: " + description);
+        }
+        
+        // ========== UPDATE NOTES IF PROVIDED ==========
+        if (notes != null) {
+            document.setNotes(notes);
+            System.out.println("Notes updated to: " + notes);
+        }
+        
+        // ========== UPDATE UPLOADED BY ==========
+        if (uploadedBy != null) {
+            document.setUploadedBy(uploadedBy);
+        }
+        
+        // Update timestamp
+        document.setUploadedAt(LocalDateTime.now());
+        
+        // ========== SAVE ALL CHANGES ==========
+        MedicalDocument updatedDocument = medicalDocumentRepository.save(document);
+        
+        System.out.println("After update:");
+        System.out.println("  - Document Type: " + updatedDocument.getDocumentType());
+        System.out.println("  - Description: " + updatedDocument.getDescription());
+        System.out.println("  - Notes: " + updatedDocument.getNotes());
+        System.out.println("  - File Name: " + updatedDocument.getFileName());
+        System.out.println("  - File URL: " + updatedDocument.getFileUrl());
+        System.out.println("========== UPDATE DOCUMENT SERVICE COMPLETED ==========");
+        
+        return mapToDocumentDTO(updatedDocument, updatedDocument.getFileUrl());
+        
+    } catch (IOException e) {
+        System.err.println("Failed to update document: " + e.getMessage());
+        throw new DocumentUploadException("Failed to update document: " + e.getMessage(), e);
+    }
+}
     // ==================== PRESCRIPTION METHODS ====================
     
     public List<PrescriptionDTO> getPatientPrescriptions(Long patientId) {
