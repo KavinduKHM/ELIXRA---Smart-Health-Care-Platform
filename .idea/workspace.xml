@@ -5,18 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/client/TelemedicineClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorVideoSessionController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/CreateSessionRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/DoctorCreateVideoSessionRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/DoctorEndVideoSessionRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/DoctorJoinVideoSessionRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/EndSessionRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/JoinSessionRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/JoinSessionResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/telemedicine/SessionDetailsDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/exception/TelemedicineClientExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/test/java/com/healthcare/doctor_service/controller/DoctorVideoSessionControllerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
