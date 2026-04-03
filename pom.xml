@@ -23,6 +23,8 @@
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <!-- Added: Spring Cloud version property -->
+        <spring-cloud.version>2022.0.5</spring-cloud.version>
     </properties>
 
     <!-- Import Spring Cloud BOM so spring-cloud starter dependencies have versions -->
@@ -31,7 +33,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>2022.0.5</version>
+                <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
