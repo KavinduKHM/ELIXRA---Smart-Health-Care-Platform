@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  service-discovery:
+    build:
+      context: ../infrastructure/service-discovery
+    container_name: service-discovery
+    ports:
+      - "8761:8761"
+    environment:
+      # keep default spring config; overridable if needed
+      SPRING_PROFILES_ACTIVE: docker
+
+  mysql-telemedicine:
+    image: mysql:8.0
+    container_name: mysql-telemedicine
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_DATABASE: telemedicine_db
+      MYSQL_ROOT_PASSWORD: root
+    command: ["--default-authentication-plugin=mysql_native_password"]
+    volumes:
+      - mysql_telemedicine_data:/var/lib/mysql
+
+  mysql-doctor:
+    image: mysql:8.0
+    container_name: mysql-doctor
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: doctor_db
+      MYSQL_ROOT_PASSWORD: root
+    command: ["--default-authentication-plugin=mysql_native_password"]
+    volumes:
+      - mysql_doctor_data:/var/lib/mysql
+
+  telemedicine-service:
+    build:
+      context: ../services/telemedicine_service
+    container_name: telemedicine-service
+    depends_on:
+      - service-discovery
+      - mysql-telemedicine
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-telemedicine:3306/telemedicine_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+  doctor-service:
+    build:
+      context: ../services/doctor_service
+    container_name: doctor-service
+    depends_on:
+      - service-discovery
+      - mysql-doctor
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-doctor:3306/doctor_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+volumes:
+  mysql_telemedicine_data:
+  mysql_doctor_data:
+

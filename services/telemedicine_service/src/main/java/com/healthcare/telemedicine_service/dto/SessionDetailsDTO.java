@@ -1,6 +1,6 @@
-package com.healthcare.telemedicine.dto;
+package com.healthcare.telemedicine_service.dto;
 
-import com.healthcare.telemedicine.model.VideoSession;
+import com.healthcare.telemedicine_service.model.VideoSession;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

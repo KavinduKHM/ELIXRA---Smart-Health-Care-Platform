@@ -6,14 +6,17 @@ server:
 spring:
   application:
     name: telemedicine-service
-  
+
   # Database Configuration
+  # NOTE:
+  # - When running via Docker Compose, this is overridden via SPRING_DATASOURCE_URL.
+  # - For local runs (no Docker), localhost works if you have MySQL installed.
   datasource:
-    url: jdbc:mysql://localhost:3306/telemedicine_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/telemedicine_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-  
+
   # JPA Configuration
   jpa:
     hibernate:
@@ -28,6 +31,7 @@ spring:
 eureka:
   client:
     service-url:
+      # NOTE: overridden via EUREKA_CLIENT_SERVICEURL_DEFAULTZONE in Docker
       defaultZone: http://localhost:8761/eureka/
     fetch-registry: true
     register-with-eureka: true

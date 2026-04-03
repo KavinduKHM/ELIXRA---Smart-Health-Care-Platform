@@ -1,30 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <annotationProcessing>
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-      </profile>
-      <profile name="Annotation profile for doctor_service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
-        </processorPath>
-        <module name="doctor_service" />
-      </profile>
-    </annotationProcessing>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="doctor_service" options="-parameters" />
-    </option>
-  </component>
-        <module name="ELIXRA---Smart-Health-Care-Platform" />
-      </profile>
-    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ai_symptom_checker" target="17" />
+      <module name="appointment_service" target="17" />
+      <module name="auth_service" target="17" />
+      <module name="doctor_service" target="17" />
+      <module name="healthcare-platform" target="17" />
+      <module name="notification_service" target="17" />
+      <module name="patient_service" target="17" />
+      <module name="payment_service" target="17" />
+      <module name="service-discovery" target="17" />
+      <module name="telemedicine-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
