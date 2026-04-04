@@ -4,32 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/AvailabilityDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClientFallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClientFallback.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/controller/ScheduleController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/controller/SearchController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/AppointmentDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/DoctorDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/DoctorDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/SearchCriteria.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/model/TimeSlot.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/repository/TimeSlotRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/service/AppointmentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/service/AppointmentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/service/ScheduleService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/doctor_service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/Dockerfile" afterDir="false" />
-    </list>
+    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
