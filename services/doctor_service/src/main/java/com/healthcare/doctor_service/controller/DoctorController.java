@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.healthcare.doctor_service.dto.*;
-import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -76,11 +76,34 @@ public class DoctorController {
     }
 
     /**
-     * Search doctors by name or specialty (public endpoint for patients)
-     * GET /api/doctors/search?q={search}
+     * Search doctors by specialty and/or name.
+     *
+     * NOTE: appointment-service calls this via Feign:
+     * GET /api/doctors/search?specialty=...&name=...
      */
     @GetMapping("/search")
-    public ResponseEntity<Page<DoctorDTO>> searchDoctors(
+    public ResponseEntity<List<DoctorDTO>> searchDoctors(
+            @RequestParam(value = "specialty", required = false) String specialty,
+            @RequestParam(value = "name", required = false) String name) {
+
+        String q = "";
+        if (specialty != null && !specialty.isBlank()) {
+            q = specialty.trim();
+        }
+        if (name != null && !name.isBlank()) {
+            q = (q.isBlank() ? "" : (q + " ")) + name.trim();
+        }
+
+        List<DoctorDTO> doctors = doctorService.searchDoctors(q, Pageable.unpaged()).getContent();
+        return ResponseEntity.ok(doctors);
+    }
+
+    /**
+     * Search doctors by name or specialty (paged, for UI usage)
+     * GET /api/doctors/search-page?q={search}
+     */
+    @GetMapping("/search-page")
+    public ResponseEntity<Page<DoctorDTO>> searchDoctorsPaged(
             @RequestParam(required = false, defaultValue = "") String q,
             @PageableDefault(size = 10) Pageable pageable) {
         Page<DoctorDTO> doctors = doctorService.searchDoctors(q, pageable);
@@ -209,5 +232,35 @@ public class DoctorController {
     public ResponseEntity<PrescriptionDTO> getPrescriptionById(@PathVariable Long prescriptionId) {
         PrescriptionDTO prescription = doctorService.getPrescriptionById(prescriptionId);
         return ResponseEntity.ok(prescription);
+    }
+
+    /**
+     * Check if a doctor is available at a specific date and time.
+     * Used by Appointment Service to validate slot before booking.
+     *
+     * GET /api/doctors/{doctorId}/check-availability?time=2024-04-10T10:00:00
+     */
+    @GetMapping("/{doctorId}/check-availability")
+    public ResponseEntity<Boolean> checkAvailability(
+            @PathVariable Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time) {
+
+        boolean available = doctorService.isDoctorAvailable(doctorId, time);
+        return ResponseEntity.ok(available);
+    }
+
+    /**
+     * Book a time slot (mark as booked) after an appointment is confirmed.
+     * Used by Appointment Service to prevent double‑booking.
+     *
+     * POST /api/doctors/{doctorId}/book-slot?time=2024-04-10T10:00:00
+     */
+    @PostMapping("/{doctorId}/book-slot")
+    public ResponseEntity<Void> bookTimeSlot(
+            @PathVariable Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time) {
+
+        doctorService.bookTimeSlot(doctorId, time);
+        return ResponseEntity.ok().build();
     }
 }

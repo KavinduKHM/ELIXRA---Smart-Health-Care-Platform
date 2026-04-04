@@ -1,8 +1,7 @@
 package com.healthcare.appointment_service.client;
 
+import com.healthcare.appointment_service.dto.AvailabilityDTO;
 import com.healthcare.appointment_service.dto.DoctorDTO;
-import com.healthcare.appointment_service.dto.DoctorSearchResponse;
-import com.healthcare.appointment_service.dto.TimeSlotDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -35,13 +34,13 @@ public class DoctorServiceClientFallback implements DoctorServiceClient {
     }
 
     @Override
-    public List<DoctorSearchResponse> searchDoctors(String specialty, String name) {
-        log.warn("Doctor Service unavailable. Returning empty search results");
+    public List<DoctorDTO> searchDoctors(String specialty, String name) {
+        log.warn("Doctor Service unavailable. Returning empty list for specialty='{}', name='{}'", specialty, name);
         return new ArrayList<>();
     }
 
     @Override
-    public List<TimeSlotDTO> getAvailableSlots(Long doctorId, LocalDate date) {
+    public List<AvailabilityDTO> getAvailableSlots(Long doctorId, LocalDate date) {
         log.warn("Doctor Service unavailable. Returning empty available slots");
         return new ArrayList<>();
     }

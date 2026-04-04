@@ -2,6 +2,10 @@ server:
   port: 8083
 
 spring:
+
+  application:
+    name: doctor-service
+
   datasource:
     url: jdbc:mysql://mysql-doctor:3306/doctor_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root

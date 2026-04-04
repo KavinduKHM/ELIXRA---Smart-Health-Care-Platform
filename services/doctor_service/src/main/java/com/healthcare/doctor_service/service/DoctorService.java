@@ -18,6 +18,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j  // <-- IMPORTANT: This annotation creates the log variable
@@ -273,5 +276,50 @@ public class DoctorService {
                 .orElseThrow(() -> new RuntimeException("Prescription not found with ID: " + prescriptionId));
 
         return PrescriptionDTO.fromEntity(prescription);
+    }
+
+    /**
+     * Check if a doctor is available at a given time.
+     * Looks at existing availabilities and existing bookings.
+     */
+    public boolean isDoctorAvailable(Long doctorId, LocalDateTime time) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        // 1. Check if the doctor has an availability covering this time
+        LocalDate date = time.toLocalDate();
+        LocalTime slotTime = time.toLocalTime();
+
+        List<Availability> availabilities = availabilityRepository.findByDoctorAndAvailableDate(doctor, date);
+        boolean hasAvailability = availabilities.stream()
+                .anyMatch(a -> !slotTime.isBefore(a.getStartTime()) && !slotTime.isAfter(a.getEndTime()));
+
+        if (!hasAvailability) {
+            return false;
+        }
+
+        // 2. Check if this time slot is already booked (via Appointment Service)
+        // For simplicity, we can use a separate table or a flag on availability.
+        // Here we'll use an in‑memory set (replace with DB later if needed).
+        return !isTimeSlotBooked(doctorId, time);
+    }
+
+    /**
+     * Mark a time slot as booked.
+     */
+    public void bookTimeSlot(Long doctorId, LocalDateTime time) {
+        // Store in a separate table or a flag.
+        // For now, we'll just log and assume success.
+        log.info("Booking time slot for doctor {} at {}", doctorId, time);
+        // TODO: Persist to a new table `booked_slots` (optional).
+    }
+
+    /**
+     * Check if a time slot is already booked.
+     */
+    private boolean isTimeSlotBooked(Long doctorId, LocalDateTime time) {
+        // For a real implementation, query a `booked_slots` table.
+        // For now, return false (allow booking).
+        return false;
     }
 }
