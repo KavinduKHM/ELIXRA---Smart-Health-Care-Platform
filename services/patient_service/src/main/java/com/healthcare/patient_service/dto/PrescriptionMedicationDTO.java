@@ -1,13 +1,25 @@
 package com.healthcare.patient_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PrescriptionMedicationDTO {
     
     private Long id;
+
+    // doctor-service sends `medicineName`
+    @JsonAlias({"medicineName", "name"})
     private String medicationName;
+
     private String dosage;
     private String frequency;
     private String duration;
+
+    // some payloads may send `timing`
+    @JsonAlias({"timing"})
     private String timing;
+
     private String instructions;
     private Integer quantity;
     private String refillInfo;
