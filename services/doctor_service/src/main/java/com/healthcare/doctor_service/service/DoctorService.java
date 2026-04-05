@@ -1,5 +1,6 @@
 package com.healthcare.doctor_service.service;
 
+import com.healthcare.doctor_service.client.PatientServiceClient;
 import com.healthcare.doctor_service.dto.*;
 import com.healthcare.doctor_service.model.*;
 import com.healthcare.doctor_service.repository.AvailabilityRepository;
@@ -29,6 +30,7 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final AvailabilityRepository availabilityRepository;
     private final PrescriptionRepository prescriptionRepository;
+    private final PatientServiceClient patientServiceClient;
 
     // ==================== Doctor Profile Management ====================
 
@@ -60,6 +62,12 @@ public class DoctorService {
         log.info("Doctor registered successfully with ID: {}", savedDoctor.getId());
 
         return DoctorDTO.fromEntity(savedDoctor);
+    }
+
+    public List<PrescriptionDTO> getPrescriptionsByPatient(Long patientId) {
+        return prescriptionRepository.findByPatientId(patientId).stream()
+                .map(PrescriptionDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
     public DoctorDTO getDoctorById(Long doctorId) {
@@ -259,7 +267,48 @@ public class DoctorService {
         DigitalPrescription finalPrescription = prescriptionRepository.save(savedPrescription);
         log.info("Prescription issued successfully with ID: {}", finalPrescription.getId());
 
-        return PrescriptionDTO.fromEntity(finalPrescription);
+        PrescriptionDTO dto = PrescriptionDTO.fromEntity(finalPrescription);
+
+        // Best-effort sync into patient-service so it is stored in patientDB too.
+        try {
+            // patient-service requires prescriptionDate to be non-null.
+            LocalDateTime prescriptionDate = dto.getIssuedAt() != null ? dto.getIssuedAt() : LocalDateTime.now();
+
+            PatientPrescriptionUpsertRequest upsert = PatientPrescriptionUpsertRequest.builder()
+                    .patientId(dto.getPatientId())
+                    .doctorId(dto.getDoctorId())
+                    .doctorName(dto.getDoctorName())
+                    // doctorSpecialty is not currently exposed on PrescriptionDTO; keep null for now.
+                    .doctorSpecialty(null)
+                    .appointmentId(dto.getAppointmentId())
+                    .prescriptionDate(prescriptionDate)
+                    .validUntil(dto.getValidUntil())
+                    .diagnosis(dto.getDiagnosis())
+                    .notes(dto.getNotes())
+                    .active(dto.getStatus() == DigitalPrescription.PrescriptionStatus.ACTIVE)
+                    .fulfilled(false)
+                    .medications(dto.getMedicines() == null ? null : dto.getMedicines().stream()
+                            .map(m -> PatientPrescriptionUpsertRequest.Medication.builder()
+                                    .medicationName(m.getMedicineName())
+                                    .dosage(m.getDosage())
+                                    .frequency(m.getFrequency())
+                                    .duration(m.getDuration())
+                                    .instructions(m.getInstructions())
+                                    .build())
+                            .toList())
+                    .build();
+
+            log.info("Syncing prescription to patient-service. patientId={} appointmentId={} prescriptionDate={}",
+                    upsert.getPatientId(), upsert.getAppointmentId(), upsert.getPrescriptionDate());
+
+            patientServiceClient.upsertPrescription(upsert);
+        } catch (Exception e) {
+            // Don't fail the prescription issuance if patient-service is temporarily down.
+            log.warn("Failed to sync prescription to patient-service (will remain only in doctor DB). appointmentId={} patientId={}",
+                    dto.getAppointmentId(), dto.getPatientId(), e);
+        }
+
+        return dto;
     }
 
     public List<PrescriptionDTO> getDoctorPrescriptions(Long doctorId) {

@@ -4,7 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="" />
+    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/client/PatientServiceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/client/PatientServiceClientFallback.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/PatientPrescriptionUpsertRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/client/DoctorServiceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/client/DoctorServiceClientFallback.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/PrescriptionIngestionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PrescriptionUpsertRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/PrescriptionIngestionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/PrescriptionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/PrescriptionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/PatientServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/PatientServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/client/NotificationServiceClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/PatientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/PatientController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/PrescriptionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/PrescriptionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/PatientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/PatientService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/resources/application.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

@@ -16,6 +16,7 @@ public interface PrescriptionRepository extends JpaRepository<DigitalPrescriptio
 
     List<DigitalPrescription> findByPatientId(Long patientId);
 
+
     DigitalPrescription findByAppointmentId(Long appointmentId);
 
     @Query("SELECT p FROM DigitalPrescription p WHERE p.patientId = :patientId " +

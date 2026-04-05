@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Prescription Repository - Database operations for Prescription entity
@@ -47,10 +48,10 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
             @Param("endDate") LocalDateTime endDate);
     
     /**
-     * Find prescriptions by appointment ID
-    
-    Optional<Prescription> findByAppointmentId(Long appointmentId);
+     * Find prescription by appointment ID (used for idempotent upsert).
      */
+    Optional<Prescription> findByAppointmentId(Long appointmentId);
+
     /**
      * Find prescriptions by patient ID ordered by prescription date descending
      */

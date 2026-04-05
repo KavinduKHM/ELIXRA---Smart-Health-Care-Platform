@@ -62,6 +62,23 @@ services:
       timeout: 5s
       retries: 5
 
+  mysql-patient:
+    image: mysql:8.0
+    container_name: mysql-patient
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: patient_db
+    ports:
+      - "3310:3306"
+    volumes:
+      - mysql-patient-data:/var/lib/mysql
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   telemedicine-service:
     build:
@@ -123,10 +140,36 @@ services:
       - healthcare-network
 
 
+  patient-service:
+    build:
+      context: ../services/patient_service
+      dockerfile: Dockerfile
+    container_name: patient-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+      mysql-patient:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-patient:3306/patient_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+      # Cloudinary credentials (replace with actual or use dummy for now)
+      CLOUDINARY_CLOUD_NAME: dummy
+      CLOUDINARY_API_KEY: dummy
+      CLOUDINARY_API_SECRET: dummy
+    networks:
+      - healthcare-network
+
 volumes:
   mysql_telemedicine_data:
   mysql_doctor_data:
   mysql-appointment-data:
+  mysql-patient-data:
 
 networks:
   healthcare-network:

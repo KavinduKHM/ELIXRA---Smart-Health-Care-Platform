@@ -44,6 +44,15 @@ public class DoctorController {
     }
 
     /**
+     * Get all prescriptions for a specific patient (used by Patient Service)
+     */
+    @GetMapping("/prescriptions/patient/{patientId}")
+    public ResponseEntity<List<PrescriptionDTO>> getPrescriptionsByPatient(@PathVariable Long patientId) {
+        List<PrescriptionDTO> prescriptions = doctorService.getPrescriptionsByPatient(patientId);
+        return ResponseEntity.ok(prescriptions);
+    }
+
+    /**
      * Get doctor profile by ID
      * GET /api/doctors/{doctorId}
      */

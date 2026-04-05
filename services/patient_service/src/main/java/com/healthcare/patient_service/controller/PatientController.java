@@ -29,9 +29,19 @@ public class PatientController {
         PatientDTO patient = patientService.registerPatient(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(patient);
     }
+
+    /**
+     * Get patient by ID – used by Appointment Service
+     */
+    @GetMapping("/{patientId}")
+    public ResponseEntity<PatientDTO> getPatientById(@PathVariable Long patientId) {
+        System.out.println("GET /api/patients/" + patientId);
+        PatientDTO patient = patientService.getPatientProfile(patientId);
+        return ResponseEntity.ok(patient);
+    }
     
     // ==================== PATIENT PROFILE ENDPOINTS ====================
-    
+
     @GetMapping("/{patientId}/profile")
     public ResponseEntity<PatientDTO> getProfile(@PathVariable Long patientId) {
         System.out.println("GET /api/patients/" + patientId + "/profile");

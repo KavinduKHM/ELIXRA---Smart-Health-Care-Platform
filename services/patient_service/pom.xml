@@ -31,6 +31,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+
         
         <!-- CRITICAL: Validation Starter - This provides jakarta.validation -->
         <dependency>

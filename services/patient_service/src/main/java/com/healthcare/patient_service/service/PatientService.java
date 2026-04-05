@@ -12,6 +12,7 @@ import com.healthcare.patient_service.repository.MedicalDocumentRepository;
 import com.healthcare.patient_service.repository.MedicalHistoryRepository;
 import com.healthcare.patient_service.repository.PatientRepository;
 import com.healthcare.patient_service.repository.PrescriptionRepository;
+import com.healthcare.patient_service.client.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ public class PatientService {
     private final PrescriptionRepository prescriptionRepository;
     private final FileStorageService fileStorageService;
     private final CloudinaryService cloudinaryService;
+    private final DoctorServiceClient doctorServiceClient;
     
     @Value("${app.base-url}")
     private String baseUrl;
@@ -41,13 +43,15 @@ public class PatientService {
                           MedicalHistoryRepository medicalHistoryRepository,
                           PrescriptionRepository prescriptionRepository,
                           FileStorageService fileStorageService,
-                          CloudinaryService cloudinaryService) {
+                          CloudinaryService cloudinaryService,
+                          DoctorServiceClient doctorServiceClient) {
         this.patientRepository = patientRepository;
         this.medicalDocumentRepository = medicalDocumentRepository;
         this.medicalHistoryRepository = medicalHistoryRepository;
         this.prescriptionRepository = prescriptionRepository;
         this.fileStorageService = fileStorageService;
         this.cloudinaryService = cloudinaryService;
+        this.doctorServiceClient = doctorServiceClient;
     }
     
     // ==================== PATIENT REGISTRATION ====================
@@ -331,10 +335,10 @@ public MedicalDocumentDTO updateDocument(Long patientId, Long documentId,
     }
 }
     // ==================== PRESCRIPTION METHODS ====================
-    
+
     public List<PrescriptionDTO> getPatientPrescriptions(Long patientId) {
         System.out.println("Fetching prescriptions for patient ID: " + patientId);
-        return List.of();
+        return doctorServiceClient.getPatientPrescriptions(patientId);
     }
     
    // ==================== MEDICAL HISTORY METHODS ====================
