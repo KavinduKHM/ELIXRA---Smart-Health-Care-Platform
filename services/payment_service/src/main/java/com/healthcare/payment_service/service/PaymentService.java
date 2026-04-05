@@ -45,9 +45,34 @@ public class PaymentService {
         log.info("Stripe initialized");
     }
     
+    /**
+     * Check if payment already exists for this appointment
+     * Returns true if payment already exists and is successful
+     */
+    private boolean isPaymentAlreadyProcessed(Long appointmentId) {
+        List<Transaction> existingTransactions = transactionRepository.findByAppointmentId(appointmentId);
+        
+        for (Transaction transaction : existingTransactions) {
+            // If there's a successful or pending transaction for this appointment
+            if (transaction.getStatus().equals(Transaction.TransactionStatus.SUCCEEDED.name()) ||
+                transaction.getStatus().equals(Transaction.TransactionStatus.PENDING.name())) {
+                log.warn("Duplicate payment attempt detected for appointment: {}. Existing transaction: {} with status: {}",
+                    appointmentId, transaction.getTransactionId(), transaction.getStatus());
+                return true;
+            }
+        }
+        return false;
+    }
+    
     @Transactional
     public PaymentResponse createPaymentIntent(PaymentRequest request) {
         log.info("Creating payment intent for appointment: {}", request.getAppointmentId());
+        
+        // CHECK FOR DUPLICATE PAYMENT
+        if (isPaymentAlreadyProcessed(request.getAppointmentId())) {
+            throw new RuntimeException("Payment already processed for appointment: " + request.getAppointmentId() + 
+                ". Duplicate payments are not allowed.");
+        }
         
         try {
             long amountInCents = request.getAmount().longValue();
@@ -100,6 +125,15 @@ public class PaymentService {
                 transaction.setPaymentMethod(request.getPaymentMethodId());
             }
             
+            // Set additional details if available
+            transaction.setPatientName(request.getPatientName());
+            transaction.setPatientEmail(request.getPatientEmail());
+            transaction.setPatientPhone(request.getPatientPhone());
+            transaction.setDoctorName(request.getDoctorName());
+            transaction.setDoctorSpecialty(request.getDoctorSpecialty());
+            transaction.setAppointmentDate(request.getAppointmentDate());
+            transaction.setAppointmentTimeSlot(request.getAppointmentTimeSlot());
+            
             transactionRepository.save(transaction);
             log.info("Transaction saved with ID: {}", transactionId);
             
@@ -126,6 +160,12 @@ public class PaymentService {
         Transaction transaction = transactionRepository
             .findByTransactionId(confirmation.getTransactionId())
             .orElseThrow(() -> new RuntimeException("Transaction not found: " + confirmation.getTransactionId()));
+        
+        // Check if this appointment already has a successful payment (double check)
+        if (transaction.getStatus().equals(Transaction.TransactionStatus.SUCCEEDED.name())) {
+            log.warn("Payment already succeeded for transaction: {}", transaction.getTransactionId());
+            return mapToDTO(transaction);
+        }
         
         try {
             // Retrieve the PaymentIntent from Stripe
@@ -190,6 +230,27 @@ public class PaymentService {
             .stream()
             .map(this::mapToDTO)
             .collect(Collectors.toList());
+    }
+    
+    /**
+     * Check if an appointment has been paid successfully
+     */
+    public boolean isAppointmentPaid(Long appointmentId) {
+        List<Transaction> transactions = transactionRepository.findByAppointmentId(appointmentId);
+        return transactions.stream()
+            .anyMatch(t -> t.getStatus().equals(Transaction.TransactionStatus.SUCCEEDED.name()));
+    }
+    
+    /**
+     * Get successful transaction for an appointment
+     */
+    public TransactionDTO getSuccessfulTransactionByAppointment(Long appointmentId) {
+        List<Transaction> transactions = transactionRepository.findByAppointmentId(appointmentId);
+        return transactions.stream()
+            .filter(t -> t.getStatus().equals(Transaction.TransactionStatus.SUCCEEDED.name()))
+            .findFirst()
+            .map(this::mapToDTO)
+            .orElse(null);
     }
     
     private TransactionDTO mapToDTO(Transaction transaction) {

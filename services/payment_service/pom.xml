@@ -70,18 +70,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-	<!-- Mail for sending emails -->
-    <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-mail</artifactId>
-    </dependency>
-
-    <!-- Thymeleaf for email templates -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
     
     <dependencyManagement>
         <dependencies>

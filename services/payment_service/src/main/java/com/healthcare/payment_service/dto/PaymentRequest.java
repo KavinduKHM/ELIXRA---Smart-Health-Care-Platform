@@ -3,6 +3,7 @@ package com.healthcare.payment_service.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class PaymentRequest {
     
@@ -22,6 +23,15 @@ public class PaymentRequest {
     private String description;
     private String paymentMethodId;
     private String returnUrl;
+    
+    // Additional fields for invoice
+    private String patientName;
+    private String patientEmail;
+    private String patientPhone;
+    private String doctorName;
+    private String doctorSpecialty;
+    private LocalDateTime appointmentDate;
+    private String appointmentTimeSlot;
     
     // Getters and Setters
     public Long getAppointmentId() { return appointmentId; }
@@ -47,4 +57,25 @@ public class PaymentRequest {
     
     public String getReturnUrl() { return returnUrl; }
     public void setReturnUrl(String returnUrl) { this.returnUrl = returnUrl; }
+    
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
+    
+    public String getPatientEmail() { return patientEmail; }
+    public void setPatientEmail(String patientEmail) { this.patientEmail = patientEmail; }
+    
+    public String getPatientPhone() { return patientPhone; }
+    public void setPatientPhone(String patientPhone) { this.patientPhone = patientPhone; }
+    
+    public String getDoctorName() { return doctorName; }
+    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
+    
+    public String getDoctorSpecialty() { return doctorSpecialty; }
+    public void setDoctorSpecialty(String doctorSpecialty) { this.doctorSpecialty = doctorSpecialty; }
+    
+    public LocalDateTime getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(LocalDateTime appointmentDate) { this.appointmentDate = appointmentDate; }
+    
+    public String getAppointmentTimeSlot() { return appointmentTimeSlot; }
+    public void setAppointmentTimeSlot(String appointmentTimeSlot) { this.appointmentTimeSlot = appointmentTimeSlot; }
 }

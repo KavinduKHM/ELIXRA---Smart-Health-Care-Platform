@@ -26,6 +26,16 @@ public class Transaction {
     
     private Long doctorId;
     
+    // Additional fields for invoice
+    private String doctorName;
+    private String doctorSpecialty;
+    private String patientName;
+    private String patientEmail;
+    private String patientPhone;
+    private LocalDateTime appointmentDate;
+    private String appointmentTimeSlot;
+    private String consultationType;
+    
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
     
@@ -34,8 +44,9 @@ public class Transaction {
     @Column(nullable = false)
     private String status;
     
-    @Column(name = "payment_method")  // ← Add this annotation
     private String paymentMethod;
+    private String cardLast4;
+    private String cardBrand;
     
     private String description;
     
@@ -88,6 +99,30 @@ public class Transaction {
     public Long getDoctorId() { return doctorId; }
     public void setDoctorId(Long doctorId) { this.doctorId = doctorId; }
     
+    public String getDoctorName() { return doctorName; }
+    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
+    
+    public String getDoctorSpecialty() { return doctorSpecialty; }
+    public void setDoctorSpecialty(String doctorSpecialty) { this.doctorSpecialty = doctorSpecialty; }
+    
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
+    
+    public String getPatientEmail() { return patientEmail; }
+    public void setPatientEmail(String patientEmail) { this.patientEmail = patientEmail; }
+    
+    public String getPatientPhone() { return patientPhone; }
+    public void setPatientPhone(String patientPhone) { this.patientPhone = patientPhone; }
+    
+    public LocalDateTime getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(LocalDateTime appointmentDate) { this.appointmentDate = appointmentDate; }
+    
+    public String getAppointmentTimeSlot() { return appointmentTimeSlot; }
+    public void setAppointmentTimeSlot(String appointmentTimeSlot) { this.appointmentTimeSlot = appointmentTimeSlot; }
+    
+    public String getConsultationType() { return consultationType; }
+    public void setConsultationType(String consultationType) { this.consultationType = consultationType; }
+    
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
     
@@ -99,6 +134,12 @@ public class Transaction {
     
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+    
+    public String getCardLast4() { return cardLast4; }
+    public void setCardLast4(String cardLast4) { this.cardLast4 = cardLast4; }
+    
+    public String getCardBrand() { return cardBrand; }
+    public void setCardBrand(String cardBrand) { this.cardBrand = cardBrand; }
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

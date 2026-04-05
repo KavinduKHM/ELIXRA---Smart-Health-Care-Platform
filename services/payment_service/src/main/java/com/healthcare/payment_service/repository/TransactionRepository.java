@@ -13,4 +13,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByPatientId(Long patientId);
     List<Transaction> findByStatus(String status);
     boolean existsByAppointmentId(Long appointmentId);
+    
+    //method for duplicate payment prevention
+    List<Transaction> findByAppointmentId(Long appointmentId);
 }
