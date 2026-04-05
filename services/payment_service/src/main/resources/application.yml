@@ -14,12 +14,13 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
     show-sql: true
 
 eureka:
   client:
+    enabled: false
     service-url:
       defaultZone: http://localhost:8761/eureka/
     fetch-registry: false
@@ -29,6 +30,8 @@ stripe:
   api:
     secret-key: ${STRIPE_SECRET_KEY:sk_test_51T52BqKEHCBvBCfzPi0M8snSEx393UTwUn5R6oGGwFWuKyR4DinZyspfd0jCcr3Z2TtbAO8hUrzKXjdtiPYGiNPo00WkchlkyC}
     publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_51T52BqKEHCBvBCfzwvAWwuTIL4zcxBnL5ag0d9iN0WMgVvyOoD2ZG2qcEwEjAKSoxdx7sAKIPej5zA3lJMjp0SXc00baYJnFpw}
+    secret-key: ${STRIPE_SECRET_KEY}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY}
 
 logging:
   level:
