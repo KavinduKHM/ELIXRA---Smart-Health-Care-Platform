@@ -1,55 +1,25 @@
-package com.healthcare.payment_service.model;
+package com.healthcare.payment_service.dto;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "invoices")
-public class Invoice {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class InvoiceDTO {
     private Long id;
-    
-    @Column(unique = true, nullable = false)
     private String invoiceNumber;
-    
-    @Column(nullable = false)
     private Long transactionId;
-    
-    @Column(nullable = false)
     private Long patientId;
-    
     private String patientName;
     private String patientEmail;
     private Long doctorId;
     private String doctorName;
-    
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
-    
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal taxAmount;
-    
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
-    
-    private String currency = "LKR";
+    private String currency;
     private String description;
     private String invoiceUrl;
-    
-    @Column(nullable = false)
     private String status;
-    
     private LocalDateTime createdAt;
-    private LocalDateTime sentAt;
-    
-    public enum InvoiceStatus {
-        GENERATED, SENT, PAID, VOID
-    }
-    
-    public Invoice() {}
     
     // Getters and Setters
     public Long getId() { return id; }
@@ -99,7 +69,4 @@ public class Invoice {
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    
-    public LocalDateTime getSentAt() { return sentAt; }
-    public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
 }

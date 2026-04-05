@@ -1,0 +1,41 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/payment_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: Shaini8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: false
+    register-with-eureka: false
+
+stripe:
+  api:
+    secret-key: ${STRIPE_SECRET_KEY:sk_test_51T52BqKEHCBvBCfzPi0M8snSEx393UTwUn5R6oGGwFWuKyR4DinZyspfd0jCcr3Z2TtbAO8hUrzKXjdtiPYGiNPo00WkchlkyC}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_51T52BqKEHCBvBCfzwvAWwuTIL4zcxBnL5ag0d9iN0WMgVvyOoD2ZG2qcEwEjAKSoxdx7sAKIPej5zA3lJMjp0SXc00baYJnFpw}
+
+logging:
+  level:
+    com.healthcare.payment_service: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

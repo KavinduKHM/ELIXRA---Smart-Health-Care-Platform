@@ -1,73 +1,22 @@
-package com.healthcare.payment_service.model;
+package com.healthcare.payment_service.dto;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "transactions")
-public class Transaction {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class TransactionDTO {
     private Long id;
-    
-    @Column(unique = true, nullable = false)
     private String transactionId;
-    
-    @Column(unique = true, nullable = false)
     private String stripePaymentIntentId;
-    
-    @Column(nullable = false)
     private Long appointmentId;
-    
-    @Column(nullable = false)
     private Long patientId;
-    
     private Long doctorId;
-    
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
-    
-    private String currency = "LKR";
-    
-    @Column(nullable = false)
+    private String currency;
     private String status;
-    
-    @Column(name = "payment_method")  // ← Add this annotation
-    private String paymentMethod;
-    
     private String description;
-    
-    @Column(length = 1000)
     private String failureReason;
-    
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private LocalDateTime paidAt;
-    private LocalDateTime refundedAt;
-    
-    public enum TransactionStatus {
-        PENDING, SUCCEEDED, FAILED, REFUNDED, CANCELLED
-    }
-    
-    public Transaction() {}
-    
-    public Transaction(String transactionId, String stripePaymentIntentId, Long appointmentId,
-                       Long patientId, Long doctorId, BigDecimal amount, String currency,
-                       String status, String description) {
-        this.transactionId = transactionId;
-        this.stripePaymentIntentId = stripePaymentIntentId;
-        this.appointmentId = appointmentId;
-        this.patientId = patientId;
-        this.doctorId = doctorId;
-        this.amount = amount;
-        this.currency = currency;
-        this.status = status;
-        this.description = description;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
     
     // Getters and Setters
     public Long getId() { return id; }
@@ -97,9 +46,6 @@ public class Transaction {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     
-    public String getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
-    
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     
@@ -109,12 +55,6 @@ public class Transaction {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-    
     public LocalDateTime getPaidAt() { return paidAt; }
     public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
-    
-    public LocalDateTime getRefundedAt() { return refundedAt; }
-    public void setRefundedAt(LocalDateTime refundedAt) { this.refundedAt = refundedAt; }
 }
