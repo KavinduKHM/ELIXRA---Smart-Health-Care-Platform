@@ -338,7 +338,50 @@ public MedicalDocumentDTO updateDocument(Long patientId, Long documentId,
 
     public List<PrescriptionDTO> getPatientPrescriptions(Long patientId) {
         System.out.println("Fetching prescriptions for patient ID: " + patientId);
-        return doctorServiceClient.getPatientPrescriptions(patientId);
+
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new PatientNotFoundException(patientId));
+
+        return prescriptionRepository.findByPatient(patient).stream()
+                .map(this::mapToPrescriptionDTO)
+                .collect(Collectors.toList());
+    }
+
+    private PrescriptionDTO mapToPrescriptionDTO(Prescription prescription) {
+        if (prescription == null) {
+            return null;
+        }
+
+        return PrescriptionDTO.builder()
+                .id(prescription.getId())
+                .patientId(prescription.getPatient() != null ? prescription.getPatient().getId() : null)
+                .doctorId(prescription.getDoctorId())
+                .doctorName(prescription.getDoctorName())
+                .doctorSpecialty(prescription.getDoctorSpecialty())
+                .appointmentId(prescription.getAppointmentId())
+                .prescriptionDate(prescription.getPrescriptionDate())
+                .validUntil(prescription.getValidUntil())
+                .diagnosis(prescription.getDiagnosis())
+                .notes(prescription.getNotes())
+                .medications(prescription.getMedications() != null
+                        ? prescription.getMedications().stream()
+                            .map(m -> PrescriptionMedicationDTO.builder()
+                                    .id(m.getId())
+                                    .medicationName(m.getMedicationName())
+                                    .dosage(m.getDosage())
+                                    .frequency(m.getFrequency())
+                                    .duration(m.getDuration())
+                                    .timing(m.getTiming())
+                                    .instructions(m.getInstructions())
+                                    .quantity(m.getQuantity())
+                                    .refillInfo(m.getRefillInfo())
+                                    .build())
+                            .collect(Collectors.toList())
+                        : null)
+                .isActive(prescription.getIsActive())
+                .isFulfilled(prescription.getIsFulfilled())
+                .createdAt(prescription.getCreatedAt())
+                .build();
     }
     
    // ==================== MEDICAL HISTORY METHODS ====================
@@ -788,3 +831,4 @@ private MedicalHistoryDTO mapToMedicalHistoryDTO(MedicalHistory history) {
             .build();
     }
 }
+

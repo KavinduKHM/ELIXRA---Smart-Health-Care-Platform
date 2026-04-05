@@ -19,7 +19,7 @@ public class PrescriptionDTO {
     private Long appointmentId;
 
     // doctor-service sends this field as `issuedAt`
-    @JsonAlias({"issuedAt"})
+    @JsonAlias({"issuedAt", "prescriptionDate"})
     private LocalDateTime prescriptionDate;
 
     private LocalDateTime validUntil;
@@ -27,16 +27,15 @@ public class PrescriptionDTO {
     private String notes;
 
     // doctor-service sends this field as `medicines`
-    @JsonAlias({"medicines"})
+    @JsonAlias({"medicines", "medications"})
     private List<PrescriptionMedicationDTO> medications;
 
-    // accept both `active` and `isActive`
-    @JsonAlias({"active"})
-    private boolean isActive;
+    // some services may send these fields; keep them optional
+    @JsonAlias({"active", "isActive"})
+    private Boolean isActive;
 
-    // accept both `fulfilled` and `isFulfilled`
-    @JsonAlias({"fulfilled"})
-    private boolean isFulfilled;
+    @JsonAlias({"fulfilled", "isFulfilled"})
+    private Boolean isFulfilled;
 
     private LocalDateTime createdAt;
 
@@ -80,18 +79,18 @@ public class PrescriptionDTO {
     public List<PrescriptionMedicationDTO> getMedications() { return medications; }
     public void setMedications(List<PrescriptionMedicationDTO> medications) { this.medications = medications; }
 
-    public boolean isActive() { return isActive; }
-    public void setActive(boolean active) { isActive = active; }
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean active) { isActive = active; }
 
-    public boolean isFulfilled() { return isFulfilled; }
-    public void setFulfilled(boolean fulfilled) { isFulfilled = fulfilled; }
+    public Boolean getIsFulfilled() { return isFulfilled; }
+    public void setIsFulfilled(Boolean fulfilled) { isFulfilled = fulfilled; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     // Builder
     public static class PrescriptionDTOBuilder {
-        private PrescriptionDTO dto = new PrescriptionDTO();
+        private final PrescriptionDTO dto = new PrescriptionDTO();
 
         public PrescriptionDTOBuilder id(Long id) { dto.id = id; return this; }
         public PrescriptionDTOBuilder patientId(Long patientId) { dto.patientId = patientId; return this; }
@@ -104,8 +103,8 @@ public class PrescriptionDTO {
         public PrescriptionDTOBuilder diagnosis(String diagnosis) { dto.diagnosis = diagnosis; return this; }
         public PrescriptionDTOBuilder notes(String notes) { dto.notes = notes; return this; }
         public PrescriptionDTOBuilder medications(List<PrescriptionMedicationDTO> meds) { dto.medications = meds; return this; }
-        public PrescriptionDTOBuilder isActive(boolean active) { dto.isActive = active; return this; }
-        public PrescriptionDTOBuilder isFulfilled(boolean fulfilled) { dto.isFulfilled = fulfilled; return this; }
+        public PrescriptionDTOBuilder isActive(Boolean active) { dto.isActive = active; return this; }
+        public PrescriptionDTOBuilder isFulfilled(Boolean fulfilled) { dto.isFulfilled = fulfilled; return this; }
         public PrescriptionDTOBuilder createdAt(LocalDateTime createdAt) { dto.createdAt = createdAt; return this; }
 
         public PrescriptionDTO build() { return dto; }
