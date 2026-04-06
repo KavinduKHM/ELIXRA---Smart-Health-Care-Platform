@@ -159,9 +159,10 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
       # Cloudinary credentials (replace with actual or use dummy for now)
-      CLOUDINARY_CLOUD_NAME: dummy
-      CLOUDINARY_API_KEY: dummy
-      CLOUDINARY_API_SECRET: dummy
+      CLOUDINARY_CLOUD_NAME: dwona3xzj
+      CLOUDINARY_API_KEY: 541144828641826
+      CLOUDINARY_API_SECRET: RoOFJQi-nLfT0_ExZewiJ_TsOak
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     networks:
       - healthcare-network
 
