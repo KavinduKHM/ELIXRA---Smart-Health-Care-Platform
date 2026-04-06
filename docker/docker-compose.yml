@@ -166,11 +166,31 @@ services:
     networks:
       - healthcare-network
 
+  ai-symptom-checker:
+    build:
+      context: ../services/ai_symptom_checker
+      dockerfile: Dockerfile
+    container_name: ai-symptom-checker
+    ports:
+      - "8086:8086"
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+      GEMINI_API_KEY: AIzaSyCudFjsyvesRqy7Hfj5BN17cRHk3_MX_oI
+      # Direct-call fallback when Eureka doesn't have appointment-service instances
+      APPOINTMENT_SERVICE_URL: http://appointment-service:8084
+    networks:
+      - healthcare-network
+
 volumes:
   mysql_telemedicine_data:
   mysql_doctor_data:
   mysql-appointment-data:
   mysql-patient-data:
+  mysql-symptom-checker-data:
 
 networks:
   healthcare-network:
