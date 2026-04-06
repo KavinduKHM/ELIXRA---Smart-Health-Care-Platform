@@ -91,23 +91,27 @@ public class PaymentService {
                         .build()
                 );
             
-            // Add return URL if provided (for redirect-based payment methods)
+            // Add return URL if provided
             if (request.getReturnUrl() != null && !request.getReturnUrl().isEmpty()) {
                 paramsBuilder.setReturnUrl(request.getReturnUrl());
             }
             
-            // If payment method ID is provided, confirm immediately
+            // Check if this is auto-confirm (payment method provided)
+            boolean isAutoConfirm = false;
             if (request.getPaymentMethodId() != null && !request.getPaymentMethodId().isEmpty()) {
                 paramsBuilder.setPaymentMethod(request.getPaymentMethodId());
                 paramsBuilder.setConfirm(true);
+                isAutoConfirm = true;
+                log.info("Auto-confirm enabled for payment method: {}", request.getPaymentMethodId());
             }
             
             PaymentIntent paymentIntent = PaymentIntent.create(paramsBuilder.build());
-            log.info("PaymentIntent created: {}", paymentIntent.getId());
+            log.info("PaymentIntent created: {} with status: {}", paymentIntent.getId(), paymentIntent.getStatus());
             
             String transactionId = "TXN-" + System.currentTimeMillis() + "-" + 
                 UUID.randomUUID().toString().substring(0, 8);
             
+            // Create transaction with PENDING status first
             Transaction transaction = new Transaction(
                 transactionId,
                 paymentIntent.getId(),
@@ -125,23 +129,46 @@ public class PaymentService {
                 transaction.setPaymentMethod(request.getPaymentMethodId());
             }
             
-            // Set additional details if available
-            transaction.setPatientName(request.getPatientName());
-            transaction.setPatientEmail(request.getPatientEmail());
-            transaction.setPatientPhone(request.getPatientPhone());
-            transaction.setDoctorName(request.getDoctorName());
-            transaction.setDoctorSpecialty(request.getDoctorSpecialty());
-            transaction.setAppointmentDate(request.getAppointmentDate());
-            transaction.setAppointmentTimeSlot(request.getAppointmentTimeSlot());
+            // Set additional details
+            if (request.getPatientName() != null) transaction.setPatientName(request.getPatientName());
+            if (request.getPatientEmail() != null) transaction.setPatientEmail(request.getPatientEmail());
+            if (request.getPatientPhone() != null) transaction.setPatientPhone(request.getPatientPhone());
+            if (request.getDoctorName() != null) transaction.setDoctorName(request.getDoctorName());
+            if (request.getDoctorSpecialty() != null) transaction.setDoctorSpecialty(request.getDoctorSpecialty());
+            if (request.getAppointmentDate() != null) transaction.setAppointmentDate(request.getAppointmentDate());
+            if (request.getAppointmentTimeSlot() != null) transaction.setAppointmentTimeSlot(request.getAppointmentTimeSlot());
             
             transactionRepository.save(transaction);
-            log.info("Transaction saved with ID: {}", transactionId);
+            log.info("Transaction saved with ID: {} with PENDING status", transactionId);
+            
+            // ========== ALWAYS CALL CONFIRM FOR AUTO-CONFIRM ==========
+            String finalStatus;
+            String finalPaymentIntentId = paymentIntent.getId();
+            String finalTransactionId = transactionId;
+            
+            if (isAutoConfirm) {
+                log.info("Auto-confirm enabled. Calling confirm to update database status...");
+                
+                // Create confirmation DTO
+                PaymentConfirmationDTO confirmation = new PaymentConfirmationDTO();
+                confirmation.setPaymentIntentId(finalPaymentIntentId);
+                confirmation.setTransactionId(finalTransactionId);
+                confirmation.setAppointmentId(request.getAppointmentId());
+                
+                // Call confirmPayment to update the database
+                TransactionDTO confirmedTransaction = confirmPayment(confirmation);
+                finalStatus = confirmedTransaction.getStatus();
+                log.info("Confirm completed. Final status: {}", finalStatus);
+            } else {
+                finalStatus = paymentIntent.getStatus();
+            }
+            // =========================================================
             
             return new PaymentResponse(
                 paymentIntent.getId(),
                 paymentIntent.getClientSecret(),
                 transactionId,
-                paymentIntent.getStatus(),
+                finalStatus,
                 request.getAmount(),
                 request.getCurrency()
             );

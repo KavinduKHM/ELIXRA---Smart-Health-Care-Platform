@@ -58,6 +58,9 @@ public class Transaction {
     private LocalDateTime paidAt;
     private LocalDateTime refundedAt;
     
+    @Column(name = "invoice_id")
+    private Long invoiceId;  // This links to the Invoice
+
     public enum TransactionStatus {
         PENDING, SUCCEEDED, FAILED, REFUNDED, CANCELLED
     }
@@ -158,4 +161,8 @@ public class Transaction {
     
     public LocalDateTime getRefundedAt() { return refundedAt; }
     public void setRefundedAt(LocalDateTime refundedAt) { this.refundedAt = refundedAt; }
+    
+    public Long getInvoiceId() { return invoiceId; }
+    public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
+
 }

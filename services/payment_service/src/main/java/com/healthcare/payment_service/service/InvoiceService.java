@@ -4,6 +4,8 @@ import com.healthcare.payment_service.dto.InvoiceDTO;
 import com.healthcare.payment_service.model.Invoice;
 import com.healthcare.payment_service.model.Transaction;
 import com.healthcare.payment_service.repository.InvoiceRepository;
+import com.healthcare.payment_service.repository.TransactionRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,14 @@ public class InvoiceService {
     
     private static final Logger log = LoggerFactory.getLogger(InvoiceService.class);
     private final InvoiceRepository invoiceRepository;
+    private final TransactionRepository transactionRepository;  
     
     private static final BigDecimal VAT_RATE = new BigDecimal("0.08");  // 8% VAT for Sri Lanka
     private static final BigDecimal SERVICE_CHARGE_RATE = new BigDecimal("0.02"); // 2% service charge
     
-    public InvoiceService(InvoiceRepository invoiceRepository) {
+    public InvoiceService(InvoiceRepository invoiceRepository, TransactionRepository transactionRepository) {
         this.invoiceRepository = invoiceRepository;
+        this.transactionRepository = transactionRepository; 
     }
     
     @Transactional
@@ -84,6 +88,10 @@ public class InvoiceService {
         
         Invoice savedInvoice = invoiceRepository.save(invoice);
         log.info("Invoice generated: {} for transaction: {}", invoiceNumber, transaction.getTransactionId());
+
+         transaction.setInvoiceId(savedInvoice.getId());
+        transactionRepository.save(transaction);
+        log.info("Updated transaction {} with invoice ID: {}", transaction.getTransactionId(), savedInvoice.getId());
         
         return mapToDTO(savedInvoice);
     }
