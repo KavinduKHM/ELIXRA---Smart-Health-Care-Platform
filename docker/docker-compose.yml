@@ -159,9 +159,29 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
       # Cloudinary credentials (replace with actual or use dummy for now)
-      CLOUDINARY_CLOUD_NAME: dummy
-      CLOUDINARY_API_KEY: dummy
-      CLOUDINARY_API_SECRET: dummy
+      CLOUDINARY_CLOUD_NAME: dwona3xzj
+      CLOUDINARY_API_KEY: 541144828641826
+      CLOUDINARY_API_SECRET: RoOFJQi-nLfT0_ExZewiJ_TsOak
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - healthcare-network
+
+  ai-symptom-checker:
+    build:
+      context: ../services/ai_symptom_checker
+      dockerfile: Dockerfile
+    container_name: ai-symptom-checker
+    ports:
+      - "8086:8086"
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+      GEMINI_API_KEY: AIzaSyCudFjsyvesRqy7Hfj5BN17cRHk3_MX_oI
+      # Direct-call fallback when Eureka doesn't have appointment-service instances
+      APPOINTMENT_SERVICE_URL: http://appointment-service:8084
     networks:
       - healthcare-network
 
@@ -170,6 +190,7 @@ volumes:
   mysql_doctor_data:
   mysql-appointment-data:
   mysql-patient-data:
+  mysql-symptom-checker-data:
 
 networks:
   healthcare-network:
