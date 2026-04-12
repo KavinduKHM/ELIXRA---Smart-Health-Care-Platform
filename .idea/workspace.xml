@@ -4,22 +4,55 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< Updated upstream
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/auth_service/auth-run.log" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/RedisConfig.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/RoleDataInitializer.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/ValidationResponse.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/repository/RoleRepository.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/compile.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/AvailabilityRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/DoctorRegistrationRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/PrescriptionDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/model/PrescriptionMedicine.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/PrescriptionRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/client/AppointmentServiceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/DocumentController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/MedicalHistoryController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/ProfileController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/DocumentUploadRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/DocumentService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/PrescriptionService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/patient_service/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/service/PayHereIntegrationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/io/agora/media/DynamicKey5.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/io/agora/media/RtcTokenBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ai/mcp/mcp.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/CODEOWNERS" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/ai_symptom_checker/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/AiSymptomCheckerApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/AiSymptomCheckerApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/client/AppointmentServiceClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/controller/SymptomCheckerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/controller/SymptomCheckerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/dto/DoctorSearchResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/dto/SymptomCheckRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/dto/SymptomCheckResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/service/GeminiAiService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/resources/application.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/services/auth_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/AuthServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/AuthServiceApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/JwtAuthenticationFilter.java" afterDir="false" />
@@ -35,48 +68,105 @@
       <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/AuthService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/JwtService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/UserDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/UserDetailsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/DoctorServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/DoctorServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/AvailabilityDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/AvailabilityDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/DoctorDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/DoctorDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/PrescriptionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/dto/PrescriptionRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/model/Availability.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/model/Availability.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/model/DigitalPrescription.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/model/DigitalPrescription.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/model/Doctor.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/model/Doctor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/AvailabilityRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/AvailabilityRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/DigitalPrescriptionRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/DoctorRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/repository/DoctorRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/NotificationServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/NotificationServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/config/TwilioConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/config/TwilioConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/controller/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/controller/NotificationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/dto/AppointmentDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/model/Notification.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/repository/NotificationRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/NotificationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/WhatsAppService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/PatientServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/PatientServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/config/AppConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/config/CloudinaryConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/config/FeignClientConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/config/JacksonConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/config/MultipartConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/config/MultipartConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/AdminController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/PatientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/controller/PatientController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/DocumentUpdateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/MedicalDocumentDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/MedicalHistoryDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/MedicalHistoryRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PatientDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PatientDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PatientRegistrationRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PatientStatsDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PrescriptionDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PrescriptionDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/PrescriptionMedicationDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/ProfileUpdateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/dto/UploadDocumentRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/exception/DocumentUploadException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/exception/DuplicateResourceException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/exception/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/exception/PatientNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/MedicalDocument.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/MedicalDocument.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/MedicalHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/MedicalHistory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/Patient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/Patient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/Prescription.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/Prescription.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/model/PrescriptionMedication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/MedicalDocumentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/MedicalDocumentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/MedicalHistoryRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/PatientRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/PatientRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/PrescriptionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/repository/PrescriptionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/CloudinaryService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/FileStorageService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/PatientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/patient_service/src/main/java/com/healthcare/patient_service/service/PatientService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/patient_service/uploads/patients/2/ea99f967-79d0-4841-ac81-0ccddfd75b7c.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/config/StripeConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/PaymentServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/PaymentServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/controller/InvoiceController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/controller/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/controller/PaymentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/dto/InvoiceDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/dto/PaymentConfirmationDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/dto/PaymentRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/dto/PaymentRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/dto/PaymentResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/dto/PaymentResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/dto/TransactionDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/model/Invoice.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/model/Invoice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/model/Transaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/model/Transaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/repository/InvoiceRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/repository/TransactionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/repository/TransactionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/service/InvoiceService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/service/PaymentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" afterDir="false" />
     </list>
+=======
+    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="" />
+>>>>>>> Stashed changes
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="CopilotPersistence">
-    <persistenceIdMap>
-      <entry key="_C:/Users/ISURI RANASINGHE/Documents/project/ELIXRA---Smart-Health-Care-Platform" value="3BKhwUPMd1YHZ4a0Cmm2okMINqm" />
-    </persistenceIdMap>
-  </component>
-  <component name="CopilotUserSelectedChatMode">
-    <option name="chatModeId" value="Agent" />
-  </component>
-  <component name="CopilotUserSelectedModel">
-    <selectedModels>
-      <entry key="chat-panel" value="GPT-5.4 mini" />
-      <entry key="agent-panel" value="GPT-5.4 mini" />
-    </selectedModels>
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Dockerfile" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;isuriranasinghe20&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/KavinduKHM/ELIXRA---Smart-Health-Care-Platform.git&quot;,
-    &quot;accountId&quot;: &quot;e32cecc8-8cf1-4ad8-bf12-d8174550b28e&quot;
-  }
-}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -92,32 +182,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Doctor__Management__Service&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "Merging Telemedicine__Service__Final",
+    "kotlin-language-version-configured": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\User\Documents\GitHub\ELIXRA---Smart-Health-Care-Platform\services\appointment_service" />
@@ -140,8 +219,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
       </set>
     </attachedChunks>
   </component>
@@ -153,16 +231,8 @@
       <option name="presentableId" value="Default" />
       <updated>1774243910439</updated>
       <workItem from="1774243913741" duration="11000" />
-      <workItem from="1775361357809" duration="2896000" />
-      <workItem from="1775364787094" duration="7000" />
-      <workItem from="1775364824338" duration="11458000" />
-      <workItem from="1775382848272" duration="2873000" />
-      <workItem from="1775393193830" duration="6335000" />
     </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

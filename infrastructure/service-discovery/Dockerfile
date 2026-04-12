@@ -1,5 +1,11 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-alpine
+
 WORKDIR /app
-COPY target/service-discovery.jar app.jar
+
+COPY target/*.jar app.jar
+
 EXPOSE 8761
+
+RUN apk add --no-cache curl
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
