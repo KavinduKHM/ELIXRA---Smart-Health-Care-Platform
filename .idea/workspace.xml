@@ -4,37 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/auth_service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/RedisConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/RoleDataInitializer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/ValidationResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/repository/RoleRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/AuthServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/AuthServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/JwtAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/AuthResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/AuthResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/LoginRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/RegisterRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/dto/RegisterRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/model/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/model/Role.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/model/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/JwtService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/UserDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/service/UserDetailsServiceImpl.java" afterDir="false" />
-    </list>
+    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
