@@ -34,12 +34,14 @@ spring:
       enabled: true
       file-size-threshold: 2KB
 
-# Disable Eureka for now
+# Eureka client
 eureka:
   client:
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
+    enabled: true
+    service-url:
+      defaultZone: http://service-discovery:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
 
 # Cloudinary Configuration
 cloudinary:

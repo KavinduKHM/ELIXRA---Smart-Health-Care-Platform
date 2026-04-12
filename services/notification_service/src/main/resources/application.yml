@@ -50,7 +50,9 @@ twilio:
 # Eureka (disable for now)
 eureka:
   client:
-    enabled: false
+    enabled: true
+    service-url:
+      defaultZone: http://service-discovery:8761/eureka/
 
 logging:
   level:
