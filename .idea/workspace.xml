@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/Dockerfile" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/RedisConfig.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/services/auth_service/src/main/java/com/healthcare/auth_service/config/RoleDataInitializer.java" afterDir="false" />
@@ -117,6 +118,25 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\User\Documents\GitHub\ELIXRA---Smart-Health-Care-Platform\services\appointment_service" />
+      <recent name="C:\Users\User\Documents\GitHub\ELIXRA---Smart-Health-Care-Platform\services\appointment_service\src" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="ELIXRA---Smart-Health-Care-Platform" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="ELIXRA---Smart-Health-Care-Platform" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
