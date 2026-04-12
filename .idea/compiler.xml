@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="ai_symptom_checker" target="17" />
+      <module name="appointment_service" target="17" />
+      <module name="auth_service" target="17" />
+      <module name="doctor_service" target="17" />
+      <module name="healthcare-platform" target="17" />
+      <module name="notification_service" target="17" />
+      <module name="patient_service" target="17" />
+      <module name="payment_service" target="17" />
+      <module name="service-discovery" target="17" />
+      <module name="telemedicine-service" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
