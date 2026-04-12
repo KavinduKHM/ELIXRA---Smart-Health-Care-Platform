@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< Updated upstream
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
@@ -155,6 +156,9 @@
       <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/config/AgoraConfig.java" afterDir="false" />
     </list>
+=======
+    <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="" />
+>>>>>>> Stashed changes
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
