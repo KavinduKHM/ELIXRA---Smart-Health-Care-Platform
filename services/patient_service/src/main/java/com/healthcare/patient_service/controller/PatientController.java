@@ -29,19 +29,9 @@ public class PatientController {
         PatientDTO patient = patientService.registerPatient(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(patient);
     }
-
-    /**
-     * Get patient by ID – used by Appointment Service
-     */
-    @GetMapping("/{patientId}")
-    public ResponseEntity<PatientDTO> getPatientById(@PathVariable Long patientId) {
-        System.out.println("GET /api/patients/" + patientId);
-        PatientDTO patient = patientService.getPatientProfile(patientId);
-        return ResponseEntity.ok(patient);
-    }
     
     // ==================== PATIENT PROFILE ENDPOINTS ====================
-
+    
     @GetMapping("/{patientId}/profile")
     public ResponseEntity<PatientDTO> getProfile(@PathVariable Long patientId) {
         System.out.println("GET /api/patients/" + patientId + "/profile");
@@ -86,20 +76,13 @@ public class PatientController {
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "notes", required = false) String notes,
             @RequestHeader(value = "X-User-Id", required = false) String uploadedBy) {
-
+        
         System.out.println("POST /api/patients/" + patientId + "/documents - Type: " + documentType);
-
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Missing required multipart part 'file' (or file is empty)");
-        }
-        if (documentType == null || documentType.isBlank()) {
-            throw new IllegalArgumentException("Missing required multipart field 'documentType'");
-        }
-
+        
         String uploader = uploadedBy != null ? "PATIENT:" + uploadedBy : "PATIENT:" + patientId;
         MedicalDocumentDTO document = patientService.uploadDocument(
             patientId, file, documentType, description, notes, uploader);
-
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(document);
     }
     
@@ -232,4 +215,3 @@ public ResponseEntity<Void> deleteMedicalHistory(@PathVariable Long historyId) {
         return ResponseEntity.noContent().build();
     }
 }
-

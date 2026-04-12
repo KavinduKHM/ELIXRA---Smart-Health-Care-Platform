@@ -1,4 +1,4 @@
-package com.healthcare.telemedicine_service.model;
+package com.healthcare.telemedicine.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

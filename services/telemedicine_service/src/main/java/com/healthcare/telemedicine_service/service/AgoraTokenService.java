@@ -1,4 +1,4 @@
-package com.healthcare.telemedicine_service.service;
+package com.healthcare.telemedicine.service;
 
 import io.agora.media.DynamicKey5;
 import io.agora.media.RtcTokenBuilder;
@@ -139,12 +139,4 @@ public class AgoraTokenService {
         }
         return null;
     }
-
-    /**
-     * Exposes the Agora App ID so clients can initialize the Agora SDK.
-     */
-    public String getAppId() {
-        return appId;
-    }
 }
-

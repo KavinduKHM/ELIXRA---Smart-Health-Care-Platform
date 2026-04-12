@@ -1,4 +1,4 @@
-package com.healthcare.telemedicine_service;
+package com.healthcare.telemedicine;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,10 +18,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableScheduling
-public class TelemedicineServiceApplication {
+public class TelemedicineApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TelemedicineServiceApplication.class, args);
+        SpringApplication.run(TelemedicineApplication.class, args);
         System.out.println("╔══════════════════════════════════════════════════════════════╗");
         System.out.println("║     TELEMEDICINE SERVICE STARTED!                            ║");
         System.out.println("║     Port: 8085                                               ║");

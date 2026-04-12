@@ -1,6 +1,6 @@
-package com.healthcare.telemedicine_service.scheduler;
+package com.healthcare.telemedicine.scheduler;
 
-import com.healthcare.telemedicine_service.service.TelemedicineService;
+import com.healthcare.telemedicine.service.TelemedicineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
