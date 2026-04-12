@@ -55,4 +55,9 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
      * Find prescriptions by patient ID ordered by prescription date descending
      */
     List<Prescription> findByPatientIdOrderByPrescriptionDateDesc(Long patientId);
+
+    /**
+     * Find prescriptions by patient ID and appointment ID
+     */
+    java.util.Optional<Prescription> findByPatientIdAndAppointmentId(Long patientId, Long appointmentId);
 }

@@ -214,4 +214,47 @@ public ResponseEntity<Void> deleteMedicalHistory(@PathVariable Long historyId) {
         patientService.permanentlyDeletePatient(patientId);
         return ResponseEntity.noContent().build();
     }
+
+    // ==================== INTERNAL PRESCRIPTION SYNC ====================
+
+    /**
+     * Internal endpoint used by doctor-service to write prescriptions into patient-service DB.
+     * Not intended for direct end-user usage.
+     */
+    @PostMapping("/_internal/prescriptions")
+    public ResponseEntity<PrescriptionDTO> upsertPrescription(@RequestBody DoctorPrescriptionUpsertRequest request) {
+        System.out.println("POST /api/patients/_internal/prescriptions (upsert) patientId=" + request.getPatientId()
+                + ", appointmentId=" + request.getAppointmentId());
+
+        PrescriptionDTO dto = PrescriptionDTO.builder()
+                .patientId(request.getPatientId())
+                .doctorId(request.getDoctorId())
+                .doctorName(request.getDoctorName())
+                .doctorSpecialty(request.getDoctorSpecialty())
+                .appointmentId(request.getAppointmentId())
+                .prescriptionDate(request.getPrescriptionDate())
+                .validUntil(request.getValidUntil())
+                .diagnosis(request.getDiagnosis())
+                .notes(request.getNotes())
+                .isActive(request.isActive())
+                .isFulfilled(request.isFulfilled())
+                .medications(request.getMedications() != null
+                        ? request.getMedications().stream()
+                        .map(m -> PrescriptionMedicationDTO.builder()
+                                .medicationName(m.getMedicationName())
+                                .dosage(m.getDosage())
+                                .frequency(m.getFrequency())
+                                .duration(m.getDuration())
+                                .timing(m.getTiming())
+                                .instructions(m.getInstructions())
+                                .quantity(m.getQuantity())
+                                .refillInfo(m.getRefillInfo())
+                                .build())
+                        .toList()
+                        : java.util.List.of())
+                .build();
+
+        PrescriptionDTO saved = patientService.upsertPrescriptionFromDoctor(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
 }

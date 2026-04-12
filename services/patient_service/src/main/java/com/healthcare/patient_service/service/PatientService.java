@@ -334,9 +334,55 @@ public MedicalDocumentDTO updateDocument(Long patientId, Long documentId,
     
     public List<PrescriptionDTO> getPatientPrescriptions(Long patientId) {
         System.out.println("Fetching prescriptions for patient ID: " + patientId);
-        return List.of();
+
+        if (!patientRepository.existsById(patientId)) {
+            throw new PatientNotFoundException(patientId);
+        }
+
+        List<Prescription> prescriptions =
+                prescriptionRepository.findByPatientIdOrderByPrescriptionDateDesc(patientId);
+
+        return prescriptions.stream()
+                .map(this::mapToPrescriptionDTO)
+                .collect(Collectors.toList());
     }
-    
+
+    private PrescriptionDTO mapToPrescriptionDTO(Prescription prescription) {
+        List<PrescriptionMedicationDTO> meds = null;
+        if (prescription.getMedications() != null) {
+            meds = prescription.getMedications().stream()
+                    .map(m -> PrescriptionMedicationDTO.builder()
+                            .id(m.getId())
+                            .medicationName(m.getMedicationName())
+                            .dosage(m.getDosage())
+                            .frequency(m.getFrequency())
+                            .duration(m.getDuration())
+                            .timing(m.getTiming())
+                            .instructions(m.getInstructions())
+                            .quantity(m.getQuantity())
+                            .refillInfo(m.getRefillInfo())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        return PrescriptionDTO.builder()
+                .id(prescription.getId())
+                .patientId(prescription.getPatient() != null ? prescription.getPatient().getId() : null)
+                .doctorId(prescription.getDoctorId())
+                .doctorName(prescription.getDoctorName())
+                .doctorSpecialty(prescription.getDoctorSpecialty())
+                .appointmentId(prescription.getAppointmentId())
+                .prescriptionDate(prescription.getPrescriptionDate())
+                .validUntil(prescription.getValidUntil())
+                .diagnosis(prescription.getDiagnosis())
+                .notes(prescription.getNotes())
+                .medications(meds)
+                .isActive(prescription.isActive())
+                .isFulfilled(prescription.isFulfilled())
+                .createdAt(prescription.getCreatedAt())
+                .build();
+    }
+
    // ==================== MEDICAL HISTORY METHODS ====================
 
 /**
@@ -782,5 +828,70 @@ private MedicalHistoryDTO mapToMedicalHistoryDTO(MedicalHistory history) {
             .documentDate(document.getDocumentDate())
             .verified(document.isVerified())
             .build();
+    }
+
+    // ==================== PRESCRIPTION SYNC (INTERNAL) ====================
+
+    @Transactional
+    public PrescriptionDTO upsertPrescriptionFromDoctor(PrescriptionDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Prescription payload is required");
+        }
+        if (dto.getPatientId() == null) {
+            throw new IllegalArgumentException("patientId is required");
+        }
+        if (dto.getDoctorId() == null) {
+            throw new IllegalArgumentException("doctorId is required");
+        }
+
+        Patient patient = patientRepository.findById(dto.getPatientId())
+                .orElseThrow(() -> new PatientNotFoundException(dto.getPatientId()));
+
+        // Try to find an existing prescription for the same appointment to make the operation idempotent.
+        Prescription prescription = null;
+        if (dto.getAppointmentId() != null) {
+            prescription = prescriptionRepository
+                    .findByPatientIdAndAppointmentId(dto.getPatientId(), dto.getAppointmentId())
+                    .orElse(null);
+        }
+
+        if (prescription == null) {
+            prescription = new Prescription();
+            prescription.setPatient(patient);
+            // if doctor-service sends its own id, we don't reuse it as PK in patient DB.
+        }
+
+        prescription.setDoctorId(dto.getDoctorId());
+        prescription.setDoctorName(dto.getDoctorName());
+        prescription.setDoctorSpecialty(dto.getDoctorSpecialty());
+        prescription.setAppointmentId(dto.getAppointmentId());
+        prescription.setPrescriptionDate(dto.getPrescriptionDate() != null ? dto.getPrescriptionDate() : LocalDateTime.now());
+        prescription.setValidUntil(dto.getValidUntil());
+        prescription.setDiagnosis(dto.getDiagnosis());
+        prescription.setNotes(dto.getNotes());
+        prescription.setActive(dto.isActive());
+        prescription.setFulfilled(dto.isFulfilled());
+
+        // Replace medications (simple approach)
+        prescription.getMedications().clear();
+        if (dto.getMedications() != null) {
+            for (PrescriptionMedicationDTO m : dto.getMedications()) {
+                var med = com.healthcare.patient_service.model.PrescriptionMedication.builder()
+                        .prescription(prescription)
+                        .medicationName(m.getMedicationName())
+                        .dosage(m.getDosage())
+                        .frequency(m.getFrequency())
+                        .duration(m.getDuration())
+                        .timing(m.getTiming())
+                        .instructions(m.getInstructions())
+                        .quantity(m.getQuantity())
+                        .refillInfo(m.getRefillInfo())
+                        .build();
+                prescription.getMedications().add(med);
+            }
+        }
+
+        Prescription saved = prescriptionRepository.save(prescription);
+        return mapToPrescriptionDTO(saved);
     }
 }
