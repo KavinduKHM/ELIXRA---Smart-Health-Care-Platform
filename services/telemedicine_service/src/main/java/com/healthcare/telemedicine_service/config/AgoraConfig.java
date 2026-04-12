@@ -1,4 +1,4 @@
-package services.telemedicine_service.src.main.java.com.healthcare.telemedicine_service.config;
+package com.healthcare.telemedicine.config;
 
 public class AgoraConfig {
     

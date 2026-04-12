@@ -18,10 +18,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableScheduling
-public class TelemedicineApplication {
+public class TelemedicineServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TelemedicineApplication.class, args);
+        SpringApplication.run(TelemedicineServiceApplication.class, args);
         System.out.println("╔══════════════════════════════════════════════════════════════╗");
         System.out.println("║     TELEMEDICINE SERVICE STARTED!                            ║");
         System.out.println("║     Port: 8085                                               ║");
