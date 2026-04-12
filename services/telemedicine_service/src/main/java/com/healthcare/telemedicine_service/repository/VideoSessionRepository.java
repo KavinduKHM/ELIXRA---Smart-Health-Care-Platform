@@ -1,6 +1,6 @@
-package com.healthcare.telemedicine.repository;
+package com.healthcare.telemedicine_service.repository;
 
-import com.healthcare.telemedicine.model.VideoSession;
+import com.healthcare.telemedicine_service.model.VideoSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

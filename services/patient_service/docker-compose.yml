@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: patient_db
-      MYSQL_ROOT_PASSWORD: Shaini8
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
     volumes:

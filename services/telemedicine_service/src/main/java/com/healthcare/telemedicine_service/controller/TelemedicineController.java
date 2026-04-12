@@ -1,7 +1,7 @@
-package com.healthcare.telemedicine.controller;
+package com.healthcare.telemedicine_service.controller;
 
-import com.healthcare.telemedicine.dto.*;
-import com.healthcare.telemedicine.service.TelemedicineService;
+import com.healthcare.telemedicine_service.dto.*;
+import com.healthcare.telemedicine_service.service.TelemedicineService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -6,15 +6,35 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.healthcare</groupId>
-        <artifactId>healthcare-platform</artifactId>
-        <version>1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <groupId>com.healthcare</groupId>
     <artifactId>service-discovery</artifactId>
+    <version>1.0.0</version>
     <name>Service Discovery</name>
     <description>Eureka Server for Service Discovery</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <!-- Spring Cloud release train compatible with Spring Boot 4.0.x -->
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Eureka Server -->
@@ -31,12 +51,12 @@
     </dependencies>
 
     <build>
+        <finalName>service-discovery</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-        <finalName>service-discovery</finalName>
     </build>
 </project>

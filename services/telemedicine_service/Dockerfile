@@ -1,5 +1,10 @@
-FROM openjdk:17-jdk-slim
+# services/telemedicine_service/Dockerfile
+FROM eclipse-temurin:17-jdk-jammy
+
 WORKDIR /app
+
 COPY target/telemedicine-service.jar app.jar
-EXPOSE 8085
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","app.jar"]

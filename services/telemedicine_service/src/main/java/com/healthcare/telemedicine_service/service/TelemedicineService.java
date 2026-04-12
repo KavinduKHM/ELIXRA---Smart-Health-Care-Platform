@@ -1,8 +1,8 @@
-package com.healthcare.telemedicine.service;
+package com.healthcare.telemedicine_service.service;
 
-import com.healthcare.telemedicine.dto.*;
-import com.healthcare.telemedicine.model.VideoSession;
-import com.healthcare.telemedicine.repository.VideoSessionRepository;
+import com.healthcare.telemedicine_service.dto.*;
+import com.healthcare.telemedicine_service.model.VideoSession;
+import com.healthcare.telemedicine_service.repository.VideoSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -341,6 +341,7 @@ public class TelemedicineService {
      * This is sent to the frontend so the Agora SDK can be initialized.
      */
     public String getAppId() {
-        return this.appId;
+        return agoraTokenService.getAppId();
     }
 }
+
