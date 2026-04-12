@@ -12,7 +12,6 @@ import com.healthcare.patient_service.repository.MedicalDocumentRepository;
 import com.healthcare.patient_service.repository.MedicalHistoryRepository;
 import com.healthcare.patient_service.repository.PatientRepository;
 import com.healthcare.patient_service.repository.PrescriptionRepository;
-import com.healthcare.patient_service.client.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,6 @@ public class PatientService {
     private final PrescriptionRepository prescriptionRepository;
     private final FileStorageService fileStorageService;
     private final CloudinaryService cloudinaryService;
-    private final DoctorServiceClient doctorServiceClient;
     
     @Value("${app.base-url}")
     private String baseUrl;
@@ -43,15 +41,13 @@ public class PatientService {
                           MedicalHistoryRepository medicalHistoryRepository,
                           PrescriptionRepository prescriptionRepository,
                           FileStorageService fileStorageService,
-                          CloudinaryService cloudinaryService,
-                          DoctorServiceClient doctorServiceClient) {
+                          CloudinaryService cloudinaryService) {
         this.patientRepository = patientRepository;
         this.medicalDocumentRepository = medicalDocumentRepository;
         this.medicalHistoryRepository = medicalHistoryRepository;
         this.prescriptionRepository = prescriptionRepository;
         this.fileStorageService = fileStorageService;
         this.cloudinaryService = cloudinaryService;
-        this.doctorServiceClient = doctorServiceClient;
     }
     
     // ==================== PATIENT REGISTRATION ====================
@@ -335,53 +331,10 @@ public MedicalDocumentDTO updateDocument(Long patientId, Long documentId,
     }
 }
     // ==================== PRESCRIPTION METHODS ====================
-
+    
     public List<PrescriptionDTO> getPatientPrescriptions(Long patientId) {
         System.out.println("Fetching prescriptions for patient ID: " + patientId);
-
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new PatientNotFoundException(patientId));
-
-        return prescriptionRepository.findByPatient(patient).stream()
-                .map(this::mapToPrescriptionDTO)
-                .collect(Collectors.toList());
-    }
-
-    private PrescriptionDTO mapToPrescriptionDTO(Prescription prescription) {
-        if (prescription == null) {
-            return null;
-        }
-
-        return PrescriptionDTO.builder()
-                .id(prescription.getId())
-                .patientId(prescription.getPatient() != null ? prescription.getPatient().getId() : null)
-                .doctorId(prescription.getDoctorId())
-                .doctorName(prescription.getDoctorName())
-                .doctorSpecialty(prescription.getDoctorSpecialty())
-                .appointmentId(prescription.getAppointmentId())
-                .prescriptionDate(prescription.getPrescriptionDate())
-                .validUntil(prescription.getValidUntil())
-                .diagnosis(prescription.getDiagnosis())
-                .notes(prescription.getNotes())
-                .medications(prescription.getMedications() != null
-                        ? prescription.getMedications().stream()
-                            .map(m -> PrescriptionMedicationDTO.builder()
-                                    .id(m.getId())
-                                    .medicationName(m.getMedicationName())
-                                    .dosage(m.getDosage())
-                                    .frequency(m.getFrequency())
-                                    .duration(m.getDuration())
-                                    .timing(m.getTiming())
-                                    .instructions(m.getInstructions())
-                                    .quantity(m.getQuantity())
-                                    .refillInfo(m.getRefillInfo())
-                                    .build())
-                            .collect(Collectors.toList())
-                        : null)
-                .isActive(prescription.getIsActive())
-                .isFulfilled(prescription.getIsFulfilled())
-                .createdAt(prescription.getCreatedAt())
-                .build();
+        return List.of();
     }
     
    // ==================== MEDICAL HISTORY METHODS ====================
@@ -831,4 +784,3 @@ private MedicalHistoryDTO mapToMedicalHistoryDTO(MedicalHistory history) {
             .build();
     }
 }
-

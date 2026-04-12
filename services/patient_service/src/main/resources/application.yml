@@ -7,12 +7,23 @@ spring:
   
   # Database Configuration - For Docker (MySQL in container)
   datasource:
-    url: jdbc:mysql://mysql-patient:3306/patient_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://mysql-patient:3306/patient_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: root
+    password: Shaini8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
     show-sql: true
   
   # File Upload Configuration
@@ -26,13 +37,9 @@ spring:
 # Disable Eureka for now
 eureka:
   client:
-    service-url:
-      defaultZone: http://service-discovery:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
-    hostname: patient-service
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
 
 # Cloudinary Configuration
 cloudinary:
@@ -51,4 +58,7 @@ app:
 # Logging
 logging:
   level:
-    com.healthcare.patient_service: INFO
+    com.healthcare.patient: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
