@@ -1,10 +1,15 @@
-# services/patient_service/Dockerfile
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-COPY target/patient-service.jar app.jar
+# Copy any JAR from target folder
+COPY target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8082
 
-ENTRYPOINT ["java","-jar","app.jar"]
+RUN apk add --no-cache curl
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8082/actuator/health || exit 1
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
