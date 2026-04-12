@@ -19,13 +19,6 @@ target/
 *.iml
 *.ipr
 
-# Environment variables
-.env
-*.env
-
-# Stripe keys
-*stripe*.key
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

@@ -22,6 +22,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+
         
         <!-- Spring Data JPA - For database operations -->
         <dependency>
@@ -54,13 +56,10 @@
             <version>8.0.33</version>
         </dependency>
         
-        <!-- Agora Token Generator - For video session authentication -->
-        <dependency>
-            <groupId>io.agora</groupId>
-            <artifactId>agora-sdk</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-        
+        <!-- NOTE: Agora SDK dependency removed for local development; a minimal local implementation
+             of the token builder exists under src/main/java/io/agora/media to allow compilation.
+             For production use, add the official Agora SDK as instructed in project docs. -->
+
         <!-- JWT - For token validation -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
