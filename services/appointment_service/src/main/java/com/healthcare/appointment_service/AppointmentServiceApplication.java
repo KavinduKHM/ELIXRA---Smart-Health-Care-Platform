@@ -19,12 +19,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 public class AppointmentServiceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(AppointmentServiceApplication.class, args);
-        System.out.println("╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║     APPOINTMENT SERVICE STARTED SUCCESSFULLY!                ║");
-        System.out.println("║     Port: 8084                                               ║");
-        System.out.println("║     API Base: http://localhost:8084/api/appointments         ║");
-        System.out.println("╚══════════════════════════════════════════════════════════════╝");
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(AppointmentServiceApplication.class, args);
+		System.out.println("╔══════════════════════════════════════════════════════════════╗");
+		System.out.println("║     APPOINTMENT SERVICE STARTED SUCCESSFULLY!                ║");
+		System.out.println("║     Port: 8084                                               ║");
+		System.out.println("║     API Base: http://localhost:8084/api/appointments         ║");
+		System.out.println("╚══════════════════════════════════════════════════════════════╝");
+	}
 }

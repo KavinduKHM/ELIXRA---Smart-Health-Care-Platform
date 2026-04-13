@@ -1,0 +1,65 @@
+server:
+  port: 3002
+
+spring:
+  application:
+    name: notification-service
+
+  # MySQL Database Configuration (same as appointment service)
+  datasource:
+    url: jdbc:mysql://localhost:3307/notification_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+
+  # Email Configuration (Gmail)
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: oshadha72mihiran@gmail.com
+    password: fxswvzorkzedtijm
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            trust: smtp.gmail.com
+            protocols: TLSv1.2
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+# Twilio Configuration (WhatsApp)
+twilio:
+  account-sid: AC9bb02e250714fc4811af1fba72ecb518
+  auth-token: 5561f4668c81e9f26b8e6e5a77d4925b
+  whatsapp-number: whatsapp:+14155238886
+
+# Eureka (disable for now)
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://service-discovery:8761/eureka/
+
+logging:
+  level:
+    com.healthcare.notification_service: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

@@ -2,19 +2,10 @@ server:
   port: 8084
 
 spring:
-
   application:
-    name: appointment-service
+    name: appointment_service
 
-  datasource:
-    url: jdbc:mysql://mysql-appointment:3306/appointment_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: root
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-
+# Eureka client configuration (Docker-compose network uses service-discovery hostname)
 eureka:
   client:
     service-url:
@@ -23,8 +14,14 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
-    hostname: appointment-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
 
 logging:
   level:
-    com.healthcare.appointment_service: INFO
+    com.healthcare.appointment_service: DEBUG
+

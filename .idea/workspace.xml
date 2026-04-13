@@ -5,20 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/ai_symptom_checker/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/client/AppointmentServiceClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/dto/DoctorSearchResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/dto/SymptomCheckRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/dto/SymptomCheckResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/service/GeminiAiService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/ai_symptom_checker/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/AiSymptomCheckerApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/AiSymptomCheckerApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/controller/SymptomCheckerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/ai_symptom_checker/src/main/java/com/healthcare/ai_symptom_checker/controller/SymptomCheckerController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +41,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Telemedicine__Service__Final&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }

@@ -2,30 +2,26 @@ server:
   port: 8083
 
 spring:
-
   application:
     name: doctor-service
 
-  datasource:
-    url: jdbc:mysql://mysql-doctor:3306/doctor_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: root
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
+# Eureka client configuration (Docker-compose network uses service-discovery hostname)
 eureka:
   client:
-    enabled: true
-    register-with-eureka: true
-    fetch-registry: true
     service-url:
       defaultZone: http://service-discovery:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
   instance:
     prefer-ip-address: true
-    hostname: doctor-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
 
 logging:
   level:
-    com.netflix.discovery: DEBUG
+    com.healthcare.doctor_service: DEBUG
+

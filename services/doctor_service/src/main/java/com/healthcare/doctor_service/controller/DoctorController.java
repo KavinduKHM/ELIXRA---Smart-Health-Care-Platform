@@ -7,14 +7,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.healthcare.doctor_service.dto.*;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import com.healthcare.doctor_service.client.TelemedicineServiceClient;
+import com.healthcare.doctor_service.dto.telemedicine.CreateVideoSessionRequest;
+import com.healthcare.doctor_service.dto.telemedicine.VideoSessionDetailsDTO;
+import com.healthcare.doctor_service.dto.telemedicine.JoinVideoSessionRequest;
+import com.healthcare.doctor_service.dto.telemedicine.JoinVideoSessionResponse;
+import com.healthcare.doctor_service.dto.telemedicine.TelemedicineJoinSessionRequest;
+import com.healthcare.doctor_service.dto.telemedicine.EndVideoSessionRequest;
+import com.healthcare.doctor_service.dto.telemedicine.TelemedicineEndSessionRequest;
 
 /**
  * Doctor Controller - Handles all doctor-related operations
@@ -30,6 +38,7 @@ import java.util.List;
 public class DoctorController {
 
     private final DoctorService doctorService;
+    private final TelemedicineServiceClient telemedicineServiceClient;
 
     // ==================== Doctor Profile Endpoints ====================
 
@@ -41,15 +50,6 @@ public class DoctorController {
     public ResponseEntity<DoctorDTO> registerDoctor(@Valid @RequestBody DoctorRegistrationRequest request) {
         DoctorDTO doctor = doctorService.registerDoctor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(doctor);
-    }
-
-    /**
-     * Get all prescriptions for a specific patient (used by Patient Service)
-     */
-    @GetMapping("/prescriptions/patient/{patientId}")
-    public ResponseEntity<List<PrescriptionDTO>> getPrescriptionsByPatient(@PathVariable Long patientId) {
-        List<PrescriptionDTO> prescriptions = doctorService.getPrescriptionsByPatient(patientId);
-        return ResponseEntity.ok(prescriptions);
     }
 
     /**
@@ -85,34 +85,11 @@ public class DoctorController {
     }
 
     /**
-     * Search doctors by specialty and/or name.
-     *
-     * NOTE: appointment-service calls this via Feign:
-     * GET /api/doctors/search?specialty=...&name=...
+     * Search doctors by name or specialty (public endpoint for patients)
+     * GET /api/doctors/search?q={search}
      */
     @GetMapping("/search")
-    public ResponseEntity<List<DoctorDTO>> searchDoctors(
-            @RequestParam(value = "specialty", required = false) String specialty,
-            @RequestParam(value = "name", required = false) String name) {
-
-        String q = "";
-        if (specialty != null && !specialty.isBlank()) {
-            q = specialty.trim();
-        }
-        if (name != null && !name.isBlank()) {
-            q = (q.isBlank() ? "" : (q + " ")) + name.trim();
-        }
-
-        List<DoctorDTO> doctors = doctorService.searchDoctors(q, Pageable.unpaged()).getContent();
-        return ResponseEntity.ok(doctors);
-    }
-
-    /**
-     * Search doctors by name or specialty (paged, for UI usage)
-     * GET /api/doctors/search-page?q={search}
-     */
-    @GetMapping("/search-page")
-    public ResponseEntity<Page<DoctorDTO>> searchDoctorsPaged(
+    public ResponseEntity<Page<DoctorDTO>> searchDoctors(
             @RequestParam(required = false, defaultValue = "") String q,
             @PageableDefault(size = 10) Pageable pageable) {
         Page<DoctorDTO> doctors = doctorService.searchDoctors(q, pageable);
@@ -243,33 +220,50 @@ public class DoctorController {
         return ResponseEntity.ok(prescription);
     }
 
-    /**
-     * Check if a doctor is available at a specific date and time.
-     * Used by Appointment Service to validate slot before booking.
-     *
-     * GET /api/doctors/{doctorId}/check-availability?time=2024-04-10T10:00:00
-     */
-    @GetMapping("/{doctorId}/check-availability")
-    public ResponseEntity<Boolean> checkAvailability(
-            @PathVariable Long doctorId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time) {
+    // ==================== Telemedicine (Video Session) Endpoints ====================
 
-        boolean available = doctorService.isDoctorAvailable(doctorId, time);
-        return ResponseEntity.ok(available);
+    /**
+     * Create a new video session (Doctor initiates).
+     * POST /api/doctors/video/sessions
+     */
+    @PostMapping("/video/sessions")
+    public ResponseEntity<VideoSessionDetailsDTO> createVideoSession(
+            @Valid @RequestBody CreateVideoSessionRequest request) {
+        VideoSessionDetailsDTO created = telemedicineServiceClient.createSession(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     /**
-     * Book a time slot (mark as booked) after an appointment is confirmed.
-     * Used by Appointment Service to prevent double‑booking.
-     *
-     * POST /api/doctors/{doctorId}/book-slot?time=2024-04-10T10:00:00
+     * Join an existing video session as doctor.
+     * POST /api/doctors/video/sessions/join
      */
-    @PostMapping("/{doctorId}/book-slot")
-    public ResponseEntity<Void> bookTimeSlot(
-            @PathVariable Long doctorId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time) {
+    @PostMapping("/video/sessions/join")
+    public ResponseEntity<JoinVideoSessionResponse> joinVideoSession(
+            @Valid @RequestBody JoinVideoSessionRequest request) {
 
-        doctorService.bookTimeSlot(doctorId, time);
-        return ResponseEntity.ok().build();
+        TelemedicineJoinSessionRequest tReq = new TelemedicineJoinSessionRequest();
+        tReq.setSessionId(request.getSessionId());
+        tReq.setUserId(request.getDoctorId());
+        tReq.setUserRole("DOCTOR");
+
+        JoinVideoSessionResponse resp = telemedicineServiceClient.joinSession(tReq);
+        return ResponseEntity.ok(resp);
+    }
+
+    /**
+     * End a video session as doctor.
+     * POST /api/doctors/video/sessions/end
+     */
+    @PostMapping("/video/sessions/end")
+    public ResponseEntity<VideoSessionDetailsDTO> endVideoSession(
+            @Valid @RequestBody EndVideoSessionRequest request) {
+
+        TelemedicineEndSessionRequest tReq = new TelemedicineEndSessionRequest();
+        tReq.setSessionId(request.getSessionId());
+        tReq.setUserId(request.getDoctorId());
+        tReq.setConsultationNotes(request.getConsultationNotes());
+
+        VideoSessionDetailsDTO ended = telemedicineServiceClient.endSession(tReq);
+        return ResponseEntity.ok(ended);
     }
 }

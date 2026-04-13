@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Payload sent to patient-service to persist a copy of the prescription.
+ * Payload sent from doctor-service to patient-service to persist a prescription in patient DB.
  */
 @Data
 @Builder

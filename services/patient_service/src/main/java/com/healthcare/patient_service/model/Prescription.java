@@ -67,14 +67,4 @@ public class Prescription {
     
     private boolean isActive = true;
     private boolean isFulfilled = false;  // Whether medications were dispensed
-
-    // Lombok may generate isActive()/isFulfilled() for boolean fields; however parts of the codebase
-    // call getIsActive()/getIsFulfilled(), so we provide explicit getters for compatibility.
-    public boolean getIsActive() {
-        return isActive;
-    }
-
-    public boolean getIsFulfilled() {
-        return isFulfilled;
-    }
 }

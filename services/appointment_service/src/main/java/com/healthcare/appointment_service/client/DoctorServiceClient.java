@@ -1,9 +1,9 @@
 package com.healthcare.appointment_service.client;
 
-import com.healthcare.appointment_service.dto.AvailabilityDTO;
 import com.healthcare.appointment_service.dto.DoctorDTO;
+import com.healthcare.appointment_service.dto.DoctorSearchResponse;
+import com.healthcare.appointment_service.dto.TimeSlotDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,25 +27,20 @@ public interface DoctorServiceClient {
     DoctorDTO getDoctorById(@PathVariable("id") Long id);
 
     /**
-     * Search doctors by specialty and/or name.
-     *
-     * doctor-service endpoint: GET /api/doctors/search?specialty=...&name=...
-     * Returns a list (unpaged).
+     * Search doctors by specialty
      */
     @GetMapping("/api/doctors/search")
-    List<DoctorDTO> searchDoctors(
+    List<DoctorSearchResponse> searchDoctors(
             @RequestParam(value = "specialty", required = false) String specialty,
             @RequestParam(value = "name", required = false) String name);
 
     /**
-     * Get available slots for a doctor on a specific date.
-     *
-     * doctor-service endpoint: GET /api/doctors/{doctorId}/availability/slots?date=YYYY-MM-DD
+     * Get available time slots for a doctor on a specific date
      */
-    @GetMapping("/api/doctors/{id}/availability/slots")
-    List<AvailabilityDTO> getAvailableSlots(
+    @GetMapping("/api/doctors/{id}/available-slots")
+    List<TimeSlotDTO> getAvailableSlots(
             @PathVariable("id") Long doctorId,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date);
+            @RequestParam("date") LocalDate date);
 
     /**
      * Check if doctor is available at specific time
@@ -53,8 +48,7 @@ public interface DoctorServiceClient {
     @GetMapping("/api/doctors/{id}/check-availability")
     boolean checkAvailability(
             @PathVariable("id") Long doctorId,
-            @RequestParam("time")
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime time);
+            @RequestParam("time") LocalDateTime time);
 
     /**
      * Book a time slot (marks it as booked in doctor service)
@@ -62,6 +56,5 @@ public interface DoctorServiceClient {
     @PostMapping("/api/doctors/{id}/book-slot")
     void bookTimeSlot(
             @PathVariable("id") Long doctorId,
-            @RequestParam("time")
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime time);
+            @RequestParam("time") LocalDateTime time);
 }

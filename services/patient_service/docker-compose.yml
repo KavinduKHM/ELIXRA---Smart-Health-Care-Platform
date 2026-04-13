@@ -1,0 +1,32 @@
+services:
+  mysql-patient:
+    image: mysql:8.0
+    container_name: mysql-patient
+    restart: always
+    environment:
+      MYSQL_DATABASE: patient_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  patient-service:
+    image: healthcare/patient-service:1.0.0
+    container_name: patient-service
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-patient:3306/patient_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Shaini8
+      CLOUDINARY_CLOUD_NAME: dwona3xzj
+      CLOUDINARY_API_KEY: 541144828641826
+      CLOUDINARY_API_SECRET: RoOFJQi-nLfT0_ExZewiJ_TsOak
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - mysql-patient
+
+volumes:
+  mysql-data:

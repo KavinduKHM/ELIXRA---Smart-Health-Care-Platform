@@ -49,33 +49,54 @@ public class AppointmentService {
      * @return List of doctors matching criteria
      */
     public List<DoctorSearchResponse> searchDoctors(SearchRequest request) {
-        log.info("Searching doctors via Doctor Service with specialty: {}", request.getSpecialty());
+        log.info("Searching doctors with specialty: {}", request.getSpecialty());
 
-        List<DoctorDTO> doctorsFromDoctorService = doctorServiceClient.searchDoctors(
-                request.getSpecialty(), request.getDoctorName());
+        // ========== TEMPORARY: Return mock doctors instead of calling doctor service ==========
 
-        List<DoctorSearchResponse> doctors = doctorsFromDoctorService.stream()
-                .map(dto -> {
-                    DoctorSearchResponse response = new DoctorSearchResponse();
-                    response.setId(dto.getId());
-                    response.setName(dto.getFullName());
-                    response.setSpecialty(dto.getSpecialty());
-                    response.setQualification(dto.getQualification());
-                    response.setConsultationFee(dto.getConsultationFee());
-                    response.setRating(dto.getAverageRating());
-                    response.setExperienceYears(dto.getExperienceYears());
-                    return response;
-                })
-                .collect(Collectors.toList());
+        List<DoctorSearchResponse> mockDoctors = new ArrayList<>();
 
-        if (request.getDate() != null) {
-            for (DoctorSearchResponse doctor : doctors) {
+        // Mock doctors data
+        String[] specialties = {"Cardiology", "Dermatology", "Pediatrics", "Orthopedics", "Neurology",
+                "Ophthalmology", "ENT", "Gastroenterology", "Psychiatry", "General Medicine"};
+        String[] names = {"Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown", "Dr. Jones",
+                "Dr. Garcia", "Dr. Miller", "Dr. Davis", "Dr. Rodriguez", "Dr. Martinez"};
+
+        for (int i = 0; i < specialties.length; i++) {
+            // Filter by specialty if provided
+            if (request.getSpecialty() != null && !request.getSpecialty().isEmpty()) {
+                if (!specialties[i].toLowerCase().contains(request.getSpecialty().toLowerCase())) {
+                    continue;
+                }
+            }
+
+            // Filter by name if provided
+            if (request.getDoctorName() != null && !request.getDoctorName().isEmpty()) {
+                if (!names[i].toLowerCase().contains(request.getDoctorName().toLowerCase())) {
+                    continue;
+                }
+            }
+
+            DoctorSearchResponse doctor = DoctorSearchResponse.builder()
+                    .id((long) (i + 101))
+                    .name(names[i])
+                    .specialty(specialties[i])
+                    .qualification("MD, PhD")
+                    .consultationFee(1500.0 + (i * 100))
+                    .rating(4.5 - (i * 0.1))
+                    .experienceYears(5 + i)
+                    .build();
+
+            // If date is provided, add available slots
+            if (request.getDate() != null) {
                 List<TimeSlotDTO> slots = getAvailableSlots(doctor.getId(), request.getDate().atStartOfDay());
                 doctor.setAvailableSlots(slots);
             }
+
+            mockDoctors.add(doctor);
         }
 
-        return doctors;
+        log.info("Found {} doctors matching criteria", mockDoctors.size());
+        return mockDoctors;
     }
     /**
      * Get available time slots for a specific doctor on a specific date
@@ -92,37 +113,35 @@ public class AppointmentService {
      * @return List of available time slots
      */
     public List<TimeSlotDTO> getAvailableSlots(Long doctorId, LocalDateTime date) {
-        log.info("Getting available slots for doctor {} from Doctor Service", doctorId);
+        log.info("Getting available slots for doctor: {} on date: {}", doctorId, date);
 
-        // Doctor Service returns AvailabilityDTO; map to our API model TimeSlotDTO
-        List<AvailabilityDTO> availability = doctorServiceClient.getAvailableSlots(doctorId, date.toLocalDate());
-        if (availability == null) {
-            return List.of();
+        // ========== TEMPORARY: Return mock time slots instead of calling doctor service ==========
+        // Since doctor service is not available, generate mock time slots for testing
+
+        List<TimeSlotDTO> mockSlots = new ArrayList<>();
+
+        // Generate time slots from 9 AM to 5 PM
+        LocalDateTime startTime = date.withHour(9).withMinute(0).withSecond(0);
+        LocalDateTime endTime = date.withHour(17).withMinute(0).withSecond(0);
+
+        while (startTime.isBefore(endTime)) {
+            TimeSlotDTO slot = new TimeSlotDTO();
+            slot.setId((long) mockSlots.size() + 1);
+            slot.setDoctorId(doctorId);
+            slot.setStartTime(startTime);
+            slot.setEndTime(startTime.plusMinutes(30));
+            slot.setIsBooked(false);
+
+            // Check if this slot is already booked in appointment service
+            boolean isBooked = appointmentRepository.isTimeSlotBooked(doctorId, startTime);
+            slot.setIsBooked(isBooked);
+
+            mockSlots.add(slot);
+            startTime = startTime.plusMinutes(30);
         }
 
-        return availability.stream()
-                .map(a -> {
-                    TimeSlotDTO slot = new TimeSlotDTO();
-                    slot.setId(a.getId());
-                    slot.setDoctorId(a.getDoctorId() != null ? a.getDoctorId() : doctorId);
-
-                    // doctor-service provides availableDate + LocalTime start/end
-                    if (a.getAvailableDate() != null && a.getStartTime() != null) {
-                        slot.setStartTime(LocalDateTime.of(a.getAvailableDate(), a.getStartTime()));
-                    }
-                    if (a.getAvailableDate() != null && a.getEndTime() != null) {
-                        slot.setEndTime(LocalDateTime.of(a.getAvailableDate(), a.getEndTime()));
-                    }
-
-                    // doctor-service AvailabilityStatus enum is serialized as a string
-                    // Treat BOOKED as booked; everything else as not booked.
-                    if (a.getStatus() != null) {
-                        slot.setIsBooked("BOOKED".equalsIgnoreCase(a.getStatus()));
-                    }
-
-                    return slot;
-                })
-                .collect(Collectors.toList());
+        log.info("Returning {} mock available slots for doctor {}", mockSlots.size(), doctorId);
+        return mockSlots;
     }
     /**
      * Book a new appointment
@@ -141,32 +160,40 @@ public class AppointmentService {
         log.info("Booking appointment for patient: {} with doctor: {} at: {}",
                 request.getPatientId(), request.getDoctorId(), request.getAppointmentTime());
 
-        // 1. Get patient details (if Patient Service exists; otherwise use fallback)
-        PatientDTO patient;
-        try {
-            patient = patientServiceClient.getPatientById(request.getPatientId());
-        } catch (Exception e) {
-            log.warn("Patient service unavailable, using mock patient");
-            patient = new PatientDTO();
-            patient.setId(request.getPatientId());
-            patient.setFirstName("Patient");
-            patient.setLastName(String.valueOf(request.getPatientId()));
-        }
+        // ========== TEMPORARILY COMMENTED OUT - REMOVE WHEN PATIENT/DOCTOR SERVICES ARE READY ==========
+        // Step 1: Validate patient exists (call patient service)
+        // PatientDTO patient = patientServiceClient.getPatientById(request.getPatientId());
+        // if (patient == null) {
+        //     throw new RuntimeException("Patient not found with ID: " + request.getPatientId());
+        // }
 
-        // 2. Get doctor details from Doctor Service
-        DoctorDTO doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
-        if (doctor == null) {
-            throw new RuntimeException("Doctor not found with ID: " + request.getDoctorId());
-        }
+        // Step 2: Validate doctor exists and is available (call doctor service)
+        // DoctorDTO doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
+        // if (doctor == null) {
+        //     throw new RuntimeException("Doctor not found with ID: " + request.getDoctorId());
+        // }
 
-        // 3. Check availability via Doctor Service
-        boolean isAvailable = doctorServiceClient.checkAvailability(
-                request.getDoctorId(), request.getAppointmentTime());
-        if (!isAvailable) {
-            throw new RuntimeException("Doctor is not available at the requested time");
-        }
+        // Step 3: Check if time slot is available
+        // boolean isAvailable = doctorServiceClient.checkAvailability(
+        //         request.getDoctorId(), request.getAppointmentTime());
+        // if (!isAvailable) {
+        //     throw new RuntimeException("Doctor is not available at the requested time");
+        // }
+        // ========== END OF COMMENTED OUT SECTION ==========
 
-        // 4. Check for conflicts with existing appointments in Appointment Service
+        // Create mock patient and doctor for testing
+        PatientDTO patient = new PatientDTO();
+        patient.setId(request.getPatientId());
+        patient.setFirstName("Test");
+        patient.setLastName("Patient");
+
+        DoctorDTO doctor = new DoctorDTO();
+        doctor.setId(request.getDoctorId());
+        doctor.setFirstName("Test");
+        doctor.setLastName("Doctor");
+        doctor.setSpecialty("General Medicine");
+
+        // Check for conflicts with existing appointments (skip time availability check for now)
         LocalDateTime endTime = request.getAppointmentTime()
                 .plusMinutes(request.getDurationMinutes());
         List<Appointment> conflicts = appointmentRepository.findConflictingAppointments(
@@ -175,7 +202,7 @@ public class AppointmentService {
             throw new RuntimeException("Time slot is already booked");
         }
 
-        // 5. Create and save appointment
+        // Create and save appointment
         Appointment appointment = Appointment.builder()
                 .patientId(request.getPatientId())
                 .doctorId(request.getDoctorId())
@@ -188,11 +215,9 @@ public class AppointmentService {
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
-        // 6. Tell Doctor Service to book this time slot
-        doctorServiceClient.bookTimeSlot(request.getDoctorId(), request.getAppointmentTime());
-
         log.info("Appointment booked successfully with ID: {}", savedAppointment.getId());
 
+        // Build and return response
         return buildResponse(savedAppointment, patient, doctor);
     }
     /**
@@ -213,19 +238,18 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found with ID: " + id));
 
-        // Get doctor details from Doctor Service
-        DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
+        // ========== TEMPORARY: Use mock data for patient/doctor ==========
+        // Instead of calling external services, use mock data
+        PatientDTO patient = new PatientDTO();
+        patient.setId(appointment.getPatientId());
+        patient.setFirstName("Patient");
+        patient.setLastName(String.valueOf(appointment.getPatientId()));
 
-        // Patient details (fallback if Patient Service not ready)
-        PatientDTO patient;
-        try {
-            patient = patientServiceClient.getPatientById(appointment.getPatientId());
-        } catch (Exception e) {
-            patient = new PatientDTO();
-            patient.setId(appointment.getPatientId());
-            patient.setFirstName("Patient");
-            patient.setLastName(String.valueOf(appointment.getPatientId()));
-        }
+        DoctorDTO doctor = new DoctorDTO();
+        doctor.setId(appointment.getDoctorId());
+        doctor.setFirstName("Dr.");
+        doctor.setLastName(String.valueOf(appointment.getDoctorId()));
+        doctor.setSpecialty("General Medicine");
 
         return buildResponse(appointment, patient, doctor);
     }
@@ -252,8 +276,12 @@ public class AppointmentService {
                 patientId, PageRequest.of(page, size));
 
         return appointments.map(appointment -> {
-            // Fetch doctor details for each appointment
-            DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
+            // Use mock doctor data instead of calling doctor service
+            DoctorDTO doctor = new DoctorDTO();
+            doctor.setId(appointment.getDoctorId());
+            doctor.setFirstName("Dr.");
+            doctor.setLastName(String.valueOf(appointment.getDoctorId()));
+            doctor.setSpecialty("General Medicine");
             return buildResponse(appointment, null, doctor);
         });
     }
@@ -280,7 +308,7 @@ public class AppointmentService {
                 doctorId, PageRequest.of(page, size));
 
         return appointments.map(appointment -> {
-            // Patient details (fallback)
+            // Use mock patient data instead of calling patient service
             PatientDTO patient = new PatientDTO();
             patient.setId(appointment.getPatientId());
             patient.setFirstName("Patient");
@@ -345,13 +373,13 @@ public class AppointmentService {
      * @return Cancelled appointment details
      */
 
-/**
- * Cancel an appointment
- *
- * @param id Appointment ID
- * @param request Cancellation reason
- * @return Cancelled appointment details
- */
+    /**
+     * Cancel an appointment
+     *
+     * @param id Appointment ID
+     * @param request Cancellation reason
+     * @return Cancelled appointment details
+     */
     @Transactional
     public AppointmentResponse cancelAppointment(Long id, CancelRequest request) {
         log.info("Cancelling appointment: {}", id);
@@ -601,5 +629,3 @@ public class AppointmentService {
         return builder.build();
     }
 }
-
-
