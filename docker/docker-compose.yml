@@ -177,9 +177,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
       # Cloudinary credentials (replace with actual or use dummy for now)
-      CLOUDINARY_CLOUD_NAME: dwona3xzj
-      CLOUDINARY_API_KEY: 541144828641826
-      CLOUDINARY_API_SECRET: RoOFJQi-nLfT0_ExZewiJ_TsOak
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     networks:
       - healthcare-network
@@ -197,7 +197,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
-      GEMINI_API_KEY: AIzaSyCudFjsyvesRqy7Hfj5BN17cRHk3_MX_oI
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
       # Direct-call fallback when Eureka doesn't have appointment-service instances
       APPOINTMENT_SERVICE_URL: http://appointment-service:8084
     networks:
@@ -218,7 +218,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
-      STRIPE_SECRET_KEY: sk_test_51T52BqKEHCBvBCfzPi0M8snSEx393UTwUn5R6oGGwFWuKyR4DinZyspfd0jCcr3Z2TtbAO8hUrzKXjdtiPYGiNPo00WkchlkyC
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
     networks:
       - healthcare-network
 
