@@ -1,0 +1,244 @@
+.ud-shell {
+  --ud-bg: #f4f8fd;
+  --ud-card: #ffffff;
+  --ud-border: #dbe6f3;
+  --ud-text: #182a42;
+  --ud-subtle: #607086;
+  --ud-primary: #2f80ed;
+  --ud-success: #1f9d67;
+  --ud-danger: #c94848;
+  min-height: 100vh;
+  padding: 20px;
+  color: var(--ud-text);
+  display: grid;
+  grid-template-columns: minmax(320px, 920px);
+  justify-content: center;
+  align-content: start;
+  gap: 14px;
+  background:
+    radial-gradient(circle at 8% 6%, rgba(157, 201, 255, 0.2), transparent 28%),
+    radial-gradient(circle at 94% 94%, rgba(173, 235, 209, 0.22), transparent 26%),
+    var(--ud-bg);
+}
+
+.ud-header,
+.ud-form,
+.ud-alert {
+  background: var(--ud-card);
+  border: 1px solid var(--ud-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.07);
+}
+
+.ud-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ud-header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2f80ed, #1f9d67);
+}
+
+.ud-header h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.ud-header p {
+  margin: 7px 0 0;
+  color: var(--ud-subtle);
+}
+
+.ud-link {
+  border: 1px solid #bfd3f2;
+  border-radius: 10px;
+  color: #2f5faa;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 9px 13px;
+  background: #f4f9ff;
+}
+
+.ud-alert {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ud-alert-success {
+  border-left: 4px solid var(--ud-success);
+}
+
+.ud-alert-error {
+  border-left: 4px solid var(--ud-danger);
+}
+
+.ud-alert-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.ud-form {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ud-field {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #4f627c;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+}
+
+.ud-field-full {
+  grid-column: span 2;
+}
+
+.ud-field input,
+.ud-field textarea {
+  border: 1px solid #ccd8ea;
+  border-radius: 11px;
+  padding: 11px 12px;
+  font-size: 14px;
+  color: #203652;
+  background: #fff;
+  outline: none;
+  font-weight: 500;
+}
+
+.ud-field input:focus,
+.ud-field textarea:focus {
+  border-color: #4b85d3;
+  box-shadow: 0 0 0 3px rgba(56, 126, 222, 0.16);
+}
+
+.ud-input-error {
+  border-color: #db5f5f !important;
+}
+
+.ud-required {
+  color: #b43f3f;
+  margin-left: 2px;
+}
+
+.ud-error {
+  color: #b43f3f;
+  font-size: 12px;
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+.ud-file-meta {
+  color: #607086;
+  font-size: 12px;
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+.ud-progress-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.ud-progress-label {
+  font-size: 12px;
+  color: #4f627c;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.ud-progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #e7eef9;
+  overflow: hidden;
+}
+
+.ud-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2f80ed, #1f9d67);
+  transition: width 0.2s ease;
+}
+
+.ud-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.ud-btn {
+  border-radius: 11px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ud-btn-secondary {
+  background: #fff;
+  border-color: #bfd3f2;
+  color: #2f5faa;
+}
+
+.ud-btn-primary {
+  background: var(--ud-primary);
+  border-color: var(--ud-primary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ud-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ud-btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 900px) {
+  .ud-form {
+    grid-template-columns: 1fr;
+  }
+
+  .ud-field-full {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .ud-shell {
+    padding: 12px;
+  }
+
+  .ud-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ud-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,237 @@
+.mhf-shell {
+  --mhf-bg: #f4f8fd;
+  --mhf-card: #ffffff;
+  --mhf-border: #dbe6f3;
+  --mhf-text: #182a42;
+  --mhf-subtle: #607086;
+  --mhf-primary: #2f80ed;
+  --mhf-success: #1f9d67;
+  --mhf-danger: #c94848;
+  min-height: 100vh;
+  padding: 20px;
+  color: var(--mhf-text);
+  display: grid;
+  grid-template-columns: minmax(320px, 920px);
+  justify-content: center;
+  align-content: start;
+  gap: 14px;
+  background:
+    radial-gradient(circle at 8% 6%, rgba(157, 201, 255, 0.2), transparent 28%),
+    radial-gradient(circle at 94% 94%, rgba(173, 235, 209, 0.22), transparent 26%),
+    var(--mhf-bg);
+}
+
+.mhf-header,
+.mhf-form,
+.mhf-alert {
+  background: var(--mhf-card);
+  border: 1px solid var(--mhf-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.07);
+}
+
+.mhf-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.mhf-header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2f80ed, #1f9d67);
+}
+
+.mhf-header h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.mhf-header p {
+  margin: 7px 0 0;
+  color: var(--mhf-subtle);
+  max-width: 640px;
+}
+
+.mhf-link {
+  border: 1px solid #bfd3f2;
+  border-radius: 10px;
+  color: #2f5faa;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 9px 13px;
+  background: #f4f9ff;
+}
+
+.mhf-alert {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mhf-alert-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mhf-alert-success {
+  border-left: 4px solid var(--mhf-success);
+}
+
+.mhf-alert-error {
+  border-left: 4px solid var(--mhf-danger);
+}
+
+.mhf-alert-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.mhf-form {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-height: calc(100vh - 170px);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.mhf-field {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #4f627c;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+}
+
+.mhf-field-full {
+  grid-column: span 2;
+}
+
+.mhf-field input,
+.mhf-field select,
+.mhf-field textarea {
+  border: 1px solid #ccd8ea;
+  border-radius: 11px;
+  padding: 11px 12px;
+  font-size: 14px;
+  color: #203652;
+  background: #fff;
+  outline: none;
+  font-weight: 500;
+}
+
+.mhf-field input:focus,
+.mhf-field select:focus,
+.mhf-field textarea:focus {
+  border-color: #4b85d3;
+  box-shadow: 0 0 0 3px rgba(56, 126, 222, 0.16);
+}
+
+.mhf-input-error {
+  border-color: #db5f5f !important;
+}
+
+.mhf-error {
+  color: #b43f3f;
+  font-size: 12px;
+}
+
+.mhf-required {
+  color: #b43f3f;
+  margin-left: 2px;
+}
+
+.mhf-actions {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+  position: sticky;
+  bottom: 0;
+  padding-top: 10px;
+  border-top: 1px solid #e8eef7;
+  background: #fff;
+}
+
+.mhf-btn {
+  border-radius: 11px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.mhf-btn-icon {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+  margin-right: 6px;
+}
+
+.mhf-actions-full {
+  grid-column: span 2;
+  justify-content: flex-start;
+  margin-top: 0;
+}
+
+.mhf-btn-secondary {
+  background: #fff;
+  border-color: #bfd3f2;
+  color: #2f5faa;
+}
+
+.mhf-btn-primary {
+  background: var(--mhf-primary);
+  border-color: var(--mhf-primary);
+  color: #fff;
+}
+
+.mhf-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .mhf-form {
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .mhf-field-full,
+  .mhf-actions,
+  .mhf-actions-full {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .mhf-shell {
+    padding: 12px;
+  }
+
+  .mhf-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mhf-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}

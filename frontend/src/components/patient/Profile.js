@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
 	CheckCircleIcon,
 	ExclamationTriangleIcon,
@@ -184,10 +185,14 @@ const validateField = (name, value, fullForm) => {
 };
 
 const PatientProfile = () => {
+	const location = useLocation();
+	const navigate = useNavigate();
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
 	const [uploadingPhoto, setUploadingPhoto] = useState(false);
 	const [removingPhoto, setRemovingPhoto] = useState(false);
+	const [statusUpdating, setStatusUpdating] = useState(false);
+	const [deletingAccount, setDeletingAccount] = useState(false);
 	const [editableFields, setEditableFields] = useState({});
 
 	const [patientId, setPatientId] = useState(null);
@@ -196,11 +201,22 @@ const PatientProfile = () => {
 	const [originalForm, setOriginalForm] = useState(initialForm);
 	const [errors, setErrors] = useState({});
 	const [message, setMessage] = useState({ type: '', text: '' });
+	const [flashModal, setFlashModal] = useState(null);
 
 	const authHeaders = useMemo(() => {
 		const token = localStorage.getItem('accessToken');
 		return token ? { Authorization: `Bearer ${token}` } : {};
 	}, []);
+
+	useEffect(() => {
+		const flash = location.state?.flashMessage;
+		if (!flash?.text) return;
+		setFlashModal({
+			type: flash.type === 'error' ? 'error' : 'success',
+			text: String(flash.text)
+		});
+		navigate(location.pathname, { replace: true, state: {} });
+	}, [location.pathname, location.state, navigate]);
 
 	useEffect(() => {
 		const loadProfile = async () => {
@@ -253,6 +269,10 @@ const PatientProfile = () => {
 	}, [authHeaders]);
 
 	const avatarUrl = useMemo(() => resolveCloudinaryUrl(profile?.profilePictureUrl), [profile]);
+	const isAccountActive = useMemo(() => {
+		if (typeof profile?.active === 'boolean') return profile.active;
+		return true;
+	}, [profile]);
 
 	const hasChanges = useMemo(() => {
 		return Object.keys(form).some((key) => (form[key] || '') !== (originalForm[key] || ''));
@@ -391,6 +411,92 @@ const PatientProfile = () => {
 		}
 	};
 
+	const handleToggleAccountStatus = async () => {
+		if (!patientId) {
+			setMessage({ type: 'error', text: 'Patient ID is missing.' });
+			return;
+		}
+
+		const nextActive = !isAccountActive;
+		const actionLabel = nextActive ? 'activate' : 'deactivate';
+		const confirmed = window.confirm(`Are you sure you want to ${actionLabel} your account?`);
+		if (!confirmed) return;
+
+		setStatusUpdating(true);
+		setMessage({ type: '', text: '' });
+
+		try {
+			const adminRes = await axios.put(
+				`${API_BASE_URL}/api/admin/patients/${patientId}/status`,
+				null,
+				{ headers: authHeaders, params: { active: nextActive } }
+			);
+
+			setProfile((prev) => ({
+				...(prev || {}),
+				...(adminRes.data || {}),
+				active: typeof adminRes?.data?.active === 'boolean' ? adminRes.data.active : nextActive
+			}));
+			setMessage({ type: 'success', text: `Account ${nextActive ? 'activated' : 'deactivated'} successfully.` });
+		} catch (error) {
+			if (!nextActive) {
+				try {
+					await axios.delete(`${API_BASE_URL}/api/patients/${patientId}/account`, { headers: authHeaders });
+					setProfile((prev) => ({ ...(prev || {}), active: false }));
+					setMessage({ type: 'success', text: 'Account deactivated successfully.' });
+					return;
+				} catch (fallbackError) {
+					const fallbackText = fallbackError?.response?.data?.message || 'Failed to deactivate account.';
+					setMessage({ type: 'error', text: fallbackText });
+					return;
+				}
+			}
+
+			const errorText =
+				error?.response?.data?.message ||
+				'Activation requires backend permission. Please contact admin or try with authorized account.';
+			setMessage({ type: 'error', text: errorText });
+		} finally {
+			setStatusUpdating(false);
+		}
+	};
+
+	const handleDeleteAllPatientData = async () => {
+		if (!patientId) {
+			setMessage({ type: 'error', text: 'Patient ID is missing.' });
+			return;
+		}
+
+		const confirmed = window.confirm(
+			'This will permanently delete your patient account and related records (reports/documents, prescriptions, history). Continue?'
+		);
+		if (!confirmed) return;
+
+		setDeletingAccount(true);
+		setMessage({ type: '', text: '' });
+
+		try {
+			await axios.delete(`${API_BASE_URL}/api/patients/${patientId}/account/permanent`, { headers: authHeaders });
+			localStorage.removeItem('patientId');
+			localStorage.removeItem('accessToken');
+			setMessage({ type: 'success', text: 'Patient account and related records deleted successfully.' });
+			navigate('/', { replace: true });
+		} catch (error) {
+			try {
+				await axios.delete(`${API_BASE_URL}/api/admin/patients/${patientId}/permanent`, { headers: authHeaders });
+				localStorage.removeItem('patientId');
+				localStorage.removeItem('accessToken');
+				setMessage({ type: 'success', text: 'Patient account and related records deleted successfully.' });
+				navigate('/', { replace: true });
+			} catch (fallbackError) {
+				const errorText = fallbackError?.response?.data?.message || 'Failed to delete account and related records.';
+				setMessage({ type: 'error', text: errorText });
+			}
+		} finally {
+			setDeletingAccount(false);
+		}
+	};
+
 	const resetForm = () => {
 		setForm(formatProfileToForm(profile || {}));
 		setOriginalForm(formatProfileToForm(profile || {}));
@@ -415,12 +521,40 @@ const PatientProfile = () => {
 
 	return (
 		<div className="pp-shell">
+			{flashModal && (
+				<div className="pp-modal-backdrop" role="dialog" aria-modal="true">
+					<div className="pp-modal">
+						<div className={`pp-message pp-message-${flashModal.type}`}>
+							{flashModal.type === 'success' ? (
+								<CheckCircleIcon className="pp-message-icon" />
+							) : (
+								<ExclamationTriangleIcon className="pp-message-icon" />
+							)}
+							<span>{flashModal.text}</span>
+						</div>
+						<div className="pp-modal-actions">
+							<button className="pp-btn pp-btn-primary" type="button" onClick={() => setFlashModal(null)}>
+								OK
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
 			<header className="pp-header">
 				<div>
 					<h1>My Profile</h1>
 					<p>Data is loaded from your profile in DB. Click the edit icon beside each field to update it.</p>
 				</div>
-				<div className="pp-edit-chip">Per-field editing enabled</div>
+				<div className="pp-header-actions">
+					<div className="pp-edit-chip">Per-field editing enabled</div>
+					<button className="pp-btn pp-btn-secondary" type="button" onClick={handleToggleAccountStatus} disabled={statusUpdating || deletingAccount}>
+						{statusUpdating ? 'Updating...' : isAccountActive ? 'Deactivate Account' : 'Activate Account'}
+					</button>
+					<button className="pp-btn pp-btn-danger" type="button" onClick={handleDeleteAllPatientData} disabled={deletingAccount || statusUpdating}>
+						{deletingAccount ? 'Deleting...' : 'Delete Account & All Data'}
+					</button>
+				</div>
 			</header>
 
 			{message.text && (
