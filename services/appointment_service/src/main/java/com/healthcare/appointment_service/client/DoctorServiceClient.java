@@ -17,7 +17,7 @@ import java.util.List;
  * name - The service name as registered in Eureka
  * fallback - Fallback implementation when service is unavailable
  */
-@FeignClient(name = "doctor-service", fallback = DoctorServiceClientFallback.class)
+@FeignClient(name = "doctor-service",url = "http://doctor-service:8083", fallback = DoctorServiceClientFallback.class)
 public interface DoctorServiceClient {
 
     /**

@@ -5,8 +5,74 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/scripts/debug-appointment.ps1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/PaymentServiceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/PaymentConfirmationRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/PaymentRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/PaymentResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/AdminDashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/AdminDashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/DoctorVerification.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/DoctorVerification.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/TransactionMonitor.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/TransactionMonitor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/UserManagement.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/UserManagement.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentDetails.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentDetails.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentList.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/ForgotPassword.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/ForgotPassword.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/Register.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/Register.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/Footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/Navbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/Navbar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/PrivateRoute.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/PrivateRoute.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/AppointmentRequests.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/AppointmentRequests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/AvailabilityManager.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/AvailabilityManager.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/DoctorDashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/DoctorDashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/IssuePrescription.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/IssuePrescription.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/VideoConsultation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/VideoConsultation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/BookAppointment.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/BookAppointment.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/Dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/MedicalHistory.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/MedicalHistory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/Prescriptions.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/Prescriptions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/Profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/Profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/UploadDocument.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/UploadDocument.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/symptoms/SymptomChecker.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/symptoms/SymptomChecker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/telemedicine/VideoCall.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/appointment.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/appointment.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/auth.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/auth.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/doctor.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/doctor.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/notification.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/notification.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/patient.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/patient.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/payment.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/payment.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utils/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utils/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/constants.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClientFallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/DoctorServiceClientFallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/PatientServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/PatientServiceClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/controller/AppointmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/controller/AppointmentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/AppointmentResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/AppointmentResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/DoctorDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/DoctorDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/model/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/model/Appointment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/model/AppointmentStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/model/AppointmentStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/service/AppointmentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/service/AppointmentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/service/DoctorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/java/com/healthcare/payment_service/service/PaymentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/repository/VideoSessionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/repository/VideoSessionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/TelemedicineService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/telemedicine_service/src/main/java/com/healthcare/telemedicine_service/service/TelemedicineService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

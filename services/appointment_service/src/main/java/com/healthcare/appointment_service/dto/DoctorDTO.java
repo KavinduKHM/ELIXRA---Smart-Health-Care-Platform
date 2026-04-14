@@ -18,6 +18,9 @@ public class DoctorDTO {
     private String qualification;
     private String email;
     private String phoneNumber;
+
+    private Double consultationFee;
+
     private Boolean available;
     private List<TimeSlotDTO> availableSlots;
 
