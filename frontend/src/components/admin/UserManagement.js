@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Legend,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -18,8 +18,8 @@ import {
 import './UserManagement.css';
 
 const PATIENT_BASE = 'http://localhost:8082';
-const DOCTOR_BASE = 'http://localhost:8083';
 const APPOINTMENT_BASE = 'http://localhost:8084';
+const CLOUDINARY_CLOUD_NAME = 'dwona3xzj';
 
 const STATUS = {
   ACTIVE: 'ACTIVE',
@@ -28,8 +28,50 @@ const STATUS = {
 
 const CHART_COLORS = ['#2f80ed', '#27ae60', '#f2a33a', '#6f4bc5'];
 
+const extractArrayPayload = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (Array.isArray(payload?.appointments)) return payload.appointments;
+  if (Array.isArray(payload?.prescriptions)) return payload.prescriptions;
+  if (Array.isArray(payload?.documents)) return payload.documents;
+  if (Array.isArray(payload?.records)) return payload.records;
+  return undefined;
+};
+
+const requestFirstSuccess = async (requests, extractor = extractArrayPayload) => {
+  let sawEmptyArray = false;
+
+  for (let i = 0; i < requests.length; i += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const response = await requests[i]();
+      const payload = response?.data;
+      const extracted = extractor(payload);
+
+      if (extracted !== undefined) {
+        if (Array.isArray(extracted) && extracted.length === 0) {
+          sawEmptyArray = true;
+          continue;
+        }
+        return extracted;
+      }
+    } catch (error) {
+      // Try next endpoint option.
+    }
+  }
+
+  if (sawEmptyArray) {
+    return [];
+  }
+
+  throw new Error('No endpoint returned data');
+};
+
 const normalizeStatus = (raw) => {
-  const val = String(raw || '').toLowerCase();
+  const val = String(raw ?? '').toLowerCase();
   if (val === 'active' || val === 'enabled' || val === 'true') return STATUS.ACTIVE;
   if (val === 'inactive' || val === 'disabled' || val === 'false') return STATUS.INACTIVE;
   return STATUS.ACTIVE;
@@ -44,6 +86,7 @@ const normalizePatient = (item) => {
   return {
     id: `patient-${backendId}`,
     backendId,
+    userId: item?.userId || item?.user?.id || null,
     fullName: item?.name || item?.fullName || fullNameCandidate || 'Unknown Patient',
     email: item?.email || item?.mail || `patient-${backendId}@example.com`,
     phone: item?.phone || item?.phoneNumber || item?.mobile || item?.contactNo || 'Not available',
@@ -54,16 +97,29 @@ const normalizePatient = (item) => {
   };
 };
 
+const resolveCloudinaryUrl = (value) => {
+  if (!value) return '';
+  const candidate = String(value).trim();
+  if (!candidate) return '';
+
+  if (/^https?:\/\//i.test(candidate)) {
+    return candidate;
+  }
+
+  // If backend returns only public ID, build a Cloudinary delivery URL.
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${candidate}`;
+};
+
 const UserManagement = () => {
   const [patients, setPatients] = useState([]);
-  const [doctorCount, setDoctorCount] = useState(0);
-  const [doctorCreatedAt, setDoctorCreatedAt] = useState([]);
+  const [showAllPatients, setShowAllPatients] = useState(false);
 
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [usersError, setUsersError] = useState('');
   const [search, setSearch] = useState('');
   const [searchError, setSearchError] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [cityFilter, setCityFilter] = useState('ALL');
 
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -72,7 +128,10 @@ const UserManagement = () => {
 
   const [documents, setDocuments] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
+  const [medicalHistory, setMedicalHistory] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [selectedPatientProfile, setSelectedPatientProfile] = useState(null);
+  const [statusUpdatingId, setStatusUpdatingId] = useState('');
 
   const [modalState, setModalState] = useState({
     open: false,
@@ -92,21 +151,37 @@ const UserManagement = () => {
     return { Authorization: `Bearer ${token}` };
   };
 
-  const requestFirstSuccess = async (requests) => {
-    for (let i = 0; i < requests.length; i += 1) {
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const response = await requests[i]();
-        const payload = response?.data;
-
-        if (Array.isArray(payload)) return payload;
-        if (Array.isArray(payload?.content)) return payload.content;
-        if (Array.isArray(payload?.data)) return payload.data;
-      } catch (error) {
-        // Try next endpoint option.
+  const getWithOptionalAuth = async (url, headers) => {
+    try {
+      return await axios.get(url, { headers });
+    } catch (error) {
+      if (headers && Object.keys(headers).length > 0) {
+        return axios.get(url);
       }
+      throw error;
     }
-    throw new Error('No endpoint returned data');
+  };
+
+  const putWithOptionalAuth = async (url, data, headers, params) => {
+    try {
+      return await axios.put(url, data, { headers, params });
+    } catch (error) {
+      if (headers && Object.keys(headers).length > 0) {
+        return axios.put(url, data, { params });
+      }
+      throw error;
+    }
+  };
+
+  const deleteWithOptionalAuth = async (url, headers) => {
+    try {
+      return await axios.delete(url, { headers });
+    } catch (error) {
+      if (headers && Object.keys(headers).length > 0) {
+        return axios.delete(url);
+      }
+      throw error;
+    }
   };
 
   const fetchUsers = useCallback(async () => {
@@ -116,16 +191,12 @@ const UserManagement = () => {
     try {
       const headers = authHeaders();
 
-      const [patientsResult, doctorsResult] = await Promise.allSettled([
+      const [patientsResult] = await Promise.allSettled([
         requestFirstSuccess([
           () => axios.get(`${PATIENT_BASE}/api/admin/patients`, { headers }),
-          () => axios.get(`${PATIENT_BASE}/api/admin/patients/search?name=`, { headers })
-        ]),
-        requestFirstSuccess([
-          () => axios.get(`${DOCTOR_BASE}/api/doctors/search?q=&page=0&size=200`, { headers }),
-          () => axios.get(`${DOCTOR_BASE}/api/doctors/verified`, { headers }),
-          () => axios.get(`${DOCTOR_BASE}/api/doctors/search?q=&page=0&size=200`),
-          () => axios.get(`${DOCTOR_BASE}/api/doctors/verified`)
+          () => axios.get(`${PATIENT_BASE}/api/admin/patients/search?name=`, { headers }),
+          () => axios.get(`${PATIENT_BASE}/api/admin/patients`),
+          () => axios.get(`${PATIENT_BASE}/api/admin/patients/search?name=`)
         ])
       ]);
 
@@ -134,14 +205,17 @@ const UserManagement = () => {
           ? patientsResult.value.map((item) => normalizePatient(item))
           : [];
 
-      const doctorList = doctorsResult.status === 'fulfilled' ? doctorsResult.value : [];
+      setPatients(
+        patientList.sort((a, b) => {
+          const aNum = Number(a.backendId);
+          const bNum = Number(b.backendId);
 
-      setPatients(patientList.sort((a, b) => a.fullName.localeCompare(b.fullName)));
-      setDoctorCount(doctorList.length);
-      setDoctorCreatedAt(
-        doctorList
-          .map((doctor) => doctor?.createdAt || doctor?.createdDate)
-          .filter(Boolean)
+          if (Number.isFinite(aNum) && Number.isFinite(bNum)) {
+            return aNum - bNum;
+          }
+
+          return String(a.backendId).localeCompare(String(b.backendId), undefined, { numeric: true });
+        })
       );
 
       if (patientList.length === 0) {
@@ -149,8 +223,6 @@ const UserManagement = () => {
       }
     } catch (error) {
       setPatients([]);
-      setDoctorCount(0);
-      setDoctorCreatedAt([]);
       setUsersError('Unable to fetch patient data from backend APIs. Please check that services are running.');
     } finally {
       setLoadingUsers(false);
@@ -193,6 +265,7 @@ const UserManagement = () => {
 
     return patients.filter((patient) => {
       const statusMatch = statusFilter === 'ALL' ? true : patient.status === statusFilter;
+      const cityMatch = cityFilter === 'ALL' ? true : patient.city === cityFilter;
       const searchMatch =
         query.length === 0
           ? true
@@ -202,9 +275,25 @@ const UserManagement = () => {
               .toLowerCase()
               .includes(query);
 
-      return statusMatch && searchMatch;
+      return statusMatch && cityMatch && searchMatch;
     });
-  }, [patients, search, statusFilter]);
+  }, [patients, search, statusFilter, cityFilter]);
+
+  const cityOptions = useMemo(() => {
+    const cities = new Set(
+      patients
+        .map((patient) => patient.city || 'Not provided')
+        .filter(Boolean)
+    );
+    return Array.from(cities).sort((a, b) => a.localeCompare(b));
+  }, [patients]);
+
+  const visiblePatients = useMemo(() => {
+    if (showAllPatients) {
+      return filteredPatients;
+    }
+    return filteredPatients.slice(0, 8);
+  }, [filteredPatients, showAllPatients]);
 
   const summary = useMemo(() => {
     const totalPatients = patients.length;
@@ -216,10 +305,9 @@ const UserManagement = () => {
       totalPatients,
       activePatients,
       inactivePatients,
-      doctorCount,
       activeRate
     };
-  }, [patients, doctorCount]);
+  }, [patients]);
 
   const statusChartData = useMemo(
     () => [
@@ -227,14 +315,6 @@ const UserManagement = () => {
       { name: 'Inactive Patients', value: summary.inactivePatients, color: '#f2a33a' }
     ],
     [summary.activePatients, summary.inactivePatients]
-  );
-
-  const patientDoctorComparisonData = useMemo(
-    () => [
-      { name: 'Patients', value: summary.totalPatients },
-      { name: 'Doctors', value: summary.doctorCount }
-    ],
-    [summary.totalPatients, summary.doctorCount]
   );
 
   const registrationTrendData = useMemo(() => {
@@ -254,13 +334,25 @@ const UserManagement = () => {
       const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
       months.push({
         month: monthDate.toLocaleString('en-US', { month: 'short' }),
-        patients: countByMonth(patientCreatedDates, monthDate),
-        doctors: countByMonth(doctorCreatedAt, monthDate)
+        patients: countByMonth(patientCreatedDates, monthDate)
       });
     }
 
     return months;
-  }, [patients, doctorCreatedAt]);
+  }, [patients]);
+
+  const cityDistributionData = useMemo(() => {
+    const cityMap = patients.reduce((acc, patient) => {
+      const city = patient.city || 'Not provided';
+      acc[city] = (acc[city] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(cityMap)
+      .map(([city, count]) => ({ city, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
+  }, [patients]);
 
   const loadPatientDetails = async (patient) => {
     setSelectedPatient(patient);
@@ -270,32 +362,94 @@ const UserManagement = () => {
 
     try {
       const headers = authHeaders();
-      const patientId = patient.backendId;
+      const idCandidates = Array.from(
+        new Set(
+          [patient.backendId, patient.userId, patient?.raw?.userId]
+            .filter((value) => value !== null && value !== undefined && value !== '')
+            .map((value) => String(value).trim())
+            .filter(Boolean)
+        )
+      );
 
-      const [docsRes, prescriptionRes, appointmentRes] = await Promise.allSettled([
-        axios.get(`${PATIENT_BASE}/api/patients/${patientId}/documents`, { headers }),
-        axios.get(`${PATIENT_BASE}/api/patients/${patientId}/prescriptions`, { headers }),
-        axios.get(`${APPOINTMENT_BASE}/api/appointments/patient/${patientId}?page=0&size=50`, { headers })
+      const buildPatientScopedUrls = (pathFactory) =>
+        idCandidates.map((id) => `${PATIENT_BASE}${pathFactory(id)}`);
+
+      const buildAppointmentScopedUrls = (pathFactory) =>
+        idCandidates.map((id) => `${APPOINTMENT_BASE}${pathFactory(id)}`);
+
+      const profilePromise = requestFirstSuccess(
+        [
+          ...buildPatientScopedUrls((id) => `/api/patients/${id}/profile`).map((url) => () => getWithOptionalAuth(url, headers)),
+          ...buildPatientScopedUrls((id) => `/api/admin/patients/${id}`).map((url) => () => getWithOptionalAuth(url, headers))
+        ],
+        (payload) => payload || null
+      );
+
+      const documentsPromise = requestFirstSuccess([
+        ...buildPatientScopedUrls((id) => `/api/patients/${id}/documents`).map((url) => () => getWithOptionalAuth(url, headers)),
+        ...buildPatientScopedUrls((id) => `/api/admin/patients/${id}/documents`).map((url) => () => getWithOptionalAuth(url, headers)),
+        ...buildPatientScopedUrls((id) => `/api/patients/${id}/documents?page=0&size=100`).map((url) => () => getWithOptionalAuth(url, headers))
       ]);
 
-      const docsData = docsRes.status === 'fulfilled' ? docsRes.value.data : [];
-      const prescriptionsData = prescriptionRes.status === 'fulfilled' ? prescriptionRes.value.data : [];
-      const appointmentsDataRaw = appointmentRes.status === 'fulfilled' ? appointmentRes.value.data : [];
-      const appointmentsData = Array.isArray(appointmentsDataRaw)
-        ? appointmentsDataRaw
-        : appointmentsDataRaw?.content || [];
+      const prescriptionsPromise = requestFirstSuccess([
+        ...buildPatientScopedUrls((id) => `/api/patients/${id}/prescriptions`).map((url) => () => getWithOptionalAuth(url, headers)),
+        ...buildPatientScopedUrls((id) => `/api/patients/${id}/prescriptions?page=0&size=100`).map((url) => () => getWithOptionalAuth(url, headers))
+      ]);
 
+      const historyPromise = requestFirstSuccess(
+        [
+          ...buildPatientScopedUrls((id) => `/api/patients/${id}/medical-history/all`).map((url) => () => getWithOptionalAuth(url, headers)),
+          ...buildPatientScopedUrls((id) => `/api/patients/${id}/medical-history`).map((url) => () => getWithOptionalAuth(url, headers))
+        ],
+        (payload) => {
+          const list = extractArrayPayload(payload);
+          if (list !== undefined) return list;
+          if (payload && typeof payload === 'object') return [payload];
+          return undefined;
+        }
+      );
+
+      const appointmentsPromise = requestFirstSuccess([
+        ...buildAppointmentScopedUrls((id) => `/api/appointments/patient/${id}?page=0&size=50`).map((url) => () => getWithOptionalAuth(url, headers)),
+        ...buildAppointmentScopedUrls((id) => `/api/appointments/patient/${id}`).map((url) => () => getWithOptionalAuth(url, headers)),
+        ...buildAppointmentScopedUrls((id) => `/api/appointments/patient/${id}/upcoming`).map((url) => () => getWithOptionalAuth(url, headers))
+      ]);
+
+      const [profileRes, docsRes, prescriptionRes, historyRes, appointmentRes] = await Promise.allSettled([
+        profilePromise,
+        documentsPromise,
+        prescriptionsPromise,
+        historyPromise,
+        appointmentsPromise
+      ]);
+
+      const profileData = profileRes.status === 'fulfilled' ? profileRes.value : null;
+      const docsData = docsRes.status === 'fulfilled' ? docsRes.value : [];
+      const prescriptionsData = prescriptionRes.status === 'fulfilled' ? prescriptionRes.value : [];
+      const historyData = historyRes.status === 'fulfilled' ? historyRes.value : [];
+      const appointmentsData = appointmentRes.status === 'fulfilled' ? appointmentRes.value : [];
+
+      setSelectedPatientProfile(profileData);
       setDocuments(Array.isArray(docsData) ? docsData : []);
       setPrescriptions(Array.isArray(prescriptionsData) ? prescriptionsData : []);
+      setMedicalHistory(Array.isArray(historyData) ? historyData : []);
       setAppointments(Array.isArray(appointmentsData) ? appointmentsData : []);
 
-      if (docsRes.status === 'rejected' && prescriptionRes.status === 'rejected' && appointmentRes.status === 'rejected') {
+      if (
+        profileRes.status === 'rejected' &&
+        docsRes.status === 'rejected' &&
+        prescriptionRes.status === 'rejected' &&
+        historyRes.status === 'rejected' &&
+        appointmentRes.status === 'rejected'
+      ) {
         setDetailsError('Could not load patient medical details from APIs.');
       }
     } catch (error) {
       setDetailsError('Could not load selected patient details.');
+      setSelectedPatientProfile(null);
       setDocuments([]);
       setPrescriptions([]);
+      setMedicalHistory([]);
       setAppointments([]);
     } finally {
       setDetailsLoading(false);
@@ -305,8 +459,10 @@ const UserManagement = () => {
   const closeDetails = () => {
     setSelectedPatient(null);
     setDetailsError('');
+    setSelectedPatientProfile(null);
     setDocuments([]);
     setPrescriptions([]);
+    setMedicalHistory([]);
     setAppointments([]);
   };
 
@@ -338,51 +494,132 @@ const UserManagement = () => {
   const validateAction = () => {
     if (!modalState.patient) return 'No patient selected.';
 
-    if (modalState.action === 'deactivate') {
-      const reason = modalState.reason.trim();
-      if (reason.length < 10) {
-        return 'Deactivation reason must be at least 10 characters.';
-      }
-      if (reason.length > 200) {
-        return 'Deactivation reason can be up to 200 characters.';
-      }
-    }
-
-    if (modalState.action === 'delete') {
-      if (modalState.confirmText.trim() !== modalState.patient.email) {
-        return 'Type the exact patient email to confirm deletion.';
-      }
-    }
-
     return '';
   };
 
   const tryStatusUpdateApi = async (patient, nextStatus) => {
     const headers = authHeaders();
-    const patientId = patient.backendId;
+    const idCandidates = new Set(
+      [patient?.backendId, patient?.userId, patient?.raw?.id, patient?.raw?.userId]
+        .filter((value) => value !== null && value !== undefined && value !== '')
+        .map((value) => String(value).trim())
+        .filter(Boolean)
+    );
 
+    // Enrich candidate IDs from admin list to ensure we hit the real patient DB primary key.
     try {
-      await axios.put(
-        `${PATIENT_BASE}/api/admin/patients/${patientId}/status?active=${nextStatus === STATUS.ACTIVE}`,
-        null,
-        { headers }
-      );
-      return true;
+      const adminPatientsRes = await getWithOptionalAuth(`${PATIENT_BASE}/api/admin/patients`, headers);
+      const adminPatients = extractArrayPayload(adminPatientsRes?.data) || [];
+      const matchedPatient = adminPatients.find((item) => {
+        const sameEmail = item?.email && patient?.email && String(item.email).toLowerCase() === String(patient.email).toLowerCase();
+        const samePhone = item?.phoneNumber && patient?.phone && String(item.phoneNumber) === String(patient.phone);
+        const sameName = item?.fullName && patient?.fullName && String(item.fullName).toLowerCase() === String(patient.fullName).toLowerCase();
+        return sameEmail || (samePhone && sameName);
+      });
+
+      if (matchedPatient?.id !== null && matchedPatient?.id !== undefined) {
+        idCandidates.add(String(matchedPatient.id));
+      }
+      if (matchedPatient?.userId !== null && matchedPatient?.userId !== undefined) {
+        idCandidates.add(String(matchedPatient.userId));
+      }
     } catch (error) {
-      return false;
+      // Continue with known ID candidates only.
     }
+
+    const orderedIds = Array.from(idCandidates);
+
+    for (let i = 0; i < orderedIds.length; i += 1) {
+      const candidateId = orderedIds[i];
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const response = await putWithOptionalAuth(
+          `${PATIENT_BASE}/api/admin/patients/${candidateId}/status`,
+          {},
+          headers,
+          { active: nextStatus === STATUS.ACTIVE }
+        );
+
+        // Some backends return empty body on success; treat any 2xx as success.
+        if (response && response.status >= 200 && response.status < 300) {
+          let refreshedPatient = response?.data || null;
+
+          if (!refreshedPatient || typeof refreshedPatient !== 'object') {
+            try {
+              // eslint-disable-next-line no-await-in-loop
+              const refreshed = await getWithOptionalAuth(`${PATIENT_BASE}/api/admin/patients/${candidateId}`, headers);
+              refreshedPatient = refreshed?.data || null;
+            } catch (refreshError) {
+              refreshedPatient = null;
+            }
+          }
+
+          return {
+            ok: true,
+            patient: refreshedPatient
+          };
+        }
+      } catch (error) {
+        // Try next ID candidate.
+      }
+    }
+
+    return {
+      ok: false,
+      patient: null
+    };
   };
 
   const tryDeletePatientApi = async (patient) => {
     const headers = authHeaders();
-    const patientId = patient.backendId;
 
+    const idCandidates = new Set(
+      [patient?.backendId, patient?.userId, patient?.raw?.id, patient?.raw?.userId]
+        .filter((value) => value !== null && value !== undefined && value !== '')
+        .map((value) => String(value).trim())
+        .filter(Boolean)
+    );
+
+    // Enrich IDs from admin list to find actual patient DB primary key.
     try {
-      await axios.delete(`${PATIENT_BASE}/api/admin/patients/${patientId}/permanent`, { headers });
-      return true;
+      const adminPatientsRes = await getWithOptionalAuth(`${PATIENT_BASE}/api/admin/patients`, headers);
+      const adminPatients = extractArrayPayload(adminPatientsRes?.data) || [];
+      const matchedPatient = adminPatients.find((item) => {
+        const sameEmail = item?.email && patient?.email && String(item.email).toLowerCase() === String(patient.email).toLowerCase();
+        const samePhone = item?.phoneNumber && patient?.phone && String(item.phoneNumber) === String(patient.phone);
+        const sameName = item?.fullName && patient?.fullName && String(item.fullName).toLowerCase() === String(patient.fullName).toLowerCase();
+        return sameEmail || (samePhone && sameName);
+      });
+
+      if (matchedPatient?.id !== null && matchedPatient?.id !== undefined) {
+        idCandidates.add(String(matchedPatient.id));
+      }
+      if (matchedPatient?.userId !== null && matchedPatient?.userId !== undefined) {
+        idCandidates.add(String(matchedPatient.userId));
+      }
     } catch (error) {
-      return false;
+      // Continue with known ID candidates only.
     }
+
+    const orderedIds = Array.from(idCandidates);
+
+    for (let i = 0; i < orderedIds.length; i += 1) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const response = await deleteWithOptionalAuth(
+          `${PATIENT_BASE}/api/admin/patients/${orderedIds[i]}/permanent`,
+          headers
+        );
+
+        if (response && response.status >= 200 && response.status < 300) {
+          return true;
+        }
+      } catch (error) {
+        // Try next ID candidate.
+      }
+    }
+
+    return false;
   };
 
   const executeAction = async () => {
@@ -399,31 +636,46 @@ const UserManagement = () => {
 
     if (action === 'activate' || action === 'deactivate') {
       const nextStatus = action === 'activate' ? STATUS.ACTIVE : STATUS.INACTIVE;
-      const apiSuccess = await tryStatusUpdateApi(patient, nextStatus);
+      setStatusUpdatingId(patient.id);
 
-      if (!apiSuccess) {
-        setModalState((prev) => ({
-          ...prev,
-          processing: false,
-          error: `Backend did not accept ${action} for this patient.`
-        }));
+      try {
+        const statusResult = await tryStatusUpdateApi(patient, nextStatus);
+
+        if (!statusResult.ok) {
+          setModalState((prev) => ({
+            ...prev,
+            processing: false,
+            error: `Could not ${action} this patient. Please try again.`
+          }));
+          return;
+        }
+
+        const updatedStatus = normalizeStatus(
+          statusResult.patient?.status ?? statusResult.patient?.active ?? statusResult.patient?.isActive ?? nextStatus
+        );
+
+        setPatients((prev) =>
+          prev.map((item) => (item.id === patient.id ? { ...item, status: updatedStatus } : item))
+        );
+
+        setSelectedPatient((prev) => {
+          if (!prev || prev.id !== patient.id) return prev;
+          return { ...prev, status: updatedStatus };
+        });
+
+        await fetchUsers();
+
+        setToast({
+          open: true,
+          type: 'success',
+          message: `${patient.fullName} is now ${updatedStatus}.`
+        });
+
+        closeModal();
         return;
+      } finally {
+        setStatusUpdatingId('');
       }
-
-      await fetchUsers();
-      setSelectedPatient((prev) => {
-        if (!prev || prev.id !== patient.id) return prev;
-        return { ...prev, status: nextStatus };
-      });
-
-      setToast({
-        open: true,
-        type: 'success',
-        message: `${patient.fullName} was ${action}d successfully.`
-      });
-
-      closeModal();
-      return;
     }
 
     if (action === 'delete') {
@@ -477,57 +729,8 @@ const UserManagement = () => {
         <SummaryCard label="Total Patients" value={summary.totalPatients} />
         <SummaryCard label="Active Patients" value={summary.activePatients} tone="green" />
         <SummaryCard label="Inactive Patients" value={summary.inactivePatients} tone="amber" />
-        <SummaryCard label="Doctors (Comparison)" value={summary.doctorCount} tone="violet" />
+        <SummaryCard label="Cities Covered" value={cityOptions.length} tone="violet" />
         <SummaryCard label="Patient Active Rate" value={`${summary.activeRate}%`} tone="blue" />
-      </section>
-
-      <section className="um-analytics-grid">
-        <article className="um-chart-card">
-          <h3>Patient Status Distribution</h3>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={statusChartData} cx="50%" cy="50%" outerRadius={90} dataKey="value" label>
-                {statusChartData.map((entry, index) => (
-                  <Cell key={`status-pie-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </article>
-
-        <article className="um-chart-card">
-          <h3>Patient vs Doctor Volume</h3>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={patientDoctorComparisonData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#d7dde8" />
-              <XAxis dataKey="name" stroke="#607086" />
-              <YAxis allowDecimals={false} stroke="#607086" />
-              <Tooltip />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                {patientDoctorComparisonData.map((entry, index) => (
-                  <Cell key={`cmp-bar-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </article>
-
-        <article className="um-chart-card um-chart-card-wide">
-          <h3>Last 6 Months Registration Trend</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={registrationTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#d7dde8" />
-              <XAxis dataKey="month" stroke="#607086" />
-              <YAxis allowDecimals={false} stroke="#607086" />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="patients" stroke="#2f80ed" strokeWidth={2.5} name="Patients" />
-              <Line type="monotone" dataKey="doctors" stroke="#6f4bc5" strokeWidth={2.5} name="Doctors" />
-            </LineChart>
-          </ResponsiveContainer>
-        </article>
       </section>
 
       {usersError && <div className="um-inline-alert">{usersError}</div>}
@@ -558,6 +761,20 @@ const UserManagement = () => {
             <option value={STATUS.INACTIVE}>Inactive</option>
           </select>
         </div>
+
+        <div className="um-form-field">
+          <label htmlFor="cityFilter">City</label>
+          <select
+            id="cityFilter"
+            value={cityFilter}
+            onChange={(e) => setCityFilter(e.target.value)}
+          >
+            <option value="ALL">All Cities</option>
+            {cityOptions.map((city) => (
+              <option key={city} value={city}>{city}</option>
+            ))}
+          </select>
+        </div>
       </section>
 
       <section className="um-table-wrap">
@@ -578,12 +795,23 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredPatients.map((patient) => (
+              {visiblePatients.map((patient) => (
                 <tr key={patient.id}>
                   <td>
-                    <p className="um-cell-title">{patient.fullName}</p>
-                    <p className="um-cell-sub">{patient.email}</p>
-                    <p className="um-cell-sub">{patient.phone}</p>
+                    <div className="um-user-cell">
+                      <ProfileAvatar
+                        src={resolveCloudinaryUrl(
+                          patient.raw?.profilePictureUrl || patient.raw?.profilePicture
+                        )}
+                        alt={patient.fullName}
+                        className="um-avatar"
+                      />
+                      <div>
+                        <p className="um-cell-title">{patient.fullName}</p>
+                        <p className="um-cell-sub">{patient.email}</p>
+                        <p className="um-cell-sub">{patient.phone}</p>
+                      </div>
+                    </div>
                   </td>
                   <td>
                     <p className="um-cell-sub">{patient.backendId}</p>
@@ -603,16 +831,18 @@ const UserManagement = () => {
                           type="button"
                           className="um-btn warning"
                           onClick={() => openActionModal('deactivate', patient)}
+                          disabled={statusUpdatingId === patient.id}
                         >
-                          Deactivate
+                          {statusUpdatingId === patient.id ? 'Updating...' : 'Deactivate'}
                         </button>
                       ) : (
                         <button
                           type="button"
                           className="um-btn success"
                           onClick={() => openActionModal('activate', patient)}
+                          disabled={statusUpdatingId === patient.id}
                         >
-                          Activate
+                          {statusUpdatingId === patient.id ? 'Updating...' : 'Activate'}
                         </button>
                       )}
                       <button
@@ -631,6 +861,64 @@ const UserManagement = () => {
         )}
       </section>
 
+      {filteredPatients.length > 8 && (
+        <div className="um-table-footer-actions">
+          <button
+            type="button"
+            className="um-btn muted"
+            onClick={() => setShowAllPatients((prev) => !prev)}
+          >
+            {showAllPatients ? 'Show Less' : `View All (${filteredPatients.length})`}
+          </button>
+        </div>
+      )}
+
+      <section className="um-analytics-grid um-analytics-grid-bottom">
+        <article className="um-chart-card um-chart-card-compact">
+          <h3>Patient Status Distribution</h3>
+          <ResponsiveContainer width="100%" height={180}>
+            <PieChart>
+              <Pie data={statusChartData} cx="50%" cy="50%" outerRadius={62} dataKey="value" label>
+                {statusChartData.map((entry, index) => (
+                  <Cell key={`status-pie-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </article>
+
+        <article className="um-chart-card um-chart-card-compact">
+          <h3>Patients by City (Top 8)</h3>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={cityDistributionData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#d7dde8" />
+              <XAxis dataKey="city" stroke="#607086" />
+              <YAxis allowDecimals={false} stroke="#607086" />
+              <Tooltip />
+              <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                {cityDistributionData.map((entry, index) => (
+                  <Cell key={`city-bar-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </article>
+
+        <article className="um-chart-card um-chart-card-compact">
+          <h3>6-Month Registration Trend</h3>
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={registrationTrendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#d7dde8" />
+              <XAxis dataKey="month" stroke="#607086" />
+              <YAxis allowDecimals={false} stroke="#607086" />
+              <Tooltip />
+              <Area type="monotone" dataKey="patients" stroke="#2f80ed" fill="#9bc0fb" fillOpacity={0.5} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </article>
+      </section>
+
       {selectedPatient && (
         <aside className="um-drawer-backdrop" onClick={closeDetails} role="presentation">
           <div className="um-drawer" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
@@ -639,6 +927,16 @@ const UserManagement = () => {
                 <h2>{selectedPatient.fullName}</h2>
                 <p>{selectedPatient.email}</p>
               </div>
+              <ProfileAvatar
+                src={resolveCloudinaryUrl(
+                  selectedPatientProfile?.profilePictureUrl ||
+                  selectedPatientProfile?.profilePicture ||
+                  selectedPatient.raw?.profilePictureUrl ||
+                  selectedPatient.raw?.profilePicture
+                )}
+                alt={selectedPatient.fullName}
+                className="um-avatar um-avatar-large"
+              />
               <button type="button" className="um-close-btn" onClick={closeDetails}>
                 Close
               </button>
@@ -653,6 +951,9 @@ const UserManagement = () => {
               </button>
               <button type="button" className={detailsTab === 'prescriptions' ? 'active' : ''} onClick={() => setDetailsTab('prescriptions')}>
                 Prescriptions
+              </button>
+              <button type="button" className={detailsTab === 'medical-history' ? 'active' : ''} onClick={() => setDetailsTab('medical-history')}>
+                Medical History
               </button>
               <button type="button" className={detailsTab === 'appointments' ? 'active' : ''} onClick={() => setDetailsTab('appointments')}>
                 Appointments
@@ -675,8 +976,12 @@ const UserManagement = () => {
                       label="Created At"
                       value={new Date(selectedPatient.createdAt).toLocaleString()}
                     />
+                    <InfoItem label="Blood Group" value={selectedPatientProfile?.bloodGroup} />
+                    <InfoItem label="Gender" value={selectedPatientProfile?.gender} />
+                    <InfoItem label="Allergies" value={selectedPatientProfile?.allergies} />
                     <InfoItem label="Documents" value={documents.length} />
                     <InfoItem label="Prescriptions" value={prescriptions.length} />
+                    <InfoItem label="Medical History" value={medicalHistory.length} />
                     <InfoItem label="Appointments" value={appointments.length} />
                   </div>
                 )}
@@ -707,6 +1012,20 @@ const UserManagement = () => {
                         <p className="um-record-sub">
                           Valid Until: {item.validUntil ? new Date(item.validUntil).toLocaleDateString() : 'N/A'}
                         </p>
+                      </>
+                    )}
+                  />
+                )}
+
+                {detailsTab === 'medical-history' && (
+                  <RecordList
+                    title="Medical History"
+                    records={medicalHistory}
+                    emptyLabel="No medical history available for this patient."
+                    renderItem={(item) => (
+                      <>
+                        <p className="um-record-title">Medical History Record</p>
+                        <DynamicMedicalHistoryFields item={item} />
                       </>
                     )}
                   />
@@ -746,36 +1065,18 @@ const UserManagement = () => {
               Patient: <strong>{modalState.patient?.fullName}</strong>
             </p>
 
-            {modalState.action === 'deactivate' && (
-              <div className="um-form-field">
-                <label htmlFor="deactivationReason">Reason for deactivation</label>
-                <textarea
-                  id="deactivationReason"
-                  rows={4}
-                  placeholder="Enter a clear reason (minimum 10 characters)"
-                  value={modalState.reason}
-                  onChange={(e) =>
-                    setModalState((prev) => ({ ...prev, reason: e.target.value, error: '' }))
-                  }
-                  maxLength={200}
-                />
-              </div>
+            {(modalState.action === 'activate' || modalState.action === 'deactivate') && (
+              <p>
+                {modalState.action === 'activate'
+                  ? 'This will set the patient account to ACTIVE.'
+                  : 'This will set the patient account to INACTIVE.'}
+              </p>
             )}
 
             {modalState.action === 'delete' && (
-              <div className="um-form-field">
-                <label htmlFor="deleteConfirmText">
-                  Type <strong>{modalState.patient?.email}</strong> to confirm
-                </label>
-                <input
-                  id="deleteConfirmText"
-                  type="text"
-                  value={modalState.confirmText}
-                  onChange={(e) =>
-                    setModalState((prev) => ({ ...prev, confirmText: e.target.value, error: '' }))
-                  }
-                />
-              </div>
+              <p>
+                This will permanently delete this patient and all related records.
+              </p>
             )}
 
             {modalState.error && <p className="um-field-error">{modalState.error}</p>}
@@ -815,6 +1116,51 @@ const InfoItem = ({ label, value }) => (
     <p>{value || 'N/A'}</p>
   </div>
 );
+
+const DynamicMedicalHistoryFields = ({ item }) => {
+  const fields = Object.entries(item || {}).filter(([key, value]) => {
+    if (key === '__v') return false;
+    if (value === null || value === undefined || value === '') return false;
+    if (typeof value === 'object') return false;
+    return true;
+  });
+
+  if (fields.length === 0) {
+    return <p className="um-record-sub">No medical history fields returned by API.</p>;
+  }
+
+  return (
+    <>
+      {fields.map(([key, value]) => (
+        <p key={key} className="um-record-sub">
+          {key}: {String(value)}
+        </p>
+      ))}
+    </>
+  );
+};
+
+const ProfileAvatar = ({ src, alt, className }) => {
+  const [imageError, setImageError] = useState(false);
+  const hasImage = Boolean(src) && !imageError;
+
+  if (!hasImage) {
+    return (
+      <div className={`um-avatar-fallback ${className || ''}`} aria-label={alt}>
+        <UserCircleIcon className="um-avatar-icon" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setImageError(true)}
+    />
+  );
+};
 
 const RecordList = ({ title, records, emptyLabel, renderItem }) => (
   <section>

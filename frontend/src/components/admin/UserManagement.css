@@ -94,8 +94,9 @@
 
 .um-analytics-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
   gap: 12px;
+  margin-top: 14px;
   margin-bottom: 16px;
 }
 
@@ -103,17 +104,26 @@
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 12px;
+  padding: 10px;
   box-shadow: 0 8px 16px rgba(23, 42, 76, 0.07);
 }
 
 .um-chart-card h3 {
   margin: 0 0 8px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .um-chart-card-wide {
   grid-column: 1 / -1;
+}
+
+.um-chart-card-compact {
+  min-height: 230px;
+}
+
+.um-analytics-grid-bottom {
+  border-top: 1px dashed #d5deeb;
+  padding-top: 14px;
 }
 
 .um-inline-alert {
@@ -133,7 +143,7 @@
 }
 
 .um-toolbar-patient-only {
-  grid-template-columns: 1.8fr 0.8fr;
+  grid-template-columns: 1.8fr 0.8fr 0.8fr;
 }
 
 .um-form-field {
@@ -181,6 +191,12 @@
   overflow: hidden;
 }
 
+.um-table-footer-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
 .um-table {
   width: 100%;
   border-collapse: collapse;
@@ -207,6 +223,41 @@
 .um-cell-title {
   margin: 0;
   font-weight: 700;
+}
+
+.um-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.um-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid #d6dfec;
+  background: #f3f6fb;
+}
+
+.um-avatar-large {
+  width: 52px;
+  height: 52px;
+}
+
+.um-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid #d6dfec;
+  background: linear-gradient(160deg, #eef3fb 0%, #dde7f7 100%);
+  color: #6c7fa3;
+}
+
+.um-avatar-icon {
+  width: 80%;
+  height: 80%;
 }
 
 .um-cell-sub {
@@ -455,7 +506,7 @@
   }
 
   .um-analytics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
   }
 
   .um-toolbar {
@@ -481,6 +532,10 @@
   }
 
   .um-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .um-analytics-grid {
     grid-template-columns: 1fr;
   }
 }
