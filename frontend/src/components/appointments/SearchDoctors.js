@@ -6,9 +6,11 @@ import {
 } from "../../services/api";
 
 const SearchDoctors = ({ patientId = 1 }) => {
-  // Default patient ID for demo
   const [specialty, setSpecialty] = useState("");
   const [doctorName, setDoctorName] = useState("");
+  const [searchDate, setSearchDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -18,16 +20,29 @@ const SearchDoctors = ({ patientId = 1 }) => {
   const [symptoms, setSymptoms] = useState("");
   const [showBookingModal, setShowBookingModal] = useState(false);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const normalizeDoctor = (doctor) => ({
+    ...doctor,
+    availableSlots: doctor.availableSlots ?? doctor.slots,
+  });
+
+  const loadDoctors = async (override = {}) => {
+    const nextSpecialty = override.specialty ?? specialty;
+    const nextDoctorName = override.doctorName ?? doctorName;
+    const nextSearchDate = override.searchDate ?? searchDate;
+
     setLoading(true);
     setError("");
-    setDoctors([]);
 
     try {
-      const results = await searchDoctors(specialty, doctorName);
-      setDoctors(results);
-      if (results.length === 0) {
+      const results = await searchDoctors(
+        nextSpecialty,
+        nextDoctorName,
+        nextSearchDate,
+      );
+      const normalizedResults = (results || []).map(normalizeDoctor);
+      setDoctors(normalizedResults);
+
+      if (normalizedResults.length === 0) {
         setError("No doctors found matching your criteria");
       }
     } catch (err) {
@@ -37,14 +52,23 @@ const SearchDoctors = ({ patientId = 1 }) => {
     }
   };
 
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setDoctors([]);
+    await loadDoctors();
+  };
+
   const handleViewSlots = async (doctor) => {
     setLoading(true);
     setError("");
     try {
-      const today = new Date().toISOString().split("T")[0];
-      const slots = await getAvailableSlots(doctor.id, today);
-      setDoctors(
-        doctors.map((d) => (d.id === doctor.id ? { ...d, slots: slots } : d)),
+      const slots = await getAvailableSlots(doctor.id, `${searchDate}T00:00:00`);
+      setDoctors((currentDoctors) =>
+        currentDoctors.map((currentDoctor) =>
+          currentDoctor.id === doctor.id
+            ? { ...currentDoctor, availableSlots: slots || [] }
+            : currentDoctor,
+        ),
       );
     } catch (err) {
       setError("Failed to load available slots");
@@ -70,12 +94,12 @@ const SearchDoctors = ({ patientId = 1 }) => {
 
     try {
       const appointmentData = {
-        patientId: patientId,
+        patientId: Number(patientId) || 1,
         doctorId: selectedDoctor.id,
         appointmentTime: selectedSlot.startTime,
         durationMinutes: 30,
         symptoms: symptoms,
-        notes: `Booked for ${selectedDoctor.name}`,
+        notes: `Booked for ${getDoctorName(selectedDoctor)}`,
       };
 
       const result = await bookAppointment(appointmentData);
@@ -87,14 +111,18 @@ const SearchDoctors = ({ patientId = 1 }) => {
       setSelectedSlot(null);
       setSymptoms("");
 
-      // Refresh search results
-      handleSearch(new Event("submit"));
+      await loadDoctors();
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  const getDoctorName = (doctor) =>
+    doctor.name || [doctor.firstName, doctor.lastName].filter(Boolean).join(" ");
+
+  const getSlots = (doctor) => doctor.availableSlots ?? doctor.slots;
 
   return (
     <div className="card">
@@ -131,6 +159,17 @@ const SearchDoctors = ({ patientId = 1 }) => {
           </div>
           <div className="col">
             <div className="form-group">
+              <label>Appointment Date</label>
+              <input
+                type="date"
+                className="form-control"
+                value={searchDate}
+                onChange={(e) => setSearchDate(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="col">
+            <div className="form-group">
               <label>&nbsp;</label>
               <button
                 type="submit"
@@ -153,15 +192,16 @@ const SearchDoctors = ({ patientId = 1 }) => {
           </h3>
           {doctors.map((doctor) => (
             <div key={doctor.id} className="doctor-card">
-              <div className="doctor-name">{doctor.name}</div>
+              <div className="doctor-name">{getDoctorName(doctor)}</div>
               <div className="doctor-specialty">{doctor.specialty}</div>
               <div className="doctor-fee">
                 Consultation Fee: LKR {doctor.consultationFee}
               </div>
               <div>Experience: {doctor.experienceYears} years</div>
               <div>Qualification: {doctor.qualification}</div>
+              {doctor.rating != null && <div>Rating: {doctor.rating}</div>}
 
-              {!doctor.slots ? (
+              {!Array.isArray(getSlots(doctor)) ? (
                 <button
                   className="btn btn-primary"
                   style={{ marginTop: "10px" }}
@@ -173,15 +213,15 @@ const SearchDoctors = ({ patientId = 1 }) => {
                 <div>
                   <h4 style={{ marginTop: "15px" }}>Available Time Slots:</h4>
                   <div className="time-slots">
-                    {doctor.slots.length === 0 ? (
+                    {getSlots(doctor).length === 0 ? (
                       <span>No available slots for today</span>
                     ) : (
-                      doctor.slots.map((slot, idx) => (
+                      getSlots(doctor).map((slot, idx) => (
                         <div
                           key={idx}
-                          className={`time-slot ${slot.booked ? "booked" : ""}`}
+                          className={`time-slot ${slot.isBooked ? "booked" : ""}`}
                           onClick={() =>
-                            !slot.booked && handleSelectSlot(doctor, slot)
+                            !slot.isBooked && handleSelectSlot(doctor, slot)
                           }
                         >
                           {new Date(slot.startTime).toLocaleTimeString([], {
@@ -218,7 +258,7 @@ const SearchDoctors = ({ patientId = 1 }) => {
           <div className="card" style={{ width: "400px", maxWidth: "90%" }}>
             <h3>Confirm Appointment</h3>
             <p>
-              <strong>Doctor:</strong> {selectedDoctor.name}
+              <strong>Doctor:</strong> {getDoctorName(selectedDoctor)}
             </p>
             <p>
               <strong>Specialty:</strong> {selectedDoctor.specialty}

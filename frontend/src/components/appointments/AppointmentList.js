@@ -15,12 +15,25 @@ const AppointmentList = ({ patientId = 1 }) => {
   const [newDateTime, setNewDateTime] = useState("");
   const [rescheduleReason, setRescheduleReason] = useState("");
 
+  const toDateTimeLocalValue = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+    const pad = (input) => String(input).padStart(2, "0");
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+      date.getDate(),
+    )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
+
   const loadAppointments = async () => {
     setLoading(true);
     setError("");
     try {
       const result = await getPatientAppointments(patientId);
-      setAppointments(result.content || []);
+      setAppointments(Array.isArray(result) ? result : result?.content || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,7 +63,7 @@ const AppointmentList = ({ patientId = 1 }) => {
 
   const handleReschedule = async (appointment) => {
     setSelectedAppointment(appointment);
-    setNewDateTime(appointment.appointmentTime);
+    setNewDateTime(toDateTimeLocalValue(appointment.appointmentTime));
     setShowRescheduleModal(true);
   };
 
@@ -97,7 +110,21 @@ const AppointmentList = ({ patientId = 1 }) => {
 
   return (
     <div className="card">
-      <h2 className="card-title">My Appointments</h2>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "12px",
+        }}
+      >
+        <h2 className="card-title" style={{ marginBottom: 0 }}>
+          My Appointments
+        </h2>
+        <button className="btn btn-primary" onClick={loadAppointments}>
+          Refresh
+        </button>
+      </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
@@ -133,7 +160,11 @@ const AppointmentList = ({ patientId = 1 }) => {
             {appointment.consultationLink && (
               <p>
                 <strong>Video Link:</strong>{" "}
-                <a href={appointment.consultationLink} target="_blank">
+                <a
+                  href={appointment.consultationLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Join Consultation
                 </a>
               </p>

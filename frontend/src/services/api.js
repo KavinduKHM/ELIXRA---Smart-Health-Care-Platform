@@ -1,19 +1,57 @@
 const API_BASE_URL = "http://localhost:8084/api/appointments";
 
+const normalizeDateTimeValue = (value) => {
+  if (!value) {
+    return "";
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (typeof value === "string" && value.includes("T")) {
+    return value;
+  }
+
+  return `${value}T00:00:00`;
+};
+
 // Helper for handling responses
 const handleResponse = async (response) => {
+  const text = await response.text();
+
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Something went wrong");
+    let message = "Something went wrong";
+
+    if (text) {
+      try {
+        const error = JSON.parse(text);
+        message = error.message || error.error || message;
+      } catch {
+        message = text;
+      }
+    }
+
+    throw new Error(message);
   }
-  return response.json();
+
+  if (!text) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 };
 
 // Search doctors by specialty
-export const searchDoctors = async (specialty, name = "") => {
+export const searchDoctors = async (specialty, name = "", date = "") => {
   const params = new URLSearchParams();
   if (specialty) params.append("specialty", specialty);
   if (name) params.append("name", name);
+  if (date) params.append("date", date);
 
   const response = await fetch(`${API_BASE_URL}/doctors/search?${params}`);
   return handleResponse(response);
@@ -21,8 +59,9 @@ export const searchDoctors = async (specialty, name = "") => {
 
 // Get available time slots for a doctor
 export const getAvailableSlots = async (doctorId, date) => {
+  const normalizedDate = normalizeDateTimeValue(date);
   const response = await fetch(
-    `${API_BASE_URL}/doctors/${doctorId}/slots?date=${date}`,
+    `${API_BASE_URL}/doctors/${doctorId}/slots?date=${encodeURIComponent(normalizedDate)}`,
   );
   return handleResponse(response);
 };
@@ -80,7 +119,10 @@ export const rescheduleAppointment = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ newAppointmentTime, reason }),
+    body: JSON.stringify({
+      newAppointmentTime: normalizeDateTimeValue(newAppointmentTime),
+      reason,
+    }),
   });
   return handleResponse(response);
 };
@@ -92,7 +134,7 @@ export const confirmAppointment = async (id, notes = "") => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: notes,
+    body: JSON.stringify(notes),
   });
   return handleResponse(response);
 };
@@ -104,7 +146,7 @@ export const completeAppointment = async (id, notes = "") => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: notes,
+    body: JSON.stringify(notes),
   });
   return handleResponse(response);
 };
