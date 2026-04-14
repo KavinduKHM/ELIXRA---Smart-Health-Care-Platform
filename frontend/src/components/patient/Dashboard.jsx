@@ -8,6 +8,7 @@ import {
   ClockIcon,
   DocumentTextIcon,
   ExclamationTriangleIcon,
+  UserCircleIcon,
   VideoCameraIcon
 } from '@heroicons/react/24/outline';
 import {
@@ -30,10 +31,73 @@ import {
 import { differenceInDays, format } from 'date-fns';
 import './Dashboard.css';
 
+const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || '';
+
+const parseJwtPayload = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+        .join('')
+    );
+
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    return null;
+  }
+};
+
+const extractUserIdFromToken = (token) => {
+  const payload = parseJwtPayload(token);
+  if (!payload) return null;
+
+  const keys = ['userId', 'id', 'user_id', 'sub'];
+  for (const key of keys) {
+    const value = payload[key];
+    if (value === null || value === undefined) continue;
+
+    const parsed = Number(value);
+    if (Number.isInteger(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+
+  return null;
+};
+
+const resolveCloudinaryUrl = (value) => {
+  if (!value) return '';
+  const candidate = String(value).trim();
+  if (!candidate) return '';
+
+  if (/^https?:\/\//i.test(candidate)) {
+    return candidate;
+  }
+
+  if (!CLOUDINARY_CLOUD_NAME) {
+    return '';
+  }
+
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${candidate}`;
+};
+
+const buildInitials = (firstName, lastName) => {
+  const first = String(firstName || '').trim().charAt(0);
+  const last = String(lastName || '').trim().charAt(0);
+  const merged = `${first}${last}`.toUpperCase();
+
+  return merged || 'PT';
+};
+
 const PatientDashboard = ({ patientId }) => {
   const [loading, setLoading] = useState(true);
   const [patient, setPatient] = useState(null);
   const [dashboardError, setDashboardError] = useState('');
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
 
   const [stats, setStats] = useState({
     totalAppointments: 0,
@@ -62,19 +126,52 @@ const PatientDashboard = ({ patientId }) => {
   const fetchDashboardData = async () => {
     setLoading(true);
     setDashboardError('');
+    setBloodPressureData([]);
 
     try {
       const token = localStorage.getItem('accessToken');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const sessionPatientId = Number(localStorage.getItem('patientId'));
+      const propPatientId = Number(patientId);
+      const fallbackPatientId = Number.isInteger(sessionPatientId) && sessionPatientId > 0
+        ? sessionPatientId
+        : (Number.isInteger(propPatientId) && propPatientId > 0 ? propPatientId : null);
 
-      const profileRes = await axios.get(
-        `http://localhost:8082/api/patients/${patientId}/profile`,
-        { headers }
-      );
-      setPatient(profileRes.data);
+      let resolvedPatientId = null;
+      let profile = null;
+
+      const loggedInUserId = token ? extractUserIdFromToken(token) : null;
+      if (loggedInUserId) {
+        try {
+          const byUserRes = await axios.get(
+            `http://localhost:8082/api/patients/user/${loggedInUserId}`,
+            { headers }
+          );
+          profile = byUserRes.data;
+          resolvedPatientId = Number(profile?.id) || null;
+        } catch (error) {
+          // Fallback below if this endpoint is unavailable in a deployment.
+        }
+      }
+
+      if (!resolvedPatientId && fallbackPatientId) {
+        const profileRes = await axios.get(
+          `http://localhost:8082/api/patients/${fallbackPatientId}/profile`,
+          { headers }
+        );
+        profile = profileRes.data;
+        resolvedPatientId = Number(profile?.id) || fallbackPatientId;
+      }
+
+      if (!resolvedPatientId || !profile) {
+        throw new Error('Unable to resolve logged-in patient profile.');
+      }
+
+      setPatient(profile);
+      localStorage.setItem('patientId', String(resolvedPatientId));
 
       const appointmentsRes = await axios.get(
-        `http://localhost:8084/api/appointments/patient/${patientId}?page=0&size=100`,
+        `http://localhost:8084/api/appointments/patient/${resolvedPatientId}?page=0&size=100`,
         { headers }
       );
 
@@ -105,7 +202,7 @@ const PatientDashboard = ({ patientId }) => {
       let prescriptions = [];
       try {
         const prescriptionsRes = await axios.get(
-          `http://localhost:8082/api/patients/${patientId}/prescriptions`,
+          `http://localhost:8082/api/patients/${resolvedPatientId}/prescriptions`,
           { headers }
         );
         prescriptions = prescriptionsRes.data || [];
@@ -145,7 +242,7 @@ const PatientDashboard = ({ patientId }) => {
 
       try {
         const documentsRes = await axios.get(
-          `http://localhost:8082/api/patients/${patientId}/documents`,
+          `http://localhost:8082/api/patients/${resolvedPatientId}/documents`,
           { headers }
         );
         setStats((prev) => ({ ...prev, totalDocuments: documentsRes.data.length || 0 }));
@@ -155,7 +252,7 @@ const PatientDashboard = ({ patientId }) => {
 
       try {
         const videoRes = await axios.get(
-          `http://localhost:8085/api/video/patients/${patientId}/active`,
+          `http://localhost:8085/api/video/patients/${resolvedPatientId}/active`,
           { headers }
         );
         setStats((prev) => ({ ...prev, videoSessions: videoRes.data.length || 0 }));
@@ -164,10 +261,9 @@ const PatientDashboard = ({ patientId }) => {
       }
 
       generateAlerts(appointments, prescriptions, upcoming.length);
-      generateMockHealthData();
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setDashboardError('Unable to load patient dashboard data. Please refresh or try again shortly.');
+      setDashboardError('Unable to load dashboard data for the logged-in patient. Please sign in again or try again shortly.');
     } finally {
       setLoading(false);
     }
@@ -245,20 +341,6 @@ const PatientDashboard = ({ patientId }) => {
     setAlerts(nextAlerts);
   };
 
-  const generateMockHealthData = () => {
-    const data = [];
-    for (let i = 6; i >= 0; i -= 1) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      data.push({
-        date: format(date, 'MMM dd'),
-        systolic: 110 + Math.floor(Math.random() * 20),
-        diastolic: 70 + Math.floor(Math.random() * 15)
-      });
-    }
-    setBloodPressureData(data);
-  };
-
   const nextAppointment = useMemo(() => {
     if (!upcomingAppointments.length) return null;
     return upcomingAppointments[0];
@@ -268,6 +350,25 @@ const PatientDashboard = ({ patientId }) => {
     if (!stats.totalPrescriptions) return 0;
     return Math.round((stats.activePrescriptions / stats.totalPrescriptions) * 100);
   }, [stats.activePrescriptions, stats.totalPrescriptions]);
+
+  const patientAvatarUrl = useMemo(() => {
+    return resolveCloudinaryUrl(
+      patient?.profilePictureUrl || patient?.profilePicture || patient?.avatarUrl || patient?.photoUrl
+    );
+  }, [patient]);
+
+  const patientName = useMemo(() => {
+    const fullName = [patient?.firstName, patient?.lastName].filter(Boolean).join(' ').trim();
+    return fullName || 'Patient';
+  }, [patient]);
+
+  const patientInitials = useMemo(() => {
+    return buildInitials(patient?.firstName, patient?.lastName);
+  }, [patient]);
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [patientAvatarUrl]);
 
   if (loading) {
     return (
@@ -281,12 +382,35 @@ const PatientDashboard = ({ patientId }) => {
   return (
     <div className="pd-shell">
       <header className="pd-header-card">
-        <div>
-          <h1>Patient Health Dashboard</h1>
-          <p>
-            Welcome back{patient?.firstName ? `, ${patient.firstName} ${patient?.lastName || ''}` : ''}. Here is your current care snapshot.
-          </p>
+        <div className="pd-header-main">
+          <div className="pd-avatar-shell" aria-label={`Patient avatar for ${patientName}`}>
+            {patientAvatarUrl && !avatarLoadFailed ? (
+              <img
+                className="pd-avatar-image"
+                src={patientAvatarUrl}
+                alt={`Profile of ${patientName}`}
+                onError={() => setAvatarLoadFailed(true)}
+              />
+            ) : (
+              <div className="pd-avatar-fallback" role="img" aria-label={`Initials avatar for ${patientName}`}>
+                {patientInitials === 'PT' ? <UserCircleIcon className="pd-avatar-icon" /> : patientInitials}
+              </div>
+            )}
+          </div>
+
+          <div className="pd-header-copy">
+            <h1>Patient Health Dashboard</h1>
+            <p>
+              Welcome back{patient?.firstName ? `, ${patient.firstName} ${patient?.lastName || ''}` : ''}. Here is your current care snapshot.
+            </p>
+            <div className="pd-patient-meta">
+              <span className="pd-patient-meta-pill">{patientName}</span>
+              {patient?.email && <span className="pd-patient-meta-pill">{patient.email}</span>}
+              {patient?.id && <span className="pd-patient-meta-pill">Patient ID: {patient.id}</span>}
+            </div>
+          </div>
         </div>
+
         <div className="pd-highlight-chip">
           <ClockIcon className="pd-chip-icon" />
           {nextAppointment
@@ -425,18 +549,22 @@ const PatientDashboard = ({ patientId }) => {
             <h2>Blood Pressure Trend</h2>
             <span className="pd-badge">Last 7 days</span>
           </div>
-          <ResponsiveContainer width="100%" height={290}>
-            <LineChart data={bloodPressureData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#d7dde8" />
-              <XAxis dataKey="date" stroke="#607086" />
-              <YAxis domain={[60, 160]} stroke="#607086" />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="systolic" stroke="#d94b4b" name="Systolic" strokeWidth={2.5} />
-              <Line type="monotone" dataKey="diastolic" stroke="#2f80ed" name="Diastolic" strokeWidth={2.5} />
-            </LineChart>
-          </ResponsiveContainer>
-          <p className="pd-footnote">Sample data shown. Connect wearable integrations for live patient vitals.</p>
+          {bloodPressureData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={290}>
+              <LineChart data={bloodPressureData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#d7dde8" />
+                <XAxis dataKey="date" stroke="#607086" />
+                <YAxis domain={[60, 160]} stroke="#607086" />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="systolic" stroke="#d94b4b" name="Systolic" strokeWidth={2.5} />
+                <Line type="monotone" dataKey="diastolic" stroke="#2f80ed" name="Diastolic" strokeWidth={2.5} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="pd-empty">No blood pressure data available in your records yet.</p>
+          )}
+          <p className="pd-footnote">Live vitals will appear here once available from your clinical data source.</p>
         </div>
       </section>
 

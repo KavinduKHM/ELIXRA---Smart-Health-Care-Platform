@@ -29,6 +29,55 @@
   box-shadow: 0 16px 36px rgba(30, 63, 114, 0.25);
 }
 
+.pd-header-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pd-avatar-shell {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex: 0 0 72px;
+  border: 3px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 18px rgba(6, 17, 43, 0.28);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.pd-avatar-image,
+.pd-avatar-fallback {
+  width: 100%;
+  height: 100%;
+}
+
+.pd-avatar-image {
+  object-fit: cover;
+  display: block;
+}
+
+.pd-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #eaf1ff;
+  background: linear-gradient(145deg, #2f62a8, #1b3a69);
+}
+
+.pd-avatar-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.pd-header-copy {
+  min-width: 0;
+}
+
 .pd-header-card h1 {
   margin: 0;
   font-size: 30px;
@@ -39,6 +88,25 @@
 .pd-header-card p {
   margin: 8px 0 0;
   color: rgba(239, 245, 255, 0.86);
+}
+
+.pd-patient-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pd-patient-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(239, 245, 255, 0.16);
+  border: 1px solid rgba(239, 245, 255, 0.26);
+  color: #eff5ff;
 }
 
 .pd-highlight-chip {
@@ -373,6 +441,10 @@
     align-items: flex-start;
   }
 
+  .pd-header-main {
+    width: 100%;
+  }
+
   .pd-chart-grid,
   .pd-lists-grid,
   .pd-alert-grid {
@@ -383,6 +455,18 @@
 @media (max-width: 640px) {
   .pd-shell {
     padding: 16px;
+  }
+
+  .pd-header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .pd-avatar-shell {
+    width: 64px;
+    height: 64px;
+    flex-basis: 64px;
   }
 
   .pd-stats-grid,
