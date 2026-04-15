@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import Card from '../../components/common/Card';
@@ -10,6 +11,7 @@ import { cancelAppointment, listAppointmentsForPatient, rescheduleAppointment } 
 
 export default function PatientAppointments() {
   const { userId } = useAuth();
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const [reschedule, setReschedule] = useState({ id: null, newAppointmentTime: '', reason: '' });
 
@@ -73,6 +75,11 @@ export default function PatientAppointments() {
                     ) : null}
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    {String(a.paymentStatus || '').toLowerCase() !== 'succeeded' ? (
+                      <Button variant="primary" onClick={() => navigate(`/patient/pay/${a.id}`)}>
+                        Pay
+                      </Button>
+                    ) : null}
                     <Button
                       variant="secondary"
                       onClick={() => setReschedule({ id: a.id, newAppointmentTime: '', reason: '' })}

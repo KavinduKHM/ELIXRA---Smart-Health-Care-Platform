@@ -70,6 +70,9 @@ public class Appointment {
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
 
+    @Column(name = "transaction_id")
+    private String transactionId;
+
     @Column(name = "payment_status")
     private String paymentStatus;  // "pending", "succeeded", "failed"
 

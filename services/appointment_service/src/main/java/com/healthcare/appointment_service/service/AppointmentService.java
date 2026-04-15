@@ -323,6 +323,7 @@ public class AppointmentService {
 
         // 8. Update appointment with payment intent ID
         savedAppointment.setPaymentIntentId(paymentResponse.getPaymentIntentId());
+        savedAppointment.setTransactionId(paymentResponse.getTransactionId());
         savedAppointment.setPaymentStatus(paymentResponse.getStatus());
         appointmentRepository.save(savedAppointment);
 
@@ -330,6 +331,7 @@ public class AppointmentService {
         AppointmentResponse response = buildResponse(savedAppointment, patient, doctor);
         response.setClientSecret(paymentResponse.getClientSecret());
         response.setPaymentIntentId(paymentResponse.getPaymentIntentId());
+        response.setTransactionId(paymentResponse.getTransactionId());
         response.setPaymentStatus(paymentResponse.getStatus());
 
         log.info("Payment intent created: {}", paymentResponse.getPaymentIntentId());
@@ -339,7 +341,7 @@ public class AppointmentService {
 
 
     @Transactional
-    public AppointmentResponse confirmPaymentAndUpdateStatus(Long appointmentId, String paymentIntentId) {
+    public AppointmentResponse confirmPaymentAndUpdateStatus(Long appointmentId, String paymentIntentId, String transactionId) {
         log.info("Confirming payment for appointment: {}", appointmentId);
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -347,6 +349,20 @@ public class AppointmentService {
 
         if (!paymentIntentId.equals(appointment.getPaymentIntentId())) {
             throw new RuntimeException("Payment intent mismatch");
+        }
+
+        // Confirm/update payment-service transaction status (idempotent)
+        String effectiveTransactionId = (transactionId != null && !transactionId.isBlank())
+                ? transactionId
+                : appointment.getTransactionId();
+        if (effectiveTransactionId != null && !effectiveTransactionId.isBlank()) {
+            PaymentConfirmationRequest confirmation = new PaymentConfirmationRequest();
+            confirmation.setAppointmentId(appointmentId);
+            confirmation.setPaymentIntentId(paymentIntentId);
+            confirmation.setTransactionId(effectiveTransactionId);
+            paymentServiceClient.confirmPayment(confirmation);
+        } else {
+            log.warn("No transactionId available for appointment {}. Payment-service confirm will be skipped.", appointmentId);
         }
 
         // Optionally verify payment status with payment service (uncomment if needed)
@@ -779,7 +795,10 @@ public class AppointmentService {
                 .consultationLink(appointment.getConsultationLink())
                 .prescriptionIssued(appointment.isPrescriptionIssued())
                 .createdAt(appointment.getCreatedAt())
-                .updatedAt(appointment.getUpdatedAt());
+                .updatedAt(appointment.getUpdatedAt())
+                .paymentIntentId(appointment.getPaymentIntentId())
+                .transactionId(appointment.getTransactionId())
+                .paymentStatus(appointment.getPaymentStatus());
 
         if (patient != null) {
             builder.patientName(patient.getFullName());

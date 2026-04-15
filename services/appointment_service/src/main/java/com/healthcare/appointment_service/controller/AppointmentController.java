@@ -59,7 +59,11 @@ public class AppointmentController {
             @PathVariable Long id,
             @Valid @RequestBody PaymentConfirmationRequest request) {
 
-        AppointmentResponse response = appointmentService.confirmPaymentAndUpdateStatus(id, request.getPaymentIntentId());
+        AppointmentResponse response = appointmentService.confirmPaymentAndUpdateStatus(
+            id,
+            request.getPaymentIntentId(),
+            request.getTransactionId()
+        );
         return ResponseEntity.ok(response);
     }
 

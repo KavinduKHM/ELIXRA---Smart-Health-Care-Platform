@@ -46,22 +46,35 @@ public class PaymentService {
     }
     
     /**
-     * Check if payment already exists for this appointment
-     * Returns true if payment already exists and is successful
+     * If a previous transaction exists for the appointment:
+     * - SUCCEEDED => payment already completed (do not create a new intent)
+     * - PENDING   => return the existing intent/transaction so clients can resume payment
      */
-    private boolean isPaymentAlreadyProcessed(Long appointmentId) {
+    private Transaction getExistingActiveTransaction(Long appointmentId) {
         List<Transaction> existingTransactions = transactionRepository.findByAppointmentId(appointmentId);
-        
-        for (Transaction transaction : existingTransactions) {
-            // If there's a successful or pending transaction for this appointment
-            if (transaction.getStatus().equals(Transaction.TransactionStatus.SUCCEEDED.name()) ||
-                transaction.getStatus().equals(Transaction.TransactionStatus.PENDING.name())) {
-                log.warn("Duplicate payment attempt detected for appointment: {}. Existing transaction: {} with status: {}",
-                    appointmentId, transaction.getTransactionId(), transaction.getStatus());
-                return true;
+
+        // Prefer latest transaction (best-effort ordering by created time when present)
+        Transaction best = null;
+        for (Transaction t : existingTransactions) {
+            if (best == null) {
+                best = t;
+                continue;
+            }
+            if (t.getCreatedAt() != null && best.getCreatedAt() != null && t.getCreatedAt().isAfter(best.getCreatedAt())) {
+                best = t;
             }
         }
-        return false;
+
+        if (best == null) return null;
+
+        if (Transaction.TransactionStatus.SUCCEEDED.name().equals(best.getStatus()) ||
+            Transaction.TransactionStatus.PENDING.name().equals(best.getStatus())) {
+            log.warn("Existing transaction found for appointment: {}. transactionId={} status={}",
+                appointmentId, best.getTransactionId(), best.getStatus());
+            return best;
+        }
+
+        return null;
     }
     
 
@@ -69,10 +82,38 @@ public class PaymentService {
     public PaymentResponse createPaymentIntent(PaymentRequest request) {
         log.info("Creating payment intent for appointment: {}", request.getAppointmentId());
 
-        // CHECK FOR DUPLICATE PAYMENT
-        if (isPaymentAlreadyProcessed(request.getAppointmentId())) {
-            throw new RuntimeException("Payment already processed for appointment: " + request.getAppointmentId() +
-                    ". Duplicate payments are not allowed.");
+        // If we already have an active transaction, return it (PENDING) or block (SUCCEEDED)
+        Transaction existing = getExistingActiveTransaction(request.getAppointmentId());
+        if (existing != null) {
+            if (Transaction.TransactionStatus.SUCCEEDED.name().equals(existing.getStatus())) {
+                throw new RuntimeException("Payment already processed for appointment: " + request.getAppointmentId() +
+                        ". Duplicate payments are not allowed.");
+            }
+
+            try {
+                PaymentIntent existingIntent = PaymentIntent.retrieve(existing.getStripePaymentIntentId());
+
+                // If intent already succeeded, update DB (idempotent)
+                if ("succeeded".equals(existingIntent.getStatus()) &&
+                    !Transaction.TransactionStatus.SUCCEEDED.name().equals(existing.getStatus())) {
+                    existing.setStatus(Transaction.TransactionStatus.SUCCEEDED.name());
+                    existing.setPaidAt(LocalDateTime.now());
+                    transactionRepository.save(existing);
+                    invoiceService.generateInvoice(existing);
+                }
+
+                return new PaymentResponse(
+                        existing.getStripePaymentIntentId(),
+                        existingIntent.getClientSecret(),
+                        existing.getTransactionId(),
+                        existing.getStatus(),
+                        existing.getAmount(),
+                        existing.getCurrency()
+                );
+            } catch (StripeException e) {
+                log.error("Stripe error while resuming existing intent: {}", e.getMessage());
+                throw new RuntimeException("Failed to retrieve existing payment intent: " + e.getMessage());
+            }
         }
 
         try {
@@ -171,7 +212,7 @@ public class PaymentService {
             }
             // =========================================================
 
-            return new PaymentResponse(
+                return new PaymentResponse(
                     paymentIntent.getId(),
                     paymentIntent.getClientSecret(),
                     transactionId,

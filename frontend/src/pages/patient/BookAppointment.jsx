@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
@@ -10,6 +11,7 @@ import { createAppointment, searchDoctorsForAppointments } from '../../services/
 
 export default function PatientBookAppointment() {
   const { userId } = useAuth();
+  const navigate = useNavigate();
   const [specialty, setSpecialty] = useState('');
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
@@ -40,6 +42,16 @@ export default function PatientBookAppointment() {
       setSelected(null);
       setSymptoms('');
       setNotes('');
+
+      if (data?.id) {
+        navigate(`/patient/pay/${data.id}`, {
+          state: {
+            clientSecret: data.clientSecret,
+            paymentIntentId: data.paymentIntentId,
+            transactionId: data.transactionId,
+          },
+        });
+      }
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Booking failed'),
   });
@@ -165,7 +177,7 @@ export default function PatientBookAppointment() {
             )}
           </Button>
           {createMutation.data?.clientSecret ? (
-            <div className="text-xs text-slate-600">Payment client secret received. (Stripe UI is next.)</div>
+            <div className="text-xs text-slate-600">Redirecting to payment…</div>
           ) : null}
         </div>
       </Card>

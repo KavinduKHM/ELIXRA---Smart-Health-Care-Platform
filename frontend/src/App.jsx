@@ -16,6 +16,7 @@ import PatientPrescriptions from './pages/patient/Prescriptions';
 import PatientMedicalHistory from './pages/patient/MedicalHistory';
 import PatientProfile from './pages/patient/Profile';
 import PatientSymptoms from './pages/patient/Symptoms';
+import PayAppointment from './pages/patient/PayAppointment';
 
 function RoleHomeRedirect() {
   const { isAuthenticated, userRole } = useAuth();
@@ -32,6 +33,7 @@ function PatientLayout() {
       <Routes>
         <Route index element={<PatientDashboard />} />
         <Route path="book" element={<PatientBookAppointment />} />
+        <Route path="pay/:appointmentId" element={<PayAppointment />} />
         <Route path="appointments" element={<PatientAppointments />} />
         <Route path="documents" element={<PatientDocuments />} />
         <Route path="prescriptions" element={<PatientPrescriptions />} />

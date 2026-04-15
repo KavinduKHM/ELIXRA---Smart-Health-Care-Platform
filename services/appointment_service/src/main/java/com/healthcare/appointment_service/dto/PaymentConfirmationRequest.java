@@ -6,4 +6,5 @@ import lombok.Data;
 public class PaymentConfirmationRequest {
     private String paymentIntentId;
     private String transactionId;
+    private Long appointmentId;
 }
