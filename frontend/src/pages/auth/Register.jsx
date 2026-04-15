@@ -13,14 +13,20 @@ import { register as registerApi } from '../../services/auth.service';
 const schema = z
   .object({
     role: z.enum(['PATIENT', 'DOCTOR']),
-    fullName: z.string().min(2, 'Name is required'),
+    userId: z.preprocess((v) => Number(v), z.number().int().positive('User ID is required')),
+    firstName: z.string().min(2, 'First name is required'),
+    lastName: z.string().min(2, 'Last name is required'),
     email: z.string().email('Enter a valid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string().min(6),
+    phoneNumber: z
+      .string()
+      .regex(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
+    specialty: z.string().optional(),
+    consultationFee: z.preprocess((v) => (v === '' ? undefined : Number(v)), z.number().positive().optional()),
+    qualification: z.string().optional(),
   })
-  .refine((v) => v.password === v.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
+  .refine((v) => (v.role === 'DOCTOR' ? Boolean(v.specialty) : true), {
+    message: 'Specialty is required for doctors',
+    path: ['specialty'],
   });
 
 export default function Register() {
@@ -37,13 +43,8 @@ export default function Register() {
 
   const onSubmit = async (values) => {
     try {
-      await registerApi({
-        role: values.role,
-        fullName: values.fullName,
-        email: values.email,
-        password: values.password,
-      });
-      toast.success('Account created. Please sign in.');
+      await registerApi(values);
+      toast.success('Profile created. Please sign in.');
       navigate('/login', { replace: true });
     } catch (e) {
       toast.error(e?.response?.data?.message || e?.message || 'Registration failed');
@@ -63,15 +64,23 @@ export default function Register() {
               <option value="DOCTOR">Doctor</option>
             </Select>
 
-            <Input label="Full name" error={errors.fullName?.message} {...register('fullName')} />
+            <Input label="User ID" type="number" error={errors.userId?.message} {...register('userId')} />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Input label="First name" error={errors.firstName?.message} {...register('firstName')} />
+              <Input label="Last name" error={errors.lastName?.message} {...register('lastName')} />
+            </div>
             <Input label="Email" type="email" error={errors.email?.message} {...register('email')} />
-            <Input label="Password" type="password" error={errors.password?.message} {...register('password')} />
-            <Input
-              label="Confirm password"
-              type="password"
-              error={errors.confirmPassword?.message}
-              {...register('confirmPassword')}
-            />
+            <Input label="Phone" placeholder="0712345678" error={errors.phoneNumber?.message} {...register('phoneNumber')} />
+
+            <div className="rounded-2xl border border-slate-200 p-4">
+              <div className="text-sm font-semibold">Doctor fields</div>
+              <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Input label="Specialty" error={errors.specialty?.message} {...register('specialty')} />
+                <Input label="Consultation fee" type="number" step="0.01" error={errors.consultationFee?.message} {...register('consultationFee')} />
+              </div>
+              <Input className="mt-4" label="Qualification" error={errors.qualification?.message} {...register('qualification')} />
+              <div className="mt-2 text-xs text-slate-500">Only required if you choose Doctor role.</div>
+            </div>
 
             <Button className="w-full" type="submit" disabled={isSubmitting}>
               {isSubmitting ? (

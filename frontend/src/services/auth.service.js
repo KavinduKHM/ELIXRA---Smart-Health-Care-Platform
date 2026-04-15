@@ -1,6 +1,10 @@
 import { createApiClient } from './api';
 import { serviceUrls } from './serviceUrls';
 import { storage } from '../lib/storage';
+import { getPatientProfile } from './patient.service';
+import { getDoctorProfile } from './doctor.service';
+import { registerPatient } from './patient.service';
+import { registerDoctor } from './doctor.service';
 
 const authApi = createApiClient(serviceUrls.auth);
 
@@ -24,13 +28,46 @@ function normalizeAuthResponse(data) {
 }
 
 export async function login(payload) {
-  const res = await authApi.post('/login', payload);
-  return normalizeAuthResponse(res.data);
+  // Preferred: dedicated auth-service (if available)
+  try {
+    const res = await authApi.post('/login', payload);
+    return normalizeAuthResponse(res.data);
+  } catch (e) {
+    // Fallback: this repo's docker-compose does not include an auth service.
+    // Allow dev login by ID so the rest of the platform can be exercised.
+    const status = e?.response?.status;
+    if (status && status !== 404) throw e;
+
+    const { role, userId } = payload || {};
+    if (!userId) throw e;
+
+    // Validate the ID exists.
+    if (role === 'PATIENT') await getPatientProfile(userId);
+    if (role === 'DOCTOR') await getDoctorProfile(userId);
+
+    return {
+      accessToken: 'dev',
+      refreshToken: null,
+      role,
+      userId: String(userId),
+    };
+  }
 }
 
 export async function register(payload) {
-  const res = await authApi.post('/register', payload);
-  return res.data;
+  // Preferred: dedicated auth-service (if available)
+  try {
+    const res = await authApi.post('/register', payload);
+    return res.data;
+  } catch (e) {
+    const status = e?.response?.status;
+    if (status && status !== 404) throw e;
+
+    // Fallback: register in patient-service / doctor-service
+    if (payload?.role === 'PATIENT') return registerPatient(payload);
+    if (payload?.role === 'DOCTOR') return registerDoctor(payload);
+    throw e;
+  }
 }
 
 export async function refreshToken() {

@@ -10,11 +10,19 @@ import Button from '../../components/common/Button';
 import Spinner from '../../components/common/Spinner';
 import { useAuth } from '../../hooks/useAuth';
 
-const schema = z.object({
-  email: z.string().email('Enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['PATIENT', 'DOCTOR', 'ADMIN']),
-});
+const schema = z
+  .object({
+    role: z.enum(['PATIENT', 'DOCTOR', 'ADMIN']),
+    userId: z
+      .preprocess((v) => (v === '' || v === undefined ? undefined : Number(v)), z.number().int().positive().optional())
+      .optional(),
+    email: z.string().email('Enter a valid email').optional().or(z.literal('')),
+    password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal('')),
+  })
+  .refine(
+    (v) => Boolean(v.userId) || (Boolean(v.email) && Boolean(v.password)),
+    { message: 'Enter User ID, or email + password', path: ['email'] }
+  );
 
 export default function Login() {
   const navigate = useNavigate();
@@ -28,6 +36,9 @@ export default function Login() {
     resolver: zodResolver(schema),
     defaultValues: {
       role: 'PATIENT',
+      userId: '',
+      email: '',
+      password: '',
     },
   });
 
@@ -72,6 +83,14 @@ export default function Login() {
               </Select>
 
               <Input
+                label="User ID (fallback)"
+                type="number"
+                placeholder="Use patientId/doctorId if no auth service"
+                error={errors.userId?.message}
+                {...register('userId')}
+              />
+
+              <Input
                 label="Email"
                 type="email"
                 placeholder="you@example.com"
@@ -86,6 +105,11 @@ export default function Login() {
                 error={errors.password?.message}
                 {...register('password')}
               />
+
+              <div className="text-xs text-slate-500">
+                If you run an auth service, set <span className="font-semibold">VITE_AUTH_BASE_URL</span> and login with email/password.
+                Otherwise, use the User ID field.
+              </div>
 
               <Button className="w-full" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (

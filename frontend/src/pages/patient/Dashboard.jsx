@@ -22,6 +22,14 @@ export default function PatientDashboard() {
     enabled: Boolean(userId),
   });
 
+  const appointments = Array.isArray(appointmentsQuery.data)
+    ? appointmentsQuery.data
+    : appointmentsQuery.data?.content || appointmentsQuery.data?.items || [];
+
+  const prescriptions = Array.isArray(prescriptionsQuery.data)
+    ? prescriptionsQuery.data
+    : prescriptionsQuery.data?.content || prescriptionsQuery.data?.items || [];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -56,19 +64,16 @@ export default function PatientDashboard() {
               <div className="text-sm text-rose-600">Failed to load appointments.</div>
             ) : (
               <div className="space-y-3">
-                {(Array.isArray(appointmentsQuery.data) ? appointmentsQuery.data : appointmentsQuery.data?.items || [])
-                  .slice(0, 5)
-                  .map((a) => (
+                {appointments.slice(0, 5).map((a) => (
                     <div key={a.id} className="rounded-xl border border-slate-200 p-3">
                       <div className="flex items-center justify-between">
                         <div className="text-sm font-semibold">{a.doctorName || a.doctor?.name || 'Doctor'}</div>
                         <div className="text-xs font-semibold text-slate-600">{a.status || 'UNKNOWN'}</div>
                       </div>
-                      <div className="mt-1 text-sm text-slate-700">{a.date || a.appointmentDate || a.startTime || '—'}</div>
+                      <div className="mt-1 text-sm text-slate-700">{a.appointmentTime || a.date || a.appointmentDate || a.startTime || '—'}</div>
                     </div>
                   ))}
-                {(Array.isArray(appointmentsQuery.data) ? appointmentsQuery.data : appointmentsQuery.data?.items || [])
-                  .length === 0 ? <div className="text-sm text-slate-600">No appointments yet.</div> : null}
+                {appointments.length === 0 ? <div className="text-sm text-slate-600">No appointments yet.</div> : null}
               </div>
             )}
           </div>
@@ -90,9 +95,7 @@ export default function PatientDashboard() {
               <div className="text-sm text-rose-600">Failed to load prescriptions.</div>
             ) : (
               <div className="space-y-3">
-                {(Array.isArray(prescriptionsQuery.data) ? prescriptionsQuery.data : prescriptionsQuery.data?.items || [])
-                  .slice(0, 5)
-                  .map((p) => (
+                {prescriptions.slice(0, 5).map((p) => (
                     <div key={p.id} className="rounded-xl border border-slate-200 p-3">
                       <div className="text-sm font-semibold">{p.title || `Prescription #${p.id}`}</div>
                       <div className="mt-1 text-sm text-slate-700">
@@ -102,8 +105,7 @@ export default function PatientDashboard() {
                       </div>
                     </div>
                   ))}
-                {(Array.isArray(prescriptionsQuery.data) ? prescriptionsQuery.data : prescriptionsQuery.data?.items || [])
-                  .length === 0 ? <div className="text-sm text-slate-600">No prescriptions yet.</div> : null}
+                {prescriptions.length === 0 ? <div className="text-sm text-slate-600">No prescriptions yet.</div> : null}
               </div>
             )}
           </div>

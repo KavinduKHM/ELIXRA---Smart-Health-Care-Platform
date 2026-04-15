@@ -9,6 +9,13 @@ import NotFound from './pages/NotFound';
 import Notifications from './pages/common/Notifications';
 
 import PatientDashboard from './pages/patient/Dashboard';
+import PatientBookAppointment from './pages/patient/BookAppointment';
+import PatientAppointments from './pages/patient/Appointments';
+import PatientDocuments from './pages/patient/Documents';
+import PatientPrescriptions from './pages/patient/Prescriptions';
+import PatientMedicalHistory from './pages/patient/MedicalHistory';
+import PatientProfile from './pages/patient/Profile';
+import PatientSymptoms from './pages/patient/Symptoms';
 
 function RoleHomeRedirect() {
   const { isAuthenticated, userRole } = useAuth();
@@ -24,6 +31,13 @@ function PatientLayout() {
     <AppShell role="PATIENT">
       <Routes>
         <Route index element={<PatientDashboard />} />
+        <Route path="book" element={<PatientBookAppointment />} />
+        <Route path="appointments" element={<PatientAppointments />} />
+        <Route path="documents" element={<PatientDocuments />} />
+        <Route path="prescriptions" element={<PatientPrescriptions />} />
+        <Route path="history" element={<PatientMedicalHistory />} />
+        <Route path="profile" element={<PatientProfile />} />
+        <Route path="symptoms" element={<PatientSymptoms />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
