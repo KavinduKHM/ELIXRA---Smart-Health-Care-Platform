@@ -1,6 +1,7 @@
 package com.healthcare.appointment_service.service;
 
 import com.healthcare.appointment_service.client.DoctorServiceClient;
+import com.healthcare.appointment_service.client.NotificationServiceClient;
 import com.healthcare.appointment_service.client.PatientServiceClient;
 import com.healthcare.appointment_service.dto.*;
 import com.healthcare.appointment_service.model.Appointment;
@@ -39,6 +40,7 @@ public class AppointmentService {
     private final DoctorServiceClient doctorServiceClient;
     private final PatientServiceClient patientServiceClient;
     private final PaymentServiceClient paymentServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     @org.springframework.beans.factory.annotation.Value("${app.payment.currency:LKR}")
     private String paymentCurrency;
@@ -273,6 +275,8 @@ public class AppointmentService {
 
         log.info("Payment intent created: {}", paymentResponse.getPaymentIntentId());
 
+        sendNotification(savedAppointment, patient, doctor, "created");
+
         return response;
     }
 
@@ -308,6 +312,8 @@ public class AppointmentService {
             patient.setFirstName("Patient");
             patient.setLastName(String.valueOf(appointment.getPatientId()));
         }
+
+        sendNotification(appointment, patient, doctor, "confirmed");
 
         return buildResponse(appointment, patient, doctor);
     }
@@ -456,6 +462,12 @@ public class AppointmentService {
         doctor.setLastName(String.valueOf(updatedAppointment.getDoctorId()));
         doctor.setSpecialty("General Medicine");
 
+        if (request.getStatus() == AppointmentStatus.CONFIRMED) {
+            sendNotification(updatedAppointment, patient, doctor, "confirmed");
+        } else if (request.getStatus() == AppointmentStatus.COMPLETED) {
+            sendNotification(updatedAppointment, patient, doctor, "completed");
+        }
+
         return buildResponse(updatedAppointment, patient, doctor);
     }
     /**
@@ -505,6 +517,8 @@ public class AppointmentService {
         doctor.setSpecialty("General Medicine");
 
         log.info("Appointment {} cancelled successfully", id);
+
+        sendNotification(cancelledAppointment, patient, doctor, "cancelled");
 
         return buildResponse(cancelledAppointment, patient, doctor);
     }
@@ -668,6 +682,38 @@ public class AppointmentService {
                 })
                 .collect(Collectors.toList());
     }
+    /**
+     * Send appointment lifecycle notification to notification-service.
+     * Failures are logged and swallowed so they never break the main flow.
+     */
+    private void sendNotification(Appointment appointment, PatientDTO patient, DoctorDTO doctor, String eventType) {
+        try {
+            AppointmentNotificationDTO dto = new AppointmentNotificationDTO();
+            dto.setAppointmentId(String.valueOf(appointment.getId()));
+            dto.setPatientId(String.valueOf(appointment.getPatientId()));
+            dto.setPatientName(patient != null ? patient.getFullName() : null);
+            dto.setPatientEmail(patient != null ? patient.getEmail() : null);
+            dto.setPatientPhone(patient != null ? patient.getPhoneNumber() : null);
+            dto.setDoctorId(String.valueOf(appointment.getDoctorId()));
+            dto.setDoctorName(doctor != null ? doctor.getFullName() : null);
+            dto.setDoctorEmail(doctor != null ? doctor.getEmail() : null);
+            dto.setSpecialty(doctor != null ? doctor.getSpecialty() : null);
+            dto.setDate(appointment.getAppointmentTime());
+            dto.setTimeSlot(appointment.getAppointmentTime() != null
+                    ? appointment.getAppointmentTime().toLocalTime().toString() : null);
+            dto.setStatus(appointment.getStatus() != null ? appointment.getStatus().name() : null);
+            dto.setConsultationLink(appointment.getConsultationLink());
+            dto.setSymptoms(appointment.getSymptoms());
+            dto.setNotes(appointment.getNotes());
+
+            notificationServiceClient.sendAppointmentNotification(new NotificationRequest(dto, eventType));
+            log.info("Notification sent for appointment {} event: {}", appointment.getId(), eventType);
+        } catch (Exception e) {
+            log.warn("Failed to send {} notification for appointment {}: {}",
+                    eventType, appointment.getId(), e.getMessage());
+        }
+    }
+
     /**
      * Generate consultation link for video call
      *
