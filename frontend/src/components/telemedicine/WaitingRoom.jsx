@@ -1,31 +1,49 @@
-// src/components/WaitingRoom.jsx
-import { useEffect, useState } from 'react';
-import { getSessionDetails } from '../../services/api';
+import { useEffect, useRef, useState } from 'react';
+import Card from '../common/Card';
+import Spinner from '../common/Spinner';
+import { getSessionDetails } from '../../services/telemedicine.service';
 
-const WaitingRoom = ({ sessionId }) => {
-  const [status, setStatus] = useState('WAITING');
+export default function WaitingRoom({ sessionId, onActive, pollMs = 3000 }) {
+  const [status, setStatus] = useState('SCHEDULED');
+  const firedRef = useRef(false);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
+    if (!sessionId) return undefined;
+
+    let cancelled = false;
+
+    const tick = async () => {
       try {
         const details = await getSessionDetails(sessionId);
-        if (details.status === 'ACTIVE') {
-          setStatus('ACTIVE');
-          window.location.reload(); // reload to join the active session
+        if (cancelled) return;
+
+        const nextStatus = details?.status || 'SCHEDULED';
+        setStatus(nextStatus);
+
+        if (nextStatus === 'ACTIVE' && !firedRef.current) {
+          firedRef.current = true;
+          if (typeof onActive === 'function') onActive();
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
+        // Ignore transient polling errors.
       }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [sessionId]);
+    };
+
+    tick();
+    const interval = setInterval(tick, pollMs);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [onActive, pollMs, sessionId]);
 
   return (
-    <div className="waiting-room">
-      <h3>Waiting for the other participant to join...</h3>
-      <p>Session status: {status}</p>
-    </div>
+    <Card>
+      <div className="flex items-center gap-2 text-sm text-slate-600">
+        <Spinner /> Waiting for the call to start
+      </div>
+      <div className="mt-2 text-xs font-semibold text-slate-600">Session status: {status}</div>
+    </Card>
   );
-};
-
-export default WaitingRoom;
+}

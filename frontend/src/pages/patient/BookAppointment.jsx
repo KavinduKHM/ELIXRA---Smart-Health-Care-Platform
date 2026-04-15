@@ -10,7 +10,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { createAppointment, searchDoctorsForAppointments } from '../../services/appointment.service';
 
 export default function PatientBookAppointment() {
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
   const navigate = useNavigate();
   const [specialty, setSpecialty] = useState('');
   const [name, setName] = useState('');
@@ -150,8 +150,8 @@ export default function PatientBookAppointment() {
           <Button
             disabled={createMutation.isPending}
             onClick={() => {
-              if (!userId) {
-                toast.error('Missing user ID');
+              if (!patientId) {
+                toast.error('Missing patient ID');
                 return;
               }
               if (!selected?.doctorId || !selected?.slotStart) {
@@ -159,7 +159,7 @@ export default function PatientBookAppointment() {
                 return;
               }
               createMutation.mutate({
-                patientId: Number(userId),
+                patientId: Number(patientId),
                 doctorId: selected.doctorId,
                 appointmentTime: selected.slotStart,
                 durationMinutes: 30,

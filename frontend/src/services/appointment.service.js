@@ -50,10 +50,12 @@ export async function acceptAppointment(appointmentId) {
   return res.data;
 }
 
-export async function rejectAppointment(appointmentId) {
-  // No explicit reject endpoint in current backend.
-  // Use status PATCH endpoint if added later.
-  throw new Error('Reject endpoint not available in backend');
+export async function rejectAppointment(appointmentId, { reason } = {}) {
+  const res = await appointmentApi.patch(`/${appointmentId}/status`, {
+    status: 'CANCELLED',
+    notes: reason || null,
+  });
+  return res.data;
 }
 
 export async function markAppointmentCompleted(appointmentId) {

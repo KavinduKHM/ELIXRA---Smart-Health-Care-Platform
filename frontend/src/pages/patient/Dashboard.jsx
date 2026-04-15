@@ -8,18 +8,18 @@ import { listAppointmentsForPatient } from '../../services/appointment.service';
 import { listPatientPrescriptions } from '../../services/patient.service';
 
 export default function PatientDashboard() {
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
 
   const appointmentsQuery = useQuery({
-    queryKey: ['patientAppointments', userId],
-    queryFn: () => listAppointmentsForPatient(userId),
-    enabled: Boolean(userId),
+    queryKey: ['patientAppointments', patientId],
+    queryFn: () => listAppointmentsForPatient(patientId),
+    enabled: Boolean(patientId),
   });
 
   const prescriptionsQuery = useQuery({
-    queryKey: ['patientPrescriptions', userId],
-    queryFn: () => listPatientPrescriptions(userId),
-    enabled: Boolean(userId),
+    queryKey: ['patientPrescriptions', patientId],
+    queryFn: () => listPatientPrescriptions(patientId),
+    enabled: Boolean(patientId),
   });
 
   const appointments = Array.isArray(appointmentsQuery.data)

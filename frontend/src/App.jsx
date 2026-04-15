@@ -18,6 +18,17 @@ import PatientProfile from './pages/patient/Profile';
 import PatientSymptoms from './pages/patient/Symptoms';
 import PayAppointment from './pages/patient/PayAppointment';
 
+import DoctorDashboard from './pages/doctor/Dashboard';
+import DoctorRequests from './pages/doctor/Requests';
+import DoctorSchedule from './pages/doctor/Schedule';
+import DoctorAvailability from './pages/doctor/Availability';
+import DoctorProfile from './pages/doctor/Profile';
+import DoctorPrescriptions from './pages/doctor/Prescriptions';
+import DoctorIssuePrescription from './pages/doctor/IssuePrescription';
+import DoctorPrescriptionDetails from './pages/doctor/PrescriptionDetails';
+
+import VideoRoom from './pages/VideoRoom';
+
 function RoleHomeRedirect() {
   const { isAuthenticated, userRole } = useAuth();
 
@@ -51,7 +62,14 @@ function DoctorLayout() {
   return (
     <AppShell role="DOCTOR">
       <Routes>
-        <Route index element={<div className="text-sm text-slate-600">Doctor dashboard coming next.</div>} />
+        <Route index element={<DoctorDashboard />} />
+        <Route path="requests" element={<DoctorRequests />} />
+        <Route path="schedule" element={<DoctorSchedule />} />
+        <Route path="availability" element={<DoctorAvailability />} />
+        <Route path="prescriptions" element={<DoctorPrescriptions />} />
+        <Route path="prescriptions/new/:appointmentId" element={<DoctorIssuePrescription />} />
+        <Route path="prescriptions/:prescriptionId" element={<DoctorPrescriptionDetails />} />
+        <Route path="profile" element={<DoctorProfile />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -85,6 +103,10 @@ export default function App() {
 
       <Route element={<ProtectedRoute allowRoles={['DOCTOR']} />}>
         <Route path="/doctor/*" element={<DoctorLayout />} />
+      </Route>
+
+      <Route element={<ProtectedRoute allowRoles={['PATIENT', 'DOCTOR']} />}>
+        <Route path="/video/:sessionId" element={<VideoRoom />} />
       </Route>
 
       <Route element={<ProtectedRoute allowRoles={['ADMIN']} />}>

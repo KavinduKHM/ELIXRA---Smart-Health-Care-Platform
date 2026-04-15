@@ -10,15 +10,15 @@ import { useAuth } from '../../hooks/useAuth';
 import { getPatientProfile, updatePatientProfile, uploadPatientProfilePicture } from '../../services/patient.service';
 
 export default function PatientProfile() {
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
   const qc = useQueryClient();
   const [profilePicFile, setProfilePicFile] = useState(null);
   const didInitFormRef = useRef(false);
 
   const profileQuery = useQuery({
-    queryKey: ['patientProfile', userId],
-    queryFn: () => getPatientProfile(userId),
-    enabled: Boolean(userId),
+    queryKey: ['patientProfile', patientId],
+    queryFn: () => getPatientProfile(patientId),
+    enabled: Boolean(patientId),
   });
 
   const initial = useMemo(() => {
@@ -39,7 +39,7 @@ export default function PatientProfile() {
 
   useEffect(() => {
     didInitFormRef.current = false;
-    // Reset form when user changes
+    // Reset form when patient changes
     setForm({
       firstName: '',
       lastName: '',
@@ -50,7 +50,7 @@ export default function PatientProfile() {
       gender: '',
       bloodGroup: '',
     });
-  }, [userId]);
+  }, [patientId]);
 
   useEffect(() => {
     if (didInitFormRef.current) return;
@@ -60,20 +60,20 @@ export default function PatientProfile() {
   }, [initial, profileQuery.data]);
 
   const updateMutation = useMutation({
-    mutationFn: (payload) => updatePatientProfile(userId, payload),
+    mutationFn: (payload) => updatePatientProfile(patientId, payload),
     onSuccess: () => {
       toast.success('Profile updated');
-      qc.invalidateQueries({ queryKey: ['patientProfile', userId] });
+      qc.invalidateQueries({ queryKey: ['patientProfile', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Update failed'),
   });
 
   const uploadPicMutation = useMutation({
-    mutationFn: (file) => uploadPatientProfilePicture(userId, file),
+    mutationFn: (file) => uploadPatientProfilePicture(patientId, file),
     onSuccess: () => {
       toast.success('Profile picture updated');
       setProfilePicFile(null);
-      qc.invalidateQueries({ queryKey: ['patientProfile', userId] });
+      qc.invalidateQueries({ queryKey: ['patientProfile', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Upload failed'),
   });
@@ -110,7 +110,7 @@ export default function PatientProfile() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold">{profileQuery.data?.fullName || 'Patient'}</div>
-                  <div className="text-xs text-slate-600">Patient ID: {profileQuery.data?.id ?? userId}</div>
+                  <div className="text-xs text-slate-600">Patient ID: {profileQuery.data?.id ?? patientId}</div>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">

@@ -14,7 +14,7 @@ import {
 } from '../../services/patient.service';
 
 export default function PatientDocuments() {
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
   const qc = useQueryClient();
   const [file, setFile] = useState(null);
   const [documentType, setDocumentType] = useState('LAB_REPORT');
@@ -22,30 +22,30 @@ export default function PatientDocuments() {
   const [notes, setNotes] = useState('');
 
   const query = useQuery({
-    queryKey: ['patientDocuments', userId],
-    queryFn: () => listPatientDocuments(userId),
-    enabled: Boolean(userId),
+    queryKey: ['patientDocuments', patientId],
+    queryFn: () => listPatientDocuments(patientId),
+    enabled: Boolean(patientId),
   });
 
   const docs = Array.isArray(query.data) ? query.data : query.data?.content || query.data?.items || [];
 
   const uploadMutation = useMutation({
-    mutationFn: (payload) => uploadPatientDocument(userId, payload),
+    mutationFn: (payload) => uploadPatientDocument(patientId, payload),
     onSuccess: () => {
       toast.success('Uploaded');
       setFile(null);
       setDescription('');
       setNotes('');
-      qc.invalidateQueries({ queryKey: ['patientDocuments', userId] });
+      qc.invalidateQueries({ queryKey: ['patientDocuments', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Upload failed'),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ documentId }) => deletePatientDocument(userId, documentId),
+    mutationFn: ({ documentId }) => deletePatientDocument(patientId, documentId),
     onSuccess: () => {
       toast.success('Deleted');
-      qc.invalidateQueries({ queryKey: ['patientDocuments', userId] });
+      qc.invalidateQueries({ queryKey: ['patientDocuments', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Delete failed'),
   });

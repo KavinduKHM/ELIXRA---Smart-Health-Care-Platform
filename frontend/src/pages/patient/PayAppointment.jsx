@@ -15,7 +15,7 @@ import { createPaymentIntent, isAppointmentPaid } from '../../services/payment.s
 
 const stripePromise = env.stripePublishableKey ? loadStripe(env.stripePublishableKey) : null;
 
-function CheckoutForm({ appointmentId, intent }) {
+function CheckoutForm({ appointmentId, intent, patientId }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ function CheckoutForm({ appointmentId, intent }) {
   const confirmMutation = useMutation({
     mutationFn: (payload) => confirmPaymentForAppointment(appointmentId, payload),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['patientAppointments'] });
+      qc.invalidateQueries({ queryKey: ['patientAppointments', patientId] });
       qc.invalidateQueries({ queryKey: ['appointment', appointmentId] });
     },
   });
@@ -88,7 +88,7 @@ function CheckoutForm({ appointmentId, intent }) {
 
 export default function PayAppointment() {
   const { appointmentId } = useParams();
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
   const location = useLocation();
 
   const idNum = Number(appointmentId);
@@ -126,14 +126,14 @@ export default function PayAppointment() {
 
   const intentPayload = useMemo(() => {
     if (!Number.isFinite(idNum) || idNum <= 0) return null;
-    if (!userId) return null;
+    if (!patientId) return null;
     return {
       appointmentId: idNum,
-      patientId: Number(userId),
+      patientId: Number(patientId),
       amount,
       currency: 'LKR',
     };
-  }, [amount, idNum, userId]);
+  }, [amount, idNum, patientId]);
 
   const intentQuery = useQuery({
     queryKey: ['paymentIntent', idNum],
@@ -186,6 +186,8 @@ export default function PayAppointment() {
             <div className="font-semibold">Already paid</div>
             <div className="mt-1 text-sm text-slate-600">This appointment is marked as paid in the payment service.</div>
           </div>
+        ) : !patientId ? (
+          <div className="text-sm text-rose-600">Missing patient ID. Please sign out and sign in again.</div>
         ) : !stripePromise ? (
           <div className="text-sm text-rose-600">Stripe failed to initialize.</div>
         ) : intentQuery.isLoading && !clientSecret ? (
@@ -198,7 +200,7 @@ export default function PayAppointment() {
           <div className="text-sm text-rose-600">Missing client secret.</div>
         ) : (
           <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm appointmentId={idNum} intent={intent} />
+            <CheckoutForm appointmentId={idNum} intent={intent} patientId={patientId} />
           </Elements>
         )}
       </Card>

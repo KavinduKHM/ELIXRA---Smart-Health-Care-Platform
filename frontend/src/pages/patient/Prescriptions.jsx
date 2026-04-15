@@ -5,12 +5,12 @@ import { useAuth } from '../../hooks/useAuth';
 import { listPatientPrescriptions } from '../../services/patient.service';
 
 export default function PatientPrescriptions() {
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
 
   const query = useQuery({
-    queryKey: ['patientPrescriptions', userId],
-    queryFn: () => listPatientPrescriptions(userId),
-    enabled: Boolean(userId),
+    queryKey: ['patientPrescriptions', patientId],
+    queryFn: () => listPatientPrescriptions(patientId),
+    enabled: Boolean(patientId),
   });
 
   const prescriptions = Array.isArray(query.data) ? query.data : query.data?.content || query.data?.items || [];

@@ -35,7 +35,9 @@ export default function Navbar({ role }) {
         ? [
             { to: '/doctor', label: 'Dashboard', end: true },
             { to: '/doctor/requests', label: 'Requests' },
+            { to: '/doctor/schedule', label: 'Schedule' },
             { to: '/doctor/availability', label: 'Availability' },
+            { to: '/doctor/prescriptions', label: 'Prescriptions' },
             { to: '/doctor/profile', label: 'Profile' },
           ]
         : [

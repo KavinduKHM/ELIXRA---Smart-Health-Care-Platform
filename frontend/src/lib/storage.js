@@ -3,6 +3,10 @@ const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_ROLE_KEY = 'userRole';
 const USER_ID_KEY = 'userId';
 
+// Entity IDs in their respective services (NOT the auth userId)
+const PATIENT_ID_KEY = 'patientId';
+const DOCTOR_ID_KEY = 'doctorId';
+
 export const storage = {
   getAccessToken() {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -48,10 +52,34 @@ export const storage = {
     localStorage.removeItem(USER_ID_KEY);
   },
 
+  getPatientId() {
+    return localStorage.getItem(PATIENT_ID_KEY);
+  },
+  setPatientId(id) {
+    if (id === undefined || id === null) return;
+    localStorage.setItem(PATIENT_ID_KEY, String(id));
+  },
+  clearPatientId() {
+    localStorage.removeItem(PATIENT_ID_KEY);
+  },
+
+  getDoctorId() {
+    return localStorage.getItem(DOCTOR_ID_KEY);
+  },
+  setDoctorId(id) {
+    if (id === undefined || id === null) return;
+    localStorage.setItem(DOCTOR_ID_KEY, String(id));
+  },
+  clearDoctorId() {
+    localStorage.removeItem(DOCTOR_ID_KEY);
+  },
+
   clearAll() {
     this.clearAccessToken();
     this.clearRefreshToken();
     this.clearUserRole();
     this.clearUserId();
+    this.clearPatientId();
+    this.clearDoctorId();
   },
 };

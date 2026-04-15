@@ -14,7 +14,7 @@ import {
 } from '../../services/patient.service';
 
 export default function PatientMedicalHistory() {
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
   const qc = useQueryClient();
 
   const [form, setForm] = useState({
@@ -28,19 +28,19 @@ export default function PatientMedicalHistory() {
   });
 
   const query = useQuery({
-    queryKey: ['patientMedicalHistory', userId],
-    queryFn: () => listPatientMedicalHistory(userId),
-    enabled: Boolean(userId),
+    queryKey: ['patientMedicalHistory', patientId],
+    queryFn: () => listPatientMedicalHistory(patientId),
+    enabled: Boolean(patientId),
   });
 
   const items = Array.isArray(query.data) ? query.data : query.data?.content || query.data?.items || [];
 
   const addMutation = useMutation({
-    mutationFn: (payload) => addPatientMedicalHistory(userId, payload),
+    mutationFn: (payload) => addPatientMedicalHistory(patientId, payload),
     onSuccess: () => {
       toast.success('History entry added');
       setForm((s) => ({ ...s, title: '', description: '', eventDate: '' }));
-      qc.invalidateQueries({ queryKey: ['patientMedicalHistory', userId] });
+      qc.invalidateQueries({ queryKey: ['patientMedicalHistory', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Failed to add entry'),
   });
@@ -49,7 +49,7 @@ export default function PatientMedicalHistory() {
     mutationFn: (historyId) => deleteMedicalHistory(historyId),
     onSuccess: () => {
       toast.success('Deleted');
-      qc.invalidateQueries({ queryKey: ['patientMedicalHistory', userId] });
+      qc.invalidateQueries({ queryKey: ['patientMedicalHistory', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Delete failed'),
   });

@@ -1,7 +1,10 @@
 // src/pages/VideoRoom.jsx
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { joinSession, endSession } from '../services/api';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import Card from '../components/common/Card';
+import Spinner from '../components/common/Spinner';
+import { useAuth } from '../hooks/useAuth';
+import { endVideoSession, joinVideoSession } from '../services/telemedicine.service';
 import VideoCall from '../components/telemedicine/VideoCall';
 import WaitingRoom from '../components/telemedicine/WaitingRoom';
 
@@ -12,43 +15,88 @@ const VideoRoom = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get user info from localStorage (set after login)
-  const userId = localStorage.getItem('userId');
-  const userRole = localStorage.getItem('userRole'); // 'PATIENT' or 'DOCTOR'
+  const { actorId, userRole } = useAuth();
+
+  const doJoin = useCallback(async () => {
+    if (!sessionId) return;
+    if (!actorId || !userRole) throw new Error('Not authenticated');
+
+    const data = await joinVideoSession({
+      sessionId: Number(sessionId),
+      userId: Number(actorId),
+      userRole,
+    });
+
+    setSessionData(data);
+  }, [actorId, sessionId, userRole]);
 
   useEffect(() => {
-    const fetchJoinInfo = async () => {
+    let mounted = true;
+
+    (async () => {
       try {
-        const data = await joinSession(sessionId, userId, userRole);
-        setSessionData(data);
-      } catch (err) {
-        console.error(err);
-        setError(err.response?.data?.message || 'Failed to join session');
+        setLoading(true);
+        setError(null);
+
+        if (!sessionId) {
+          setError('Missing session ID');
+          return;
+        }
+        if (!actorId || !userRole) {
+          setError('Please sign in again to join this call');
+          return;
+        }
+
+        await doJoin();
+      } catch (e) {
+        if (!mounted) return;
+        setError(e?.response?.data?.message || e?.message || 'Failed to join session');
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
+    })();
+
+    return () => {
+      mounted = false;
     };
-    fetchJoinInfo();
-  }, [sessionId, userId, userRole]);
+  }, [actorId, doJoin, sessionId, userRole]);
 
   const handleEndCall = async () => {
     try {
-      await endSession(sessionId, userId, 'Consultation ended by user');
-      navigate('/dashboard'); // redirect after call
-    } catch (err) {
-      console.error('Failed to end session:', err);
+      if (!actorId) throw new Error('Not authenticated');
+
+      await endVideoSession({
+        sessionId: Number(sessionId),
+        userId: Number(actorId),
+        consultationNotes: 'Consultation ended by user',
+      });
+
+      if (userRole === 'DOCTOR') navigate('/doctor/schedule', { replace: true });
+      else navigate('/patient/appointments', { replace: true });
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || 'Failed to end session');
     }
   };
 
-  if (loading) return <div>Loading video session...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!sessionData) return null;
-
   return (
-    <div className="video-room">
-      <h2>Video Consultation</h2>
-      {!sessionData.sessionActive ? (
-        <WaitingRoom sessionId={sessionId} />
+    <div className="space-y-4">
+      <div>
+        <h1 className="text-2xl font-bold">Video Consultation</h1>
+        <p className="mt-1 text-sm text-slate-600">Session #{sessionId}</p>
+      </div>
+
+      {loading ? (
+        <Card>
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <Spinner /> Joining session
+          </div>
+        </Card>
+      ) : error ? (
+        <Card>
+          <div className="text-sm text-rose-600">{error}</div>
+        </Card>
+      ) : !sessionData ? null : !sessionData.sessionActive ? (
+        <WaitingRoom sessionId={Number(sessionId)} onActive={() => doJoin()} />
       ) : (
         <VideoCall
           channelName={sessionData.channelName}

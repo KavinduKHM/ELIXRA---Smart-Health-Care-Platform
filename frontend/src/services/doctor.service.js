@@ -62,3 +62,41 @@ export async function listVerifiedDoctors() {
   const res = await doctorApi.get('/verified');
   return res.data;
 }
+
+// Availability helper: generated slots for a given date
+export async function getDoctorAvailableSlots(doctorId, date) {
+  const res = await doctorApi.get(`/${doctorId}/availability/slots`, { params: { date } });
+  return res.data;
+}
+
+// Prescriptions
+export async function issuePrescription(doctorId, payload) {
+  const res = await doctorApi.post(`/${doctorId}/prescriptions`, payload);
+  return res.data;
+}
+
+export async function listDoctorPrescriptions(doctorId) {
+  const res = await doctorApi.get(`/${doctorId}/prescriptions`);
+  return res.data;
+}
+
+export async function getPrescription(prescriptionId) {
+  const res = await doctorApi.get(`/prescriptions/${prescriptionId}`);
+  return res.data;
+}
+
+// Telemedicine (optional)
+export async function createVideoSession(payload) {
+  const res = await doctorApi.post('/video/sessions', payload);
+  return res.data;
+}
+
+export async function joinVideoSession(payload) {
+  const res = await doctorApi.post('/video/sessions/join', payload);
+  return res.data;
+}
+
+export async function endVideoSession(payload) {
+  const res = await doctorApi.post('/video/sessions/end', payload);
+  return res.data;
+}

@@ -1,10 +1,8 @@
 import { createApiClient } from './api';
 import { serviceUrls } from './serviceUrls';
 import { storage } from '../lib/storage';
-import { getPatientProfile } from './patient.service';
-import { getDoctorProfile } from './doctor.service';
-import { registerPatient } from './patient.service';
-import { registerDoctor } from './doctor.service';
+import { getPatientByUserId, registerPatient } from './patient.service';
+import { getDoctorByUserId, registerDoctor } from './doctor.service';
 
 const authApi = createApiClient(serviceUrls.auth);
 
@@ -42,8 +40,8 @@ export async function login(payload) {
     if (!userId) throw e;
 
     // Validate the ID exists.
-    if (role === 'PATIENT') await getPatientProfile(userId);
-    if (role === 'DOCTOR') await getDoctorProfile(userId);
+    if (role === 'PATIENT') await getPatientByUserId(userId);
+    if (role === 'DOCTOR') await getDoctorByUserId(userId);
 
     return {
       accessToken: 'dev',

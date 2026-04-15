@@ -10,15 +10,15 @@ import { useAuth } from '../../hooks/useAuth';
 import { cancelAppointment, listAppointmentsForPatient, rescheduleAppointment } from '../../services/appointment.service';
 
 export default function PatientAppointments() {
-  const { userId } = useAuth();
+  const { patientId } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [reschedule, setReschedule] = useState({ id: null, newAppointmentTime: '', reason: '' });
 
   const query = useQuery({
-    queryKey: ['patientAppointments', userId],
-    queryFn: () => listAppointmentsForPatient(userId),
-    enabled: Boolean(userId),
+    queryKey: ['patientAppointments', patientId],
+    queryFn: () => listAppointmentsForPatient(patientId),
+    enabled: Boolean(patientId),
   });
 
   const appointments = useMemo(() => {
@@ -30,7 +30,7 @@ export default function PatientAppointments() {
     mutationFn: (appointmentId) => cancelAppointment(appointmentId),
     onSuccess: () => {
       toast.success('Cancelled');
-      qc.invalidateQueries({ queryKey: ['patientAppointments', userId] });
+      qc.invalidateQueries({ queryKey: ['patientAppointments', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Cancel failed'),
   });
@@ -40,7 +40,7 @@ export default function PatientAppointments() {
     onSuccess: () => {
       toast.success('Rescheduled');
       setReschedule({ id: null, newAppointmentTime: '', reason: '' });
-      qc.invalidateQueries({ queryKey: ['patientAppointments', userId] });
+      qc.invalidateQueries({ queryKey: ['patientAppointments', patientId] });
     },
     onError: (e) => toast.error(e?.response?.data?.message || e?.message || 'Reschedule failed'),
   });

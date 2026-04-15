@@ -369,11 +369,12 @@ public class AppointmentService {
         // boolean isPaid = paymentServiceClient.isAppointmentPaid(appointmentId);
         // if (!isPaid) throw new RuntimeException("Payment not confirmed");
 
-        appointment.setStatus(AppointmentStatus.CONFIRMED);
+        // Payment succeeded; move to PENDING so the doctor can accept/reject.
+        appointment.setStatus(AppointmentStatus.PENDING);
         appointment.setPaymentStatus("succeeded");
         appointmentRepository.save(appointment);
 
-        log.info("Appointment {} confirmed after successful payment", appointmentId);
+        log.info("Appointment {} payment succeeded; awaiting doctor confirmation", appointmentId);
 
         DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
         PatientDTO patient;
@@ -513,19 +514,32 @@ public class AppointmentService {
             appointment.setNotes(request.getNotes());
         }
 
-        // If status is CONFIRMED, generate consultation link
+        // Status side-effects
         if (request.getStatus() == AppointmentStatus.CONFIRMED) {
             String consultationLink = generateConsultationLink(id);
             appointment.setConsultationLink(consultationLink);
+
+            // Best-effort: reserve the slot in doctor-service to prevent double booking.
+            try {
+                doctorServiceClient.bookTimeSlot(appointment.getDoctorId(), appointment.getAppointmentTime());
+            } catch (Exception e) {
+                log.warn("Failed to book doctor slot for appointment {}: {}", id, e.getMessage());
+            }
+        } else if (request.getStatus() == AppointmentStatus.CANCELLED) {
+            // Capture cancellation metadata when doctors cancel/reject via status endpoint.
+            appointment.setCancellationReason(request.getNotes());
+            appointment.setCancelledAt(LocalDateTime.now());
         }
 
         Appointment updatedAppointment = appointmentRepository.save(appointment);
 
-        // Notify: only for selected status transitions
+        // Notify: selected status transitions
         if (request.getStatus() == AppointmentStatus.CONFIRMED) {
             sendNotification(updatedAppointment, "confirmed");
         } else if (request.getStatus() == AppointmentStatus.COMPLETED) {
             sendNotification(updatedAppointment, "completed");
+        } else if (request.getStatus() == AppointmentStatus.CANCELLED) {
+            sendNotification(updatedAppointment, "cancelled");
         }
 
         // Use mock data instead of calling external services
