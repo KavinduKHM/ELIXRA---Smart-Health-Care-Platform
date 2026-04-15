@@ -154,6 +154,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-telemedicine:3306/telemedicine_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      # Optional (only needed if you want real Agora connectivity)
+      AGORA_APP_ID: ${AGORA_APP_ID}
+      AGORA_APP_CERTIFICATE: ${AGORA_APP_CERTIFICATE}
+      AGORA_TOKEN_EXPIRATION: ${AGORA_TOKEN_EXPIRATION}
     networks:
       - healthcare-network
 

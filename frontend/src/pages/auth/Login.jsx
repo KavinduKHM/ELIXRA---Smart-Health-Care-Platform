@@ -85,7 +85,7 @@ export default function Login() {
               <Input
                 label="User ID (fallback)"
                 type="number"
-                placeholder="Use patientId/doctorId if no auth service"
+                placeholder="Use the User ID you registered with (not patientId/doctorId)"
                 error={errors.userId?.message}
                 {...register('userId')}
               />

@@ -34,11 +34,12 @@ eureka:
   instance:
     prefer-ip-address: true
 
-# Agora Configuration (Replace with your actual credentials from agora.io)
+# Agora Configuration
+# IMPORTANT: Do not hardcode credentials in source control. Provide these via environment variables.
 agora:
-  app-id: 0285c138d0d34d71ba6b7a6a0440cc1b          # Get from Agora Console
-  app-certificate: a26ef39826a24a3599b281f64b60207f  # Get from Agora Console
-  token-expiration: 7200              # Token validity in seconds (1 hour)
+  app-id: ${AGORA_APP_ID:dummy-app-id}
+  app-certificate: ${AGORA_APP_CERTIFICATE:}
+  token-expiration: ${AGORA_TOKEN_EXPIRATION:7200} # seconds
 
 # Logging
 logging:
