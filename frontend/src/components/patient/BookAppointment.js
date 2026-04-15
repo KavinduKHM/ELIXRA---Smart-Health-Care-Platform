@@ -27,7 +27,9 @@ import {
 import { format } from 'date-fns';
 import './BookAppointment.css';
 
-const PATIENT_API = process.env.REACT_APP_API_URL || 'http://localhost:8082';
+const PATIENT_API = import.meta.env.VITE_API_URL
+  || (typeof process !== 'undefined' ? process.env.REACT_APP_API_URL : '')
+  || 'http://localhost:8082';
 const APPOINTMENT_API = 'http://localhost:8084';
 const COMING_SOON_DAYS = 7;
 

@@ -64,3 +64,4 @@ services/**/uploads/*
 *.tmp
 *.temp
 *.bak
+docker/.env

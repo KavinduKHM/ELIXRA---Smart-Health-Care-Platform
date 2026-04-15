@@ -12,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.healthcare.appointment_service.client.PaymentServiceClient;
+import com.healthcare.appointment_service.dto.PaymentRequest;
+import com.healthcare.appointment_service.dto.PaymentResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,6 +38,16 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DoctorServiceClient doctorServiceClient;
     private final PatientServiceClient patientServiceClient;
+    private final PaymentServiceClient paymentServiceClient;
+
+    @org.springframework.beans.factory.annotation.Value("${app.payment.currency:LKR}")
+    private String paymentCurrency;
+
+    @org.springframework.beans.factory.annotation.Value("${app.payment.minimum-amount:1500}")
+    private java.math.BigDecimal minimumPaymentAmount;
+
+    @org.springframework.beans.factory.annotation.Value("${app.payment.default-consultation-fee:1500}")
+    private java.math.BigDecimal defaultConsultationFee;
 
     /**
      * Search for doctors by specialty
@@ -160,40 +173,32 @@ public class AppointmentService {
         log.info("Booking appointment for patient: {} with doctor: {} at: {}",
                 request.getPatientId(), request.getDoctorId(), request.getAppointmentTime());
 
-        // ========== TEMPORARILY COMMENTED OUT - REMOVE WHEN PATIENT/DOCTOR SERVICES ARE READY ==========
-        // Step 1: Validate patient exists (call patient service)
-        // PatientDTO patient = patientServiceClient.getPatientById(request.getPatientId());
-        // if (patient == null) {
-        //     throw new RuntimeException("Patient not found with ID: " + request.getPatientId());
-        // }
+        // 1. Get patient details (fallback if Patient Service not ready)
+        PatientDTO patient;
+        try {
+            patient = patientServiceClient.getPatientById(request.getPatientId());
+        } catch (Exception e) {
+            log.warn("Patient service unavailable, using mock patient");
+            patient = new PatientDTO();
+            patient.setId(request.getPatientId());
+            patient.setFirstName("Patient");
+            patient.setLastName(String.valueOf(request.getPatientId()));
+        }
 
-        // Step 2: Validate doctor exists and is available (call doctor service)
-        // DoctorDTO doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
-        // if (doctor == null) {
-        //     throw new RuntimeException("Doctor not found with ID: " + request.getDoctorId());
-        // }
+        // 2. Get doctor details from Doctor Service
+        DoctorDTO doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
+        if (doctor == null) {
+            throw new RuntimeException("Doctor not found with ID: " + request.getDoctorId());
+        }
 
-        // Step 3: Check if time slot is available
-        // boolean isAvailable = doctorServiceClient.checkAvailability(
-        //         request.getDoctorId(), request.getAppointmentTime());
-        // if (!isAvailable) {
-        //     throw new RuntimeException("Doctor is not available at the requested time");
-        // }
-        // ========== END OF COMMENTED OUT SECTION ==========
+        // 3. Check availability via Doctor Service
+        boolean isAvailable = doctorServiceClient.checkAvailability(
+                request.getDoctorId(), request.getAppointmentTime());
+        if (!isAvailable) {
+            throw new RuntimeException("Doctor is not available at the requested time");
+        }
 
-        // Create mock patient and doctor for testing
-        PatientDTO patient = new PatientDTO();
-        patient.setId(request.getPatientId());
-        patient.setFirstName("Test");
-        patient.setLastName("Patient");
-
-        DoctorDTO doctor = new DoctorDTO();
-        doctor.setId(request.getDoctorId());
-        doctor.setFirstName("Test");
-        doctor.setLastName("Doctor");
-        doctor.setSpecialty("General Medicine");
-
-        // Check for conflicts with existing appointments (skip time availability check for now)
+        // 4. Check for conflicts with existing appointments in Appointment Service
         LocalDateTime endTime = request.getAppointmentTime()
                 .plusMinutes(request.getDurationMinutes());
         List<Appointment> conflicts = appointmentRepository.findConflictingAppointments(
@@ -202,24 +207,112 @@ public class AppointmentService {
             throw new RuntimeException("Time slot is already booked");
         }
 
-        // Create and save appointment
+        // 5. Create appointment with PENDING_PAYMENT status
         Appointment appointment = Appointment.builder()
                 .patientId(request.getPatientId())
                 .doctorId(request.getDoctorId())
                 .appointmentTime(request.getAppointmentTime())
                 .durationMinutes(request.getDurationMinutes())
-                .status(AppointmentStatus.PENDING)
+                .status(AppointmentStatus.PENDING_PAYMENT)
                 .symptoms(request.getSymptoms())
                 .notes(request.getNotes())
                 .build();
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
+        log.info("Appointment created with ID: {} (status: PENDING_PAYMENT)", savedAppointment.getId());
 
-        log.info("Appointment booked successfully with ID: {}", savedAppointment.getId());
+        // 6. Prepare payment request
+        PaymentRequest paymentReq = new PaymentRequest();
+        paymentReq.setAppointmentId(savedAppointment.getId());
+        paymentReq.setPatientId(request.getPatientId());
+        paymentReq.setDoctorId(request.getDoctorId());
 
-        // Build and return response
-        return buildResponse(savedAppointment, patient, doctor);
+        // payment-service (Stripe) has minimum amounts. Use a configurable floor.
+        // NOTE: Amount here is in major currency units (e.g., 1500 LKR or 500 PKR).
+        java.math.BigDecimal consultationFee = (doctor.getConsultationFee() == null)
+                ? defaultConsultationFee
+                : java.math.BigDecimal.valueOf(doctor.getConsultationFee());
+
+        if (consultationFee.compareTo(minimumPaymentAmount) < 0) {
+            log.warn("Consultation fee {} {} is below configured minimum {}, using minimum.",
+                    consultationFee, paymentCurrency, minimumPaymentAmount);
+            consultationFee = minimumPaymentAmount;
+        }
+        paymentReq.setAmount(consultationFee);
+
+        paymentReq.setCurrency(paymentCurrency);
+        paymentReq.setDescription("Consultation fee for appointment #" + savedAppointment.getId());
+        paymentReq.setPatientName(patient.getFullName());
+        paymentReq.setPatientEmail(patient.getEmail());
+        paymentReq.setPatientPhone(patient.getPhoneNumber());
+        paymentReq.setDoctorName(doctor.getFullName());
+        paymentReq.setDoctorSpecialty(doctor.getSpecialty());
+        paymentReq.setAppointmentDate(request.getAppointmentTime());
+        paymentReq.setAppointmentTimeSlot(request.getAppointmentTime().toLocalTime().toString());
+        paymentReq.setReturnUrl("http://localhost:3000/payment-success");
+
+        // 7. Call Payment Service to create payment intent
+        PaymentResponse paymentResponse;
+        try {
+            paymentResponse = paymentServiceClient.createPaymentIntent(paymentReq);
+        } catch (Exception e) {
+            log.error("Failed to create payment intent: {}", e.getMessage());
+            throw new RuntimeException("Payment service unavailable: " + e.getMessage());
+        }
+
+        // 8. Update appointment with payment intent ID
+        savedAppointment.setPaymentIntentId(paymentResponse.getPaymentIntentId());
+        savedAppointment.setPaymentStatus(paymentResponse.getStatus());
+        appointmentRepository.save(savedAppointment);
+
+        // 9. Build response with client secret for frontend
+        AppointmentResponse response = buildResponse(savedAppointment, patient, doctor);
+        response.setClientSecret(paymentResponse.getClientSecret());
+        response.setPaymentIntentId(paymentResponse.getPaymentIntentId());
+        response.setPaymentStatus(paymentResponse.getStatus());
+
+        log.info("Payment intent created: {}", paymentResponse.getPaymentIntentId());
+
+        return response;
     }
+
+
+    @Transactional
+    public AppointmentResponse confirmPaymentAndUpdateStatus(Long appointmentId, String paymentIntentId) {
+        log.info("Confirming payment for appointment: {}", appointmentId);
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found: " + appointmentId));
+
+        if (!paymentIntentId.equals(appointment.getPaymentIntentId())) {
+            throw new RuntimeException("Payment intent mismatch");
+        }
+
+        // Optionally verify payment status with payment service (uncomment if needed)
+        // boolean isPaid = paymentServiceClient.isAppointmentPaid(appointmentId);
+        // if (!isPaid) throw new RuntimeException("Payment not confirmed");
+
+        appointment.setStatus(AppointmentStatus.CONFIRMED);
+        appointment.setPaymentStatus("succeeded");
+        appointmentRepository.save(appointment);
+
+        log.info("Appointment {} confirmed after successful payment", appointmentId);
+
+        DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
+        PatientDTO patient;
+        try {
+            patient = patientServiceClient.getPatientById(appointment.getPatientId());
+        } catch (Exception e) {
+            patient = new PatientDTO();
+            patient.setId(appointment.getPatientId());
+            patient.setFirstName("Patient");
+            patient.setLastName(String.valueOf(appointment.getPatientId()));
+        }
+
+        return buildResponse(appointment, patient, doctor);
+    }
+
+
     /**
      * Get appointment by ID
      *
@@ -629,3 +722,4 @@ public class AppointmentService {
         return builder.build();
     }
 }
+

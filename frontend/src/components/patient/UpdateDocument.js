@@ -4,7 +4,9 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './UploadDocument.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8082';
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  || (typeof process !== 'undefined' ? process.env.REACT_APP_API_URL : '')
+  || 'http://localhost:8082';
 
 const ACCEPTED_TYPES = [
   'application/pdf',

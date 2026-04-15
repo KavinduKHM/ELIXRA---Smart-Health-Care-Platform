@@ -28,7 +28,9 @@ import {
 import { format } from 'date-fns';
 import './MedicalDocument.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8082';
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  || (typeof process !== 'undefined' ? process.env.REACT_APP_API_URL : '')
+  || 'http://localhost:8082';
 
 const COLORS = ['#2f80ed', '#1f9d67', '#f59f00', '#cb4b4b', '#6f4cdc', '#15aabf'];
 const ACCEPTED_TYPES = [

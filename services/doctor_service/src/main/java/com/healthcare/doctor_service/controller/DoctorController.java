@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.healthcare.doctor_service.dto.*;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,6 +53,58 @@ public class DoctorController {
     public ResponseEntity<DoctorDTO> registerDoctor(@Valid @RequestBody DoctorRegistrationRequest request) {
         DoctorDTO doctor = doctorService.registerDoctor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(doctor);
+    }
+
+    /**
+     * Check if a doctor is available at a specific date and time.
+     * Used by Appointment Service to validate slot before booking.
+     *
+     * GET /api/doctors/{doctorId}/check-availability?time=2026-04-20T10:30:00
+     */
+    @GetMapping("/{doctorId}/check-availability")
+    public ResponseEntity<Boolean> checkAvailability(
+            @PathVariable Long doctorId,
+            @RequestParam("time") String timeStr) {
+
+        LocalDateTime time = parseDateTime(timeStr);
+        boolean available = doctorService.isDoctorAvailable(doctorId, time);
+        return ResponseEntity.ok(available);
+    }
+
+    /**
+     * Book a time slot (mark as booked) after an appointment is confirmed.
+     * Used by Appointment Service to prevent double‑booking.
+     *
+     * POST /api/doctors/{doctorId}/book-slot?time=2026-04-20T10:30:00
+     */
+    @PostMapping("/{doctorId}/book-slot")
+    public ResponseEntity<Void> bookTimeSlot(
+            @PathVariable Long doctorId,
+            @RequestParam("time") String timeStr) {
+
+        LocalDateTime time = parseDateTime(timeStr);
+        doctorService.bookTimeSlot(doctorId, time);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Helper method to parse datetime from various formats.
+     * Handles both ISO-8601 and the format sent by Appointment Service.
+     */
+    private LocalDateTime parseDateTime(String timeStr) {
+        // Try ISO format first (yyyy-MM-ddTHH:mm:ss)
+        try {
+            return LocalDateTime.parse(timeStr, java.time.format.DateTimeFormatter.ISO_DATE_TIME);
+        } catch (java.time.format.DateTimeParseException e1) {
+            // Try the format used by Appointment Service: "M/d/yy, h:mm a"
+            try {
+                java.time.format.DateTimeFormatter formatter =
+                        java.time.format.DateTimeFormatter.ofPattern("M/d/yy, h:mm a");
+                return LocalDateTime.parse(timeStr, formatter);
+            } catch (java.time.format.DateTimeParseException e2) {
+                throw new RuntimeException("Unsupported date format: " + timeStr);
+            }
+        }
     }
 
     /**

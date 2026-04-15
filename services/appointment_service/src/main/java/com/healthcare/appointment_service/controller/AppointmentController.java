@@ -51,6 +51,19 @@ public class AppointmentController {
     }
 
     /**
+     * Confirm payment for an appointment (called after Stripe confirms payment)
+     * POST /api/appointments/{id}/confirm-payment
+     */
+    @PostMapping("/{id}/confirm-payment")
+    public ResponseEntity<AppointmentResponse> confirmAppointmentPayment(
+            @PathVariable Long id,
+            @Valid @RequestBody PaymentConfirmationRequest request) {
+
+        AppointmentResponse response = appointmentService.confirmPaymentAndUpdateStatus(id, request.getPaymentIntentId());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Get available time slots for a doctor
      * GET /api/appointments/doctors/{doctorId}/slots?date=2024-01-15
      */

@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: appointment_service
+    name: appointment-service
 
 # Eureka client configuration (Docker-compose network uses service-discovery hostname)
 eureka:

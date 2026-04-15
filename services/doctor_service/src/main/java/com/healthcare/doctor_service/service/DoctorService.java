@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -94,6 +96,38 @@ public class DoctorService {
         log.info("Doctor profile updated successfully");
 
         return DoctorDTO.fromEntity(updatedDoctor);
+    }
+
+    /**
+     * Check if a doctor is available at a given time.
+     * Looks at the doctor's availability schedule.
+     * Does NOT check existing bookings (the Appointment Service already does that).
+     */
+    public boolean isDoctorAvailable(Long doctorId, LocalDateTime time) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        LocalDate date = time.toLocalDate();
+        LocalTime slotTime = time.toLocalTime();
+
+        List<Availability> availabilities = availabilityRepository.findByDoctorAndAvailableDate(doctor, date);
+        boolean hasAvailability = availabilities.stream()
+                .anyMatch(a -> !slotTime.isBefore(a.getStartTime()) && !slotTime.isAfter(a.getEndTime()));
+
+        if (!hasAvailability) {
+            log.debug("Doctor {} not available on {} at {}", doctorId, date, slotTime);
+        }
+        return hasAvailability;
+    }
+
+    /**
+     * Mark a time slot as booked.
+     * For now, we only log the booking because the Appointment Service already prevents double‑booking.
+     * In a real system, you would store the booking in a separate table.
+     */
+    public void bookTimeSlot(Long doctorId, LocalDateTime time) {
+        log.info("Booking time slot for doctor {} at {}", doctorId, time);
+        // Optionally, you could store the booking in a `booked_slots` table here.
     }
 
     public Page<DoctorDTO> searchDoctors(String search, Pageable pageable) {

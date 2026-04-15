@@ -21,6 +21,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2022.0.4</spring-cloud.version>
+		<lombok.version>1.18.32</lombok.version>
 	</properties>
 
 	<dependencies>

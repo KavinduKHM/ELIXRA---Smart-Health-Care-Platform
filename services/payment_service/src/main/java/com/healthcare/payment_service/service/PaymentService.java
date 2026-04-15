@@ -64,71 +64,78 @@ public class PaymentService {
         return false;
     }
     
+
     @Transactional
     public PaymentResponse createPaymentIntent(PaymentRequest request) {
         log.info("Creating payment intent for appointment: {}", request.getAppointmentId());
-        
+
         // CHECK FOR DUPLICATE PAYMENT
         if (isPaymentAlreadyProcessed(request.getAppointmentId())) {
-            throw new RuntimeException("Payment already processed for appointment: " + request.getAppointmentId() + 
-                ". Duplicate payments are not allowed.");
+            throw new RuntimeException("Payment already processed for appointment: " + request.getAppointmentId() +
+                    ". Duplicate payments are not allowed.");
         }
-        
+
         try {
-            long amountInCents = request.getAmount().longValue();
-            
+            String currency = (request.getCurrency() == null || request.getCurrency().isBlank())
+                    ? "LKR"
+                    : request.getCurrency().trim().toUpperCase();
+
+            // Stripe expects amount in the smallest currency unit (e.g., cents).
+            long amountInSmallestUnit = toSmallestCurrencyUnit(request.getAmount(), currency);
+
             // Build the PaymentIntent parameters
             PaymentIntentCreateParams.Builder paramsBuilder = PaymentIntentCreateParams.builder()
-                .setAmount(amountInCents)
-                .setCurrency(request.getCurrency().toLowerCase())
-                .setDescription(request.getDescription())
-                .putMetadata("appointmentId", String.valueOf(request.getAppointmentId()))
-                .putMetadata("patientId", String.valueOf(request.getPatientId()))
-                .setAutomaticPaymentMethods(
-                    PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                        .setEnabled(true)
-                        .setAllowRedirects(PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER)
-                        .build()
-                );
-            
-            // Add return URL if provided
-            if (request.getReturnUrl() != null && !request.getReturnUrl().isEmpty()) {
-                paramsBuilder.setReturnUrl(request.getReturnUrl());
-            }
-            
+                    .setAmount(amountInSmallestUnit)
+                    .setCurrency(currency.toLowerCase())
+                    .setDescription(request.getDescription())
+                    .putMetadata("appointmentId", String.valueOf(request.getAppointmentId()))
+                    .putMetadata("patientId", String.valueOf(request.getPatientId()))
+                    .setAutomaticPaymentMethods(
+                            PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
+                                    .setEnabled(true)
+                                    .setAllowRedirects(PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER)
+                                    .build()
+                    );
+
             // Check if this is auto-confirm (payment method provided)
             boolean isAutoConfirm = false;
             if (request.getPaymentMethodId() != null && !request.getPaymentMethodId().isEmpty()) {
                 paramsBuilder.setPaymentMethod(request.getPaymentMethodId());
                 paramsBuilder.setConfirm(true);
                 isAutoConfirm = true;
+
+                // ✅ Add return URL only when confirming immediately (Stripe requirement)
+                if (request.getReturnUrl() != null && !request.getReturnUrl().isEmpty()) {
+                    paramsBuilder.setReturnUrl(request.getReturnUrl());
+                }
+
                 log.info("Auto-confirm enabled for payment method: {}", request.getPaymentMethodId());
             }
-            
+
             PaymentIntent paymentIntent = PaymentIntent.create(paramsBuilder.build());
             log.info("PaymentIntent created: {} with status: {}", paymentIntent.getId(), paymentIntent.getStatus());
-            
-            String transactionId = "TXN-" + System.currentTimeMillis() + "-" + 
-                UUID.randomUUID().toString().substring(0, 8);
-            
+
+            String transactionId = "TXN-" + System.currentTimeMillis() + "-" +
+                    UUID.randomUUID().toString().substring(0, 8);
+
             // Create transaction with PENDING status first
             Transaction transaction = new Transaction(
-                transactionId,
-                paymentIntent.getId(),
-                request.getAppointmentId(),
-                request.getPatientId(),
-                request.getDoctorId(),
-                request.getAmount(),
-                request.getCurrency(),
-                Transaction.TransactionStatus.PENDING.name(),
-                request.getDescription()
+                    transactionId,
+                    paymentIntent.getId(),
+                    request.getAppointmentId(),
+                    request.getPatientId(),
+                    request.getDoctorId(),
+                    request.getAmount(),
+                    currency,
+                    Transaction.TransactionStatus.PENDING.name(),
+                    request.getDescription()
             );
-            
+
             // Set payment method if provided
             if (request.getPaymentMethodId() != null) {
                 transaction.setPaymentMethod(request.getPaymentMethodId());
             }
-            
+
             // Set additional details
             if (request.getPatientName() != null) transaction.setPatientName(request.getPatientName());
             if (request.getPatientEmail() != null) transaction.setPatientEmail(request.getPatientEmail());
@@ -137,24 +144,24 @@ public class PaymentService {
             if (request.getDoctorSpecialty() != null) transaction.setDoctorSpecialty(request.getDoctorSpecialty());
             if (request.getAppointmentDate() != null) transaction.setAppointmentDate(request.getAppointmentDate());
             if (request.getAppointmentTimeSlot() != null) transaction.setAppointmentTimeSlot(request.getAppointmentTimeSlot());
-            
+
             transactionRepository.save(transaction);
             log.info("Transaction saved with ID: {} with PENDING status", transactionId);
-            
+
             // ========== ALWAYS CALL CONFIRM FOR AUTO-CONFIRM ==========
             String finalStatus;
             String finalPaymentIntentId = paymentIntent.getId();
             String finalTransactionId = transactionId;
-            
+
             if (isAutoConfirm) {
                 log.info("Auto-confirm enabled. Calling confirm to update database status...");
-                
+
                 // Create confirmation DTO
                 PaymentConfirmationDTO confirmation = new PaymentConfirmationDTO();
                 confirmation.setPaymentIntentId(finalPaymentIntentId);
                 confirmation.setTransactionId(finalTransactionId);
                 confirmation.setAppointmentId(request.getAppointmentId());
-                
+
                 // Call confirmPayment to update the database
                 TransactionDTO confirmedTransaction = confirmPayment(confirmation);
                 finalStatus = confirmedTransaction.getStatus();
@@ -163,22 +170,22 @@ public class PaymentService {
                 finalStatus = paymentIntent.getStatus();
             }
             // =========================================================
-            
+
             return new PaymentResponse(
-                paymentIntent.getId(),
-                paymentIntent.getClientSecret(),
-                transactionId,
-                finalStatus,
-                request.getAmount(),
-                request.getCurrency()
+                    paymentIntent.getId(),
+                    paymentIntent.getClientSecret(),
+                    transactionId,
+                    finalStatus,
+                    request.getAmount(),
+                    request.getCurrency()
             );
-            
+
         } catch (StripeException e) {
             log.error("Stripe error: {}", e.getMessage());
             throw new RuntimeException("Failed to create payment intent: " + e.getMessage());
         }
     }
-    
+
     @Transactional
     public TransactionDTO confirmPayment(PaymentConfirmationDTO confirmation) {
         log.info("Confirming payment for intent: {}", confirmation.getPaymentIntentId());
@@ -297,4 +304,28 @@ public class PaymentService {
         dto.setPaidAt(transaction.getPaidAt());
         return dto;
     }
+
+    /**
+     * Convert an amount in major currency unit (e.g., 15.00 PKR) to the smallest unit expected by Stripe.
+     * Most currencies use 2 fraction digits, some use 0 (e.g., JPY), and a few use 3.
+     */
+    private long toSmallestCurrencyUnit(java.math.BigDecimal amount, String currency) {
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount is required");
+        }
+
+        java.util.Currency cur = java.util.Currency.getInstance(currency);
+        int fractionDigits = cur.getDefaultFractionDigits();
+
+        java.math.BigDecimal scaled = amount
+                .setScale(fractionDigits, java.math.RoundingMode.HALF_UP)
+                .movePointRight(fractionDigits);
+
+        try {
+            return scaled.longValueExact();
+        } catch (ArithmeticException ex) {
+            throw new IllegalArgumentException("Amount is too large or has too many decimals for currency " + currency + ": " + amount);
+        }
+    }
 }
+

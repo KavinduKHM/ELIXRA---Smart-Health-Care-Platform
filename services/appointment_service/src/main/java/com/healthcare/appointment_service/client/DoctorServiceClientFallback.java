@@ -30,6 +30,7 @@ public class DoctorServiceClientFallback implements DoctorServiceClient {
         mockDoctor.setLastName("Doctor");
         mockDoctor.setSpecialty("General Medicine");
         mockDoctor.setEmail("mock@doctor.com");
+        mockDoctor.setConsultationFee(2500.0);
         mockDoctor.setAvailable(true);
         return mockDoctor;
     }

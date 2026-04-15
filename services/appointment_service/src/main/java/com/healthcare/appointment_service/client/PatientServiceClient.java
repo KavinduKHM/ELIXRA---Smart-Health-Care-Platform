@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Feign client for calling Patient Service.
  */
-@FeignClient(name = "patient-service", fallback = PatientServiceClientFallback.class)
+@FeignClient(name = "patient-service", url = "http://patient-service:8082", fallback = PatientServiceClientFallback.class)
 public interface PatientServiceClient {
 
     /**

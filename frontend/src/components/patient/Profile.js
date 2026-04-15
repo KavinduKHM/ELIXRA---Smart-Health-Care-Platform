@@ -12,8 +12,12 @@ import {
 } from '@heroicons/react/24/outline';
 import './Profile.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8082';
-const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || '';
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  || (typeof process !== 'undefined' ? process.env.REACT_APP_API_URL : '')
+  || 'http://localhost:8082';
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+  || (typeof process !== 'undefined' ? process.env.REACT_APP_CLOUDINARY_CLOUD_NAME : '')
+  || '';
 
 const initialForm = {
 	firstName: '',
@@ -754,4 +758,3 @@ const TextAreaField = ({ label, name, value, onChange, error, disabled, onToggle
 );
 
 export default PatientProfile;
-

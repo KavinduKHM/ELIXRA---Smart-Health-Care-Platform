@@ -67,6 +67,12 @@ public class Appointment {
     @Column(name = "prescription_issued")
     private boolean prescriptionIssued = false;
 
+    @Column(name = "payment_intent_id")
+    private String paymentIntentId;
+
+    @Column(name = "payment_status")
+    private String paymentStatus;  // "pending", "succeeded", "failed"
+
     // Timestamps - automatically managed
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

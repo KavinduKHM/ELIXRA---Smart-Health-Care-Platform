@@ -4,7 +4,9 @@ import { CheckCircleIcon, ExclamationTriangleIcon, UserCircleIcon, CameraIcon, U
 import { Link, useNavigate } from 'react-router-dom';
 import './CreateProfile.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8082';
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  || (typeof process !== 'undefined' ? process.env.REACT_APP_API_URL : '')
+  || 'http://localhost:8082';
 const MAX_PROFILE_PICTURE_SIZE_MB = 5;
 const MAX_PROFILE_PICTURE_SIZE = MAX_PROFILE_PICTURE_SIZE_MB * 1024 * 1024;
 

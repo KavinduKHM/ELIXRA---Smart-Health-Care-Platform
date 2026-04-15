@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

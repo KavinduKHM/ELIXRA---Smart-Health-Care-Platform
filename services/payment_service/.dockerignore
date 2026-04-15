@@ -7,7 +7,6 @@ pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
-.mvn/
 .m2/
 
 # IDE
@@ -30,7 +29,7 @@ Thumbs.db
 desktop.ini
 
 # Docker
-Dockerfile
+# Dockerfile  (do NOT ignore; required to build the image)
 docker-compose*.yml
 .dockerignore
 

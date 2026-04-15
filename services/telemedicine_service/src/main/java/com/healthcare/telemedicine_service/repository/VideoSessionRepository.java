@@ -40,12 +40,30 @@ public interface VideoSessionRepository extends JpaRepository<VideoSession, Long
     );
 
     /**
+     * Find sessions for a patient matching any of the provided statuses.
+     * Useful for dashboards that need to show "available" sessions (e.g., SCHEDULED + ACTIVE).
+     */
+    List<VideoSession> findByPatientIdAndStatusIn(
+            Long patientId,
+            List<VideoSession.SessionStatus> statuses
+    );
+
+    /**
      * Find all active sessions for a specific doctor.
      * Used to prevent multiple active sessions for same doctor.
      */
     List<VideoSession> findByDoctorIdAndStatus(
             Long doctorId,
             VideoSession.SessionStatus status
+    );
+
+    /**
+     * Find sessions for a doctor matching any of the provided statuses.
+     * Useful for dashboards that need to show "available" sessions (e.g., SCHEDULED + ACTIVE).
+     */
+    List<VideoSession> findByDoctorIdAndStatusIn(
+            Long doctorId,
+            List<VideoSession.SessionStatus> statuses
     );
 
     /**

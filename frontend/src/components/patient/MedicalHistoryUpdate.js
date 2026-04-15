@@ -4,7 +4,9 @@ import { CheckCircleIcon, ExclamationTriangleIcon, MagnifyingGlassIcon } from '@
 import { Link, useNavigate } from 'react-router-dom';
 import './MedicalHistoryForm.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8082';
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  || (typeof process !== 'undefined' ? process.env.REACT_APP_API_URL : '')
+  || 'http://localhost:8082';
 
 const initialLookup = {
 	patientId: '',
