@@ -20,6 +20,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
+        
+        if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("not found")) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("error", "Not Found");
+            response.put("message", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        
         response.put("status", HttpStatus.BAD_REQUEST.value());
         response.put("error", "Bad Request");
         response.put("message", ex.getMessage());

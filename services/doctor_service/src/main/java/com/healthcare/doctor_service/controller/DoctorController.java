@@ -73,6 +73,16 @@ public class DoctorController {
     }
 
     /**
+     * Get all doctors
+     * GET /api/doctors or /api/doctors/
+     */
+    @GetMapping({"", "/"})
+    public ResponseEntity<Page<DoctorDTO>> getAllDoctors(
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(doctorService.searchDoctors(null, pageable));
+    }
+
+    /**
      * Update doctor profile
      * PUT /api/doctors/{doctorId}/profile
      */

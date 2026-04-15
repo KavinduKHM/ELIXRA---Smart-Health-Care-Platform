@@ -5,17 +5,91 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/service-discovery/target/service-discovery.jar.original" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/DoctorServiceApp.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/AdminDashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/AdminDashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/DoctorVerification.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/DoctorVerification.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/TransactionMonitor.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/TransactionMonitor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/admin/UserManagement.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/admin/UserManagement.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentDetails.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentDetails.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentList.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/appointments/AppointmentList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/ForgotPassword.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/ForgotPassword.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/Register.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/Register.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/Footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/Navbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/Navbar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/PrivateRoute.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/PrivateRoute.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/AppointmentRequests.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/AppointmentRequests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/AvailabilityManager.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/AvailabilityManager.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/DoctorDashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/DoctorDashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/IssuePrescription.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/IssuePrescription.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/doctor/VideoConsultation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/doctor/VideoConsultation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/BookAppointment.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/BookAppointment.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/Dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/MedicalHistory.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/MedicalHistory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/Prescriptions.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/Prescriptions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/Profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/Profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/patient/UploadDocument.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/patient/UploadDocument.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/symptoms/SymptomChecker.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/symptoms/SymptomChecker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/telemedicine/VideoCall.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/telemedicine/VideoCall.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/appointment.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/appointment.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/auth.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/auth.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/doctor.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/doctor.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/notification.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/notification.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/patient.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/patient.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/payment.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/payment.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utils/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utils/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/constants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/controller/DoctorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/doctor_service/src/main/java/com/healthcare/doctor_service/exception/GlobalExceptionHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/ISURI RANASINGHE/Documents/project/ELIXRA---Smart-Health-Care-Platform" value="3BKhwUPMd1YHZ4a0Cmm2okMINqm" />
+    </persistenceIdMap>
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="chat-panel" value="Gemini 3.1 Pro" />
+      <entry key="agent-panel" value="Gemini 3.1 Pro" />
+    </selectedModels>
+  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;isuriranasinghe20&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/KavinduKHM/ELIXRA---Smart-Health-Care-Platform.git&quot;,
+    &quot;accountId&quot;: &quot;e32cecc8-8cf1-4ad8-bf12-d8174550b28e&quot;
+  }
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -31,21 +105,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Doctor__Management__Service__Final",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\User\Documents\GitHub\ELIXRA---Smart-Health-Care-Platform\services\appointment_service" />
@@ -55,7 +137,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
       </set>
     </attachedChunks>
   </component>
@@ -67,8 +150,13 @@
       <option name="presentableId" value="Default" />
       <updated>1774243910439</updated>
       <workItem from="1774243913741" duration="11000" />
+      <workItem from="1776135524609" duration="11314000" />
+      <workItem from="1776224229297" duration="7600000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
