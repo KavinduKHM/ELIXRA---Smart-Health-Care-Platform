@@ -1,64 +1,62 @@
-// src/services/api.js
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { storage } from '../lib/storage';
 
-const API_BASE_URL = 'http://localhost:8085/api/video'; // Telemedicine service
+let onUnauthorized = null;
+let refreshHandler = null;
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+export function setOnUnauthorized(handler) {
+  onUnauthorized = handler;
+}
 
-// For authenticated requests (add token from localStorage)
-export const setAuthToken = (token) => {
-  if (token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete api.defaults.headers.common['Authorization'];
-  }
-};
+export function setRefreshHandler(handler) {
+  refreshHandler = handler;
+}
 
-// Video session endpoints
-export const createSession = async (data) => {
-  const response = await api.post('/sessions', data);
-  return response.data;
-};
-
-export const joinSession = async (sessionId, userId, userRole) => {
-  const response = await api.post('/sessions/join', {
-    sessionId,
-    userId,
-    userRole,
+export function createApiClient(baseURL) {
+  const api = axios.create({
+    baseURL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
-  return response.data;
-};
 
-export const endSession = async (sessionId, userId, consultationNotes) => {
-  const response = await api.post('/sessions/end', {
-    sessionId,
-    userId,
-    consultationNotes,
+  api.interceptors.request.use((config) => {
+    const token = storage.getAccessToken();
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   });
-  return response.data;
-};
 
-export const getSessionDetails = async (sessionId) => {
-  const response = await api.get(`/sessions/${sessionId}`);
-  return response.data;
-};
+  api.interceptors.response.use(
+    (res) => res,
+    async (error) => {
+      const status = error?.response?.status;
+      const originalRequest = error?.config;
 
-export const getActiveSessionsForPatient = async (patientId) => {
-  const response = await api.get(`/patients/${patientId}/active`);
-  return response.data;
-};
+      if (status === 401 && originalRequest && !originalRequest.__isRetryRequest) {
+        originalRequest.__isRetryRequest = true;
 
-export const getActiveSessionsForDoctor = async (doctorId) => {
-  const response = await api.get(`/doctors/${doctorId}/active`);
-  return response.data;
-};
+        try {
+          if (typeof refreshHandler === 'function') {
+            const refreshed = await refreshHandler();
+            if (refreshed) {
+              return api.request(originalRequest);
+            }
+          }
+        } catch {
+          // swallow and fallback to unauthorized flow
+        }
 
-export const cancelSession = async (sessionId, userId) => {
-  const response = await api.post(`/sessions/${sessionId}/cancel?userId=${userId}`);
-  return response.data;
-};
+        toast.error('Session expired. Please log in again.');
+        if (typeof onUnauthorized === 'function') onUnauthorized();
+      }
+
+      return Promise.reject(error);
+    }
+  );
+
+  return api;
+}
