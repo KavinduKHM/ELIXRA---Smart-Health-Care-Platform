@@ -1,13 +1,13 @@
 server:
-  port: 3002
+  port: 8088
 
 spring:
   application:
     name: notification-service
 
-  # MySQL Database Configuration (same as appointment service)
+  # MySQL Database Configuration (docker-compose)
   datasource:
-    url: jdbc:mysql://localhost:3307/notification_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://mysql-notification:3306/notification_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -26,8 +26,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 465
-    username: oshadha72mihiran@gmail.com
-    password: fxswvzorkzedtijm
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         debug: true
@@ -43,11 +43,11 @@ spring:
 
 # Twilio Configuration (WhatsApp)
 twilio:
-  account-sid: AC9bb02e250714fc4811af1fba72ecb518
-  auth-token: 5561f4668c81e9f26b8e6e5a77d4925b
-  whatsapp-number: whatsapp:+14155238886
+  account-sid: ${TWILIO_ACCOUNT_SID}
+  auth-token: ${TWILIO_AUTH_TOKEN}
+  whatsapp-number: ${TWILIO_WHATSAPP_NUMBER}
 
-# Eureka (disable for now)
+# Eureka
 eureka:
   client:
     enabled: true

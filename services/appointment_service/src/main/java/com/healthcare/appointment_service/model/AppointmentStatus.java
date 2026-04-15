@@ -1,5 +1,10 @@
-package services.appointment_service.src.main.java.com.healthcare.appointment_service.model;
+package com.healthcare.appointment_service.model;
 
-public class AppointmentStatus {
-    
+public enum AppointmentStatus {
+    PENDING,            // Waiting for doctor confirmation (original status)
+    PENDING_PAYMENT,    // Awaiting payment
+    CONFIRMED,
+    CANCELLED,
+    COMPLETED,
+    RESCHEDULED
 }

@@ -80,6 +80,65 @@ services:
       timeout: 5s
       retries: 5
 
+  mysql-payment:
+    image: mysql:8.0
+    container_name: mysql-payment
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: payment_db
+    ports:
+      - "3311:3306"
+    volumes:
+      - mysql-payment-data:/var/lib/mysql
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mysql-notification:
+    image: mysql:8.0
+    container_name: mysql-notification
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: notification_db
+    ports:
+      - "3312:3306"
+    volumes:
+      - mysql-notification-data:/var/lib/mysql
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notification-service:
+    build:
+      context: ../services/notification_service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+      mysql-notification:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_WHATSAPP_NUMBER: ${TWILIO_WHATSAPP_NUMBER}
+    networks:
+      - healthcare-network
+
   telemedicine-service:
     build:
       context: ../services/telemedicine_service
@@ -159,9 +218,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
       # Cloudinary credentials (replace with actual or use dummy for now)
-      CLOUDINARY_CLOUD_NAME: dwona3xzj
-      CLOUDINARY_API_KEY: 541144828641826
-      CLOUDINARY_API_SECRET: RoOFJQi-nLfT0_ExZewiJ_TsOak
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     networks:
       - healthcare-network
@@ -179,9 +238,28 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
-      GEMINI_API_KEY: AIzaSyCudFjsyvesRqy7Hfj5BN17cRHk3_MX_oI
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
       # Direct-call fallback when Eureka doesn't have appointment-service instances
       APPOINTMENT_SERVICE_URL: http://appointment-service:8084
+    networks:
+      - healthcare-network
+
+  payment-service:
+    build:
+      context: ../services/payment_service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+      mysql-payment:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
     networks:
       - healthcare-network
 
@@ -191,6 +269,8 @@ volumes:
   mysql-appointment-data:
   mysql-patient-data:
   mysql-symptom-checker-data:
+  mysql-payment-data:
+  mysql-notification-data:
 
 networks:
   healthcare-network:

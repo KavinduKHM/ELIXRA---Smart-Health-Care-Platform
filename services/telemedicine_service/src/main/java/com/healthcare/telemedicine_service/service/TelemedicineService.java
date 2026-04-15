@@ -270,8 +270,9 @@ public class TelemedicineService {
      * @return List of active sessions
      */
     public List<SessionDetailsDTO> getActiveSessionsForPatient(Long patientId) {
-        return sessionRepository.findByPatientIdAndStatus(
-                        patientId, VideoSession.SessionStatus.ACTIVE)
+        return sessionRepository.findByPatientIdAndStatusIn(
+                patientId,
+                List.of(VideoSession.SessionStatus.ACTIVE, VideoSession.SessionStatus.SCHEDULED))
                 .stream()
                 .map(SessionDetailsDTO::fromEntity)
                 .collect(Collectors.toList());
@@ -284,8 +285,9 @@ public class TelemedicineService {
      * @return List of active sessions
      */
     public List<SessionDetailsDTO> getActiveSessionsForDoctor(Long doctorId) {
-        return sessionRepository.findByDoctorIdAndStatus(
-                        doctorId, VideoSession.SessionStatus.ACTIVE)
+        return sessionRepository.findByDoctorIdAndStatusIn(
+                doctorId,
+                List.of(VideoSession.SessionStatus.ACTIVE, VideoSession.SessionStatus.SCHEDULED))
                 .stream()
                 .map(SessionDetailsDTO::fromEntity)
                 .collect(Collectors.toList());
