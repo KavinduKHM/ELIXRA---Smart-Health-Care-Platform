@@ -98,6 +98,24 @@ services:
       timeout: 5s
       retries: 5
 
+  mysql-notification:
+    image: mysql:8.0
+    container_name: mysql-notification
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: notification_db
+    ports:
+      - "3312:3306"
+    volumes:
+      - mysql-notification-data:/var/lib/mysql
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   telemedicine-service:
     build:
       context: ../services/telemedicine_service
@@ -222,6 +240,28 @@ services:
     networks:
       - healthcare-network
 
+  notification-service:
+    build:
+      context: ../services/notification_service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      service-discovery:
+        condition: service_healthy
+      mysql-notification:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8088
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-notification:3306/notification_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
+    networks:
+      - healthcare-network
+
 volumes:
   mysql_telemedicine_data:
   mysql_doctor_data:
@@ -229,6 +269,7 @@ volumes:
   mysql-patient-data:
   mysql-symptom-checker-data:
   mysql-payment-data:
+  mysql-notification-data:
 
 networks:
   healthcare-network:

@@ -10,7 +10,7 @@ spring:
 # Eureka Server Configuration
 eureka:
   instance:
-    hostname: localhost
+    hostname: service-discovery
     prefer-ip-address: true
 
   client:
