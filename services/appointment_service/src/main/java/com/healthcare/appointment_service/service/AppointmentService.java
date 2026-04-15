@@ -2,6 +2,7 @@ package com.healthcare.appointment_service.service;
 
 import com.healthcare.appointment_service.client.DoctorServiceClient;
 import com.healthcare.appointment_service.client.PatientServiceClient;
+import com.healthcare.appointment_service.client.NotificationServiceClient;
 import com.healthcare.appointment_service.dto.*;
 import com.healthcare.appointment_service.model.Appointment;
 import com.healthcare.appointment_service.model.AppointmentStatus;
@@ -18,7 +19,9 @@ import com.healthcare.appointment_service.dto.PaymentResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +42,7 @@ public class AppointmentService {
     private final DoctorServiceClient doctorServiceClient;
     private final PatientServiceClient patientServiceClient;
     private final PaymentServiceClient paymentServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     @org.springframework.beans.factory.annotation.Value("${app.payment.currency:LKR}")
     private String paymentCurrency;
@@ -156,6 +160,60 @@ public class AppointmentService {
         log.info("Returning {} mock available slots for doctor {}", mockSlots.size(), doctorId);
         return mockSlots;
     }
+
+
+    private void sendNotification(Appointment appointment, String eventType) {
+        try {
+            // 1. Build the DTO – you need to fetch patient/doctor details
+            NotificationAppointmentDTO dto = new NotificationAppointmentDTO();
+            dto.setAppointmentId(appointment.getId().toString());
+            dto.setPatientId(appointment.getPatientId().toString());
+            dto.setDoctorId(appointment.getDoctorId().toString());
+            dto.setDate(appointment.getAppointmentTime());
+            dto.setTimeSlot(appointment.getAppointmentTime().toLocalTime().toString());
+            dto.setStatus(appointment.getStatus().name());
+            dto.setSymptoms(appointment.getSymptoms());
+            dto.setNotes(appointment.getNotes());
+            dto.setConsultationLink(appointment.getConsultationLink());
+
+            // 2. Get patient and doctor details from their services (you already have Feign clients for them)
+            PatientDTO patient = patientServiceClient.getPatientById(appointment.getPatientId());
+            if (patient != null) {
+                dto.setPatientName(patient.getFullName());
+                dto.setPatientEmail(patient.getEmail());
+                dto.setPatientPhone(patient.getPhoneNumber());
+            } else {
+                // fallback
+                dto.setPatientName("Patient");
+                dto.setPatientEmail("patient@example.com");
+                dto.setPatientPhone("0000000000");
+            }
+
+            DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
+            if (doctor != null) {
+                dto.setDoctorName(doctor.getFullName());
+                dto.setDoctorEmail(doctor.getEmail());
+                dto.setDoctorPhone(doctor.getPhoneNumber());
+                dto.setSpecialty(doctor.getSpecialty());
+            } else {
+                dto.setDoctorName("Doctor");
+                dto.setDoctorEmail("doctor@example.com");
+                dto.setDoctorPhone("0000000000");
+                dto.setSpecialty("General");
+            }
+
+            // 3. Prepare request map
+            Map<String, Object> request = new HashMap<>();
+            request.put("appointment", dto);
+            request.put("eventType", eventType);
+
+            // 4. Call notification service
+            notificationServiceClient.sendAppointmentNotifications(request);
+            log.info("Notification sent for appointment {} event {}", appointment.getId(), eventType);
+        } catch (Exception e) {
+            log.error("Failed to send notification: {}", e.getMessage());
+        }
+    }
     /**
      * Book a new appointment
      *
@@ -220,6 +278,9 @@ public class AppointmentService {
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
         log.info("Appointment created with ID: {} (status: PENDING_PAYMENT)", savedAppointment.getId());
+
+        // Notify: appointment created
+        sendNotification(savedAppointment, "created");
 
         // 6. Prepare payment request
         PaymentRequest paymentReq = new PaymentRequest();
@@ -444,6 +505,13 @@ public class AppointmentService {
 
         Appointment updatedAppointment = appointmentRepository.save(appointment);
 
+        // Notify: only for selected status transitions
+        if (request.getStatus() == AppointmentStatus.CONFIRMED) {
+            sendNotification(updatedAppointment, "confirmed");
+        } else if (request.getStatus() == AppointmentStatus.COMPLETED) {
+            sendNotification(updatedAppointment, "completed");
+        }
+
         // Use mock data instead of calling external services
         PatientDTO patient = new PatientDTO();
         patient.setId(updatedAppointment.getPatientId());
@@ -491,6 +559,9 @@ public class AppointmentService {
         appointment.setCancelledAt(LocalDateTime.now());
 
         Appointment cancelledAppointment = appointmentRepository.save(appointment);
+
+        // Notify: appointment cancelled
+        sendNotification(cancelledAppointment, "cancelled");
 
         // Use mock data instead of calling external services
         PatientDTO patient = new PatientDTO();

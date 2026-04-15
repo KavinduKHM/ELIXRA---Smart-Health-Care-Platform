@@ -25,7 +25,9 @@ public class EmailService {
     public boolean sendEmail(String to, String subject, String htmlContent) {
         log.info("📧 Sending email to: {}", to);
 
-        if (fromEmail == null || fromEmail.equals("your-email@gmail.com")) {
+        // Consider email delivery "mocked" unless we have a real username configured.
+        // In docker-compose/dev setups this property is often empty or a placeholder.
+        if (fromEmail == null || fromEmail.isBlank() || fromEmail.equalsIgnoreCase("your-email@gmail.com")) {
             logMockEmail(to, subject, htmlContent);
             return true;
         }

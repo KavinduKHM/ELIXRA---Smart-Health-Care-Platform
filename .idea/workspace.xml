@@ -5,11 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b65143b-aace-4c2f-8bb4-335faba45c93" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/NotificationServiceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/NotificationServiceClientFallback.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/dto/NotificationAppointmentDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/notification_service/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/.env" beforeDir="false" afterPath="$PROJECT_DIR$/docker/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment_service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/PatientServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/client/PatientServiceClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/service/AppointmentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/appointment_service/src/main/java/com/healthcare/appointment_service/service/AppointmentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/WhatsAppService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/java/com/healthcare/notification_service/service/WhatsAppService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification_service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification_service/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

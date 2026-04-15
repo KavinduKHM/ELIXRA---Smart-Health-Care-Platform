@@ -57,12 +57,18 @@ public class WhatsAppService {
             log.info("✅ WhatsApp sent successfully to: {}", formattedNumber);
             return true;
         } catch (ApiException e) {
-            log.error("❌ WhatsApp error: {}", e.getMessage());
-            if (e.getCode() == 63016) {
+            Integer code = e.getCode();
+            log.error("❌ WhatsApp error (code={}): {}", code, e.getMessage());
+
+            // 63016 = recipient hasn't joined sandbox (common in dev)
+            if (code != null && code == 63016) {
                 log.error("   ⚠️ Recipient not joined to WhatsApp Sandbox!");
                 log.error("   Send 'join {}' to {} on WhatsApp",
                         getSandboxCode(), twilioConfig.getWhatsappNumber());
             }
+            return false;
+        } catch (Exception e) {
+            log.error("❌ WhatsApp unexpected error: {}", e.getMessage(), e);
             return false;
         }
     }
