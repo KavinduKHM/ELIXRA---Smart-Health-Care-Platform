@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import com.healthcare.appointment_service.client.PaymentServiceClient;
 import com.healthcare.appointment_service.dto.PaymentRequest;
 import com.healthcare.appointment_service.dto.PaymentResponse;
@@ -188,14 +190,14 @@ public class AppointmentService {
         // 2. Get doctor details from Doctor Service
         DoctorDTO doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
         if (doctor == null) {
-            throw new RuntimeException("Doctor not found with ID: " + request.getDoctorId());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found");
         }
 
         // 3. Check availability via Doctor Service
         boolean isAvailable = doctorServiceClient.checkAvailability(
                 request.getDoctorId(), request.getAppointmentTime());
         if (!isAvailable) {
-            throw new RuntimeException("Doctor is not available at the requested time");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Doctor is not available at the requested time");
         }
 
         // 4. Check for conflicts with existing appointments in Appointment Service
@@ -204,7 +206,7 @@ public class AppointmentService {
         List<Appointment> conflicts = appointmentRepository.findConflictingAppointments(
                 request.getDoctorId(), request.getAppointmentTime(), endTime);
         if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Time slot is already booked");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Time slot is already booked");
         }
 
         // 5. Create appointment with PENDING_PAYMENT status
@@ -256,8 +258,8 @@ public class AppointmentService {
         try {
             paymentResponse = paymentServiceClient.createPaymentIntent(paymentReq);
         } catch (Exception e) {
-            log.error("Failed to create payment intent: {}", e.getMessage());
-            throw new RuntimeException("Payment service unavailable: " + e.getMessage());
+            log.error("Failed to create payment intent", e);
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Payment service unavailable");
         }
 
         // 8. Update appointment with payment intent ID
