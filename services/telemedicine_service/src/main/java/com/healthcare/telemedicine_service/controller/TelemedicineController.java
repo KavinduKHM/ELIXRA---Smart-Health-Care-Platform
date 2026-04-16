@@ -47,6 +47,22 @@ public class TelemedicineController {
     }
 
     /**
+     * Generates an Agora RTC token for a channel + user.
+     */
+    @PostMapping("/token/generate")
+    public ResponseEntity<TokenGenerateResponse> generateToken(
+            @Valid @RequestBody TokenGenerateRequest request) {
+        log.info("POST /api/video/token/generate - Generating token for channel: {}",
+                request.getChannelName());
+
+        try {
+            return ResponseEntity.ok(telemedicineService.generateToken(request));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
      * Joins a video session.
      * Generates an Agora token for the user to connect to the video call.
      */

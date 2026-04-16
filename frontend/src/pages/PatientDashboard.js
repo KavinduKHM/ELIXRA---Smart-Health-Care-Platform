@@ -1,10 +1,12 @@
 // src/pages/PatientDashboard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Profile from '../components/patient/Profile';
 import Documents from '../components/patient/Documents';
 import Prescriptions from '../components/patient/Prescriptions';
 import MedicalHistory from '../components/patient/MedicalHistory';
+import PatientAppointments from '../components/patient/PatientAppointments';
 import BookAppointment from '../components/patient/BookAppointment';
+import AISymptomCheckerChatbot from '../components/patient/AISymptomCheckerChatbot';
 import { getPatientProfile, getPatientDocuments, getPatientPrescriptions, getPatientMedicalHistory } from '../services/patientService';
 
 const PatientDashboard = () => {
@@ -70,6 +72,8 @@ const PatientDashboard = () => {
       <Documents documents={documents} patientId={patientId} onDocumentUploaded={refreshDocuments} />
       <Prescriptions prescriptions={prescriptions} />
       <MedicalHistory history={medicalHistory} />
+      <AISymptomCheckerChatbot />
+      <PatientAppointments patientId={patientId} />
       <BookAppointment patientId={patientId} />
     </div>
   );

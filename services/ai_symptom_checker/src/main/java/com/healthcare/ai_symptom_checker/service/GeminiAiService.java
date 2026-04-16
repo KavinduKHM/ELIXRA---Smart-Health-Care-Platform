@@ -36,87 +36,109 @@ public class GeminiAiService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SymptomCheckResponse analyzeSymptoms(String symptomsText) {
-        log.info("Analyzing symptoms: {}", symptomsText);
-        String prompt = buildPrompt(symptomsText);
+        log.info("Analyzing symptoms (len={} chars)", symptomsText == null ? 0 : symptomsText.length());
 
         if (apiKey == null || apiKey.isBlank()) {
-            throw new RuntimeException("AI analysis failed: Gemini API key is missing");
+            log.warn("Gemini API key not configured. Returning fallback analysis.");
+            return fallbackResponse("Gemini API key is not configured on the server");
         }
         if (modelName == null || modelName.isBlank()) {
-            throw new RuntimeException("AI analysis failed: Gemini model name is missing");
+            log.warn("Gemini model name not configured. Returning fallback analysis.");
+            return fallbackResponse("Gemini model name is not configured on the server");
         }
 
-        String configuredModel = normalizeModelName(modelName);
+        String prompt = buildPrompt(symptomsText);
 
-        // Candidate models (configured first, then discovered ones)
-        Set<String> candidates = new LinkedHashSet<>();
-        candidates.add(configuredModel);
+        try {
+            String configuredModel = normalizeModelName(modelName);
 
-        // We'll discover models lazily only when needed; this avoids an extra network call on success.
+            // Candidate models (configured first, then discovered ones)
+            Set<String> candidates = new LinkedHashSet<>();
+            candidates.add(configuredModel);
 
-        RestClientResponseException lastHttp = null;
-        RuntimeException lastOther = null;
+            // We'll discover models lazily only when needed; this avoids an extra network call on success.
 
-        for (String model : new ArrayList<>(candidates)) {
-            try {
-                return callGenerateContentWithRetry(model, prompt);
-            } catch (RestClientResponseException e) {
-                lastHttp = e;
+            RestClientResponseException lastHttp = null;
+            RuntimeException lastOther = null;
 
-                // Model not found / not allowed -> discover and try other models.
-                if (e.getRawStatusCode() == 404 || e.getRawStatusCode() == 403) {
-                    log.warn("Gemini model {} not usable (status {}). Discovering supported models...", model, e.getRawStatusCode());
-                    for (String discovered : discoverGenerateContentModels()) {
-                        candidates.add(discovered);
-                    }
-                    // continue loop; candidates list will be extended below
-                } else if (e.getRawStatusCode() == 503) {
-                    // 503 handled inside retry method; if we still got here, try other models.
-                    log.warn("Gemini model {} still unavailable after retries (503). Trying other models...", model);
-                    for (String discovered : discoverGenerateContentModels()) {
-                        candidates.add(discovered);
-                    }
-                } else {
-                    // Other HTTP errors (401, 429, 400 etc.) -> fail fast, since retrying other models won't help.
-                    log.error("Gemini call failed with non-recoverable HTTP status {}", e.getRawStatusCode(), e);
-                    throw new RuntimeException("AI analysis failed: Gemini returned HTTP " + e.getRawStatusCode(), e);
-                }
-            } catch (RuntimeException e) {
-                lastOther = e;
-            }
+            for (String model : new ArrayList<>(candidates)) {
+                try {
+                    return callGenerateContentWithRetry(model, prompt);
+                } catch (RestClientResponseException e) {
+                    lastHttp = e;
 
-            // if discover added more, iterate them
-            if (candidates.size() > 1) {
-                // continue; loop over all candidates in insertion order
-                // Rebuild list to avoid ConcurrentModification
-                for (String discovered : candidates) {
-                    if (discovered.equals(model)) continue;
-                    try {
-                        return callGenerateContentWithRetry(discovered, prompt);
-                    } catch (RestClientResponseException e) {
-                        lastHttp = e;
-                        if (e.getRawStatusCode() == 503) {
-                            log.warn("Gemini model {} unavailable (503) after retries.", discovered);
-                            continue;
+                    // Model not found / not allowed -> discover and try other models.
+                    if (e.getRawStatusCode() == 404 || e.getRawStatusCode() == 403) {
+                        log.warn("Gemini model {} not usable (status {}). Discovering supported models...", model, e.getRawStatusCode());
+                        for (String discovered : discoverGenerateContentModels()) {
+                            candidates.add(discovered);
                         }
-                        if (e.getRawStatusCode() == 404 || e.getRawStatusCode() == 403) {
-                            log.warn("Gemini model {} not usable (status {}).", discovered, e.getRawStatusCode());
-                            continue;
+                        // continue loop; candidates list will be extended below
+                    } else if (e.getRawStatusCode() == 503) {
+                        // 503 handled inside retry method; if we still got here, try other models.
+                        log.warn("Gemini model {} still unavailable after retries (503). Trying other models...", model);
+                        for (String discovered : discoverGenerateContentModels()) {
+                            candidates.add(discovered);
                         }
+                    } else {
+                        // Other HTTP errors (401, 429, 400 etc.) -> fail fast, since retrying other models won't help.
+                        log.error("Gemini call failed with non-recoverable HTTP status {}", e.getRawStatusCode(), e);
                         throw new RuntimeException("AI analysis failed: Gemini returned HTTP " + e.getRawStatusCode(), e);
                     }
+                } catch (RuntimeException e) {
+                    lastOther = e;
                 }
-                break;
-            }
-        }
 
-        if (lastHttp != null) {
-            throw new RuntimeException("AI analysis failed: Gemini error (" + lastHttp.getRawStatusCode() + ")", lastHttp);
+                // if discover added more, iterate them
+                if (candidates.size() > 1) {
+                    // continue; loop over all candidates in insertion order
+                    // Rebuild list to avoid ConcurrentModification
+                    for (String discovered : candidates) {
+                        if (discovered.equals(model)) continue;
+                        try {
+                            return callGenerateContentWithRetry(discovered, prompt);
+                        } catch (RestClientResponseException e) {
+                            lastHttp = e;
+                            if (e.getRawStatusCode() == 503) {
+                                log.warn("Gemini model {} unavailable (503) after retries.", discovered);
+                                continue;
+                            }
+                            if (e.getRawStatusCode() == 404 || e.getRawStatusCode() == 403) {
+                                log.warn("Gemini model {} not usable (status {}).", discovered, e.getRawStatusCode());
+                                continue;
+                            }
+                            throw new RuntimeException("AI analysis failed: Gemini returned HTTP " + e.getRawStatusCode(), e);
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (lastHttp != null) {
+                throw new RuntimeException("AI analysis failed: Gemini error (" + lastHttp.getRawStatusCode() + ")", lastHttp);
+            }
+            if (lastOther != null) {
+                throw lastOther;
+            }
+            throw new RuntimeException("AI analysis failed: unknown error");
+
+        } catch (Exception ex) {
+            log.warn("AI analysis failed. Returning fallback analysis. reason={}", ex.getMessage());
+            return fallbackResponse("AI analysis is currently unavailable");
         }
-        if (lastOther != null) {
-            throw lastOther;
-        }
-        throw new RuntimeException("AI analysis failed: unknown error");
+    }
+
+    private SymptomCheckResponse fallbackResponse(String reason) {
+        String analysisText = "AI symptom analysis is currently unavailable. " + (reason == null ? "" : reason) + ".\n" +
+                "To enable it, set GEMINI_API_KEY (and optionally GEMINI_MODEL) for the ai-symptom-checker service and restart it.";
+
+        return SymptomCheckResponse.builder()
+                .analysis(analysisText)
+                .possibleConditions("")
+                .recommendedSpecialty("General Medicine")
+                .urgencyLevel("Routine")
+                .disclaimer("This is an AI-generated preliminary analysis and is not a substitute for professional medical advice.")
+                .build();
     }
 
     private SymptomCheckResponse callGenerateContentWithRetry(String normalizedModel, String prompt) {

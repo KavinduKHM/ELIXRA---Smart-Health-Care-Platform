@@ -17,6 +17,11 @@ export const APPOINTMENT_API = axios.create({
   headers: { 'Content-Type': 'application/json' }
 });
 
+export const AI_SYMPTOM_CHECKER_API = axios.create({
+  baseURL: 'http://localhost:8086/api/ai/symptom-checker',
+  headers: { 'Content-Type': 'application/json' }
+});
+
 // For file uploads (multipart), we'll use a separate instance without default content-type
 export const PATIENT_UPLOAD_API = axios.create({
   baseURL: 'http://localhost:8082/api/patients'

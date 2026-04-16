@@ -52,13 +52,82 @@ const DoctorPrescriptions = ({ doctorId }) => {
     setFormData({ ...formData, medicines: updated });
   };
 
+  const normalizeLocalDateTime = (value) => {
+    const v = String(value || '').trim();
+    if (!v) return '';
+    // <input type="datetime-local" /> returns "YYYY-MM-DDTHH:mm" (no seconds)
+    return v.length === 16 ? `${v}:00` : v;
+  };
+
+  const extractBackendError = (err) => {
+    const data = err?.response?.data;
+    if (!data) return null;
+
+    if (typeof data?.message === 'string' && data.message.trim()) return data.message;
+
+    const errors = data?.errors;
+    if (errors && typeof errors === 'object') {
+      const firstKey = Object.keys(errors)[0];
+      if (firstKey) return `${firstKey}: ${errors[firstKey]}`;
+    }
+
+    return null;
+  };
+
   const handleSubmit = async () => {
-    if (!formData.patientId || !formData.appointmentId || !formData.validUntil) {
-      alert('Please fill all required fields');
+    const patientIdNum = Number(formData.patientId);
+    const appointmentIdNum = Number(formData.appointmentId);
+    const validUntil = normalizeLocalDateTime(formData.validUntil);
+
+    const medicines = (formData.medicines || [])
+      .map((m) => ({
+        ...m,
+        medicineName: String(m?.medicineName || '').trim(),
+        dosage: String(m?.dosage || '').trim() || null,
+        frequency: String(m?.frequency || '').trim() || null,
+        duration: String(m?.duration || '').trim() || null,
+        instructions: String(m?.instructions || '').trim() || null,
+      }))
+      .filter((m) => m.medicineName);
+
+    if (!Number.isFinite(patientIdNum) || patientIdNum <= 0) {
+      alert('Please select a patient');
       return;
     }
+    if (!Number.isFinite(appointmentIdNum) || appointmentIdNum <= 0) {
+      alert('Please select an appointment');
+      return;
+    }
+    if (!validUntil) {
+      alert('Please select a valid until date/time');
+      return;
+    }
+    if (medicines.length === 0) {
+      alert('Please add at least one medicine name');
+      return;
+    }
+
+    const validUntilDate = new Date(validUntil);
+    if (Number.isNaN(validUntilDate.getTime())) {
+      alert('Valid until must be a valid date/time');
+      return;
+    }
+    if (validUntilDate.getTime() <= Date.now()) {
+      alert('Valid until must be in the future');
+      return;
+    }
+
+    const payload = {
+      patientId: patientIdNum,
+      appointmentId: appointmentIdNum,
+      diagnosis: String(formData.diagnosis || '').trim() || null,
+      notes: String(formData.notes || '').trim() || null,
+      validUntil,
+      medicines,
+    };
+
     try {
-      await issuePrescription(doctorId, formData);
+      await issuePrescription(doctorId, payload);
       alert('Prescription issued');
       setShowForm(false);
       loadPrescriptions();
@@ -68,7 +137,8 @@ const DoctorPrescriptions = ({ doctorId }) => {
       });
     } catch (err) {
       console.error(err);
-      alert('Failed to issue prescription');
+      const msg = extractBackendError(err) || 'Failed to issue prescription';
+      alert(msg);
     }
   };
 
@@ -78,21 +148,54 @@ const DoctorPrescriptions = ({ doctorId }) => {
       <button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Issue New Prescription'}</button>
       {showForm && (
         <div style={{ marginTop: '1rem', border: '1px solid #ddd', padding: '1rem' }}>
-          <select value={formData.patientId} onChange={e => setFormData({...formData, patientId: e.target.value})}>
+          <select
+            value={formData.patientId}
+            onChange={e => {
+              const nextPatientId = e.target.value;
+              // avoid accidental mismatch between patient + appointment
+              const currentAppointment = appointments.find(a => String(a.id) === String(formData.appointmentId));
+              const appointmentMatches = currentAppointment && String(currentAppointment.patientId) === String(nextPatientId);
+              setFormData({
+                ...formData,
+                patientId: nextPatientId,
+                appointmentId: appointmentMatches ? formData.appointmentId : '',
+              });
+            }}
+          >
             <option value="">Select Patient</option>
-            {appointments.map(apt => (
-              <option key={apt.id} value={apt.patientId}>Patient {apt.patientId} (Appt {apt.id})</option>
+            {[...new Map(appointments.map(a => [String(a.patientId), a.patientId])).values()].map((pid) => (
+              <option key={pid} value={pid}>Patient {pid}</option>
             ))}
           </select>
-          <select value={formData.appointmentId} onChange={e => setFormData({...formData, appointmentId: e.target.value})}>
+          <select
+            value={formData.appointmentId}
+            onChange={e => {
+              const nextAppointmentId = e.target.value;
+              const apt = appointments.find(a => String(a.id) === String(nextAppointmentId));
+              setFormData({
+                ...formData,
+                appointmentId: nextAppointmentId,
+                patientId: apt?.patientId != null ? String(apt.patientId) : formData.patientId,
+              });
+            }}
+          >
             <option value="">Select Appointment</option>
-            {appointments.map(apt => (
-              <option key={apt.id} value={apt.id}>Appointment {apt.id} - {new Date(apt.appointmentTime).toLocaleDateString()}</option>
-            ))}
+            {appointments
+              .filter(a => !formData.patientId || String(a.patientId) === String(formData.patientId))
+              .map(apt => (
+                <option key={apt.id} value={apt.id}>
+                  Appointment {apt.id} - {new Date(apt.appointmentTime).toLocaleDateString()}
+                </option>
+              ))}
           </select>
           <input type="text" placeholder="Diagnosis" value={formData.diagnosis} onChange={e => setFormData({...formData, diagnosis: e.target.value})} />
           <textarea placeholder="Notes" value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} />
-          <input type="date" placeholder="Valid Until" value={formData.validUntil} onChange={e => setFormData({...formData, validUntil: e.target.value})} />
+          <input
+            type="datetime-local"
+            placeholder="Valid Until"
+            value={formData.validUntil}
+            onChange={e => setFormData({...formData, validUntil: e.target.value})}
+          />
           <h4>Medicines</h4>
           {formData.medicines.map((med, idx) => (
             <div key={idx} style={{ marginBottom: '0.5rem' }}>

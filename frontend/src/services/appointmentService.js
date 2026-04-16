@@ -11,6 +11,9 @@ export const getAvailableSlots = (doctorId, date = '2026-04-20T00:00:00') =>
 export const bookAppointment = (appointmentData) => 
   APPOINTMENT_API.post('', appointmentData);
 
+export const getUpcomingAppointmentsForPatient = (patientId) =>
+  APPOINTMENT_API.get(`/patient/${patientId}/upcoming`);
+
 // ========== Doctor-facing functions ==========
 export const getDoctorAppointments = (doctorId, page = 0, size = 20) => 
   APPOINTMENT_API.get(`/doctor/${doctorId}?page=${page}&size=${size}`);

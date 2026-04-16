@@ -20,12 +20,9 @@ const VideoConsultation = ({ doctorId }) => {
   };
 
   const handleStartCall = async (apt) => {
-    // For demo, just show the consultation link if available
-    if (apt.consultationLink) {
-      window.open(apt.consultationLink, '_blank');
-    } else {
-      alert('Consultation link not yet generated. Ensure appointment is confirmed.');
-    }
+    const channelName = `appointment_${apt.id}`;
+    const url = `/video-call/${encodeURIComponent(channelName)}/${encodeURIComponent(doctorId)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const handleComplete = async (aptId) => {
