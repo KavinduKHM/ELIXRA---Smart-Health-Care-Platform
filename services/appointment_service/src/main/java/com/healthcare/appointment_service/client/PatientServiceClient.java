@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface PatientServiceClient {
 
     /**
-     * Get patient profile by ID
-     *
-     * NOTE: patient-service exposes the profile at /api/patients/{patientId}/profile
+     * Get patient by ID
      */
-    @GetMapping("/api/patients/{id}/profile")
+    @GetMapping("/api/patients/{id}")
     PatientDTO getPatientById(@PathVariable("id") Long id);
 }

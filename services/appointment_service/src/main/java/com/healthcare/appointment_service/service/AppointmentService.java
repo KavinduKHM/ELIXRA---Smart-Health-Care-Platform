@@ -2,7 +2,6 @@ package com.healthcare.appointment_service.service;
 
 import com.healthcare.appointment_service.client.DoctorServiceClient;
 import com.healthcare.appointment_service.client.PatientServiceClient;
-import com.healthcare.appointment_service.client.NotificationServiceClient;
 import com.healthcare.appointment_service.dto.*;
 import com.healthcare.appointment_service.model.Appointment;
 import com.healthcare.appointment_service.model.AppointmentStatus;
@@ -19,9 +18,7 @@ import com.healthcare.appointment_service.dto.PaymentResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +39,6 @@ public class AppointmentService {
     private final DoctorServiceClient doctorServiceClient;
     private final PatientServiceClient patientServiceClient;
     private final PaymentServiceClient paymentServiceClient;
-    private final NotificationServiceClient notificationServiceClient;
 
     @org.springframework.beans.factory.annotation.Value("${app.payment.currency:LKR}")
     private String paymentCurrency;
@@ -160,60 +156,6 @@ public class AppointmentService {
         log.info("Returning {} mock available slots for doctor {}", mockSlots.size(), doctorId);
         return mockSlots;
     }
-
-
-    private void sendNotification(Appointment appointment, String eventType) {
-        try {
-            // 1. Build the DTO – you need to fetch patient/doctor details
-            NotificationAppointmentDTO dto = new NotificationAppointmentDTO();
-            dto.setAppointmentId(appointment.getId().toString());
-            dto.setPatientId(appointment.getPatientId().toString());
-            dto.setDoctorId(appointment.getDoctorId().toString());
-            dto.setDate(appointment.getAppointmentTime());
-            dto.setTimeSlot(appointment.getAppointmentTime().toLocalTime().toString());
-            dto.setStatus(appointment.getStatus().name());
-            dto.setSymptoms(appointment.getSymptoms());
-            dto.setNotes(appointment.getNotes());
-            dto.setConsultationLink(appointment.getConsultationLink());
-
-            // 2. Get patient and doctor details from their services (you already have Feign clients for them)
-            PatientDTO patient = patientServiceClient.getPatientById(appointment.getPatientId());
-            if (patient != null) {
-                dto.setPatientName(patient.getFullName());
-                dto.setPatientEmail(patient.getEmail());
-                dto.setPatientPhone(patient.getPhoneNumber());
-            } else {
-                // fallback
-                dto.setPatientName("Patient");
-                dto.setPatientEmail("patient@example.com");
-                dto.setPatientPhone("0000000000");
-            }
-
-            DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
-            if (doctor != null) {
-                dto.setDoctorName(doctor.getFullName());
-                dto.setDoctorEmail(doctor.getEmail());
-                dto.setDoctorPhone(doctor.getPhoneNumber());
-                dto.setSpecialty(doctor.getSpecialty());
-            } else {
-                dto.setDoctorName("Doctor");
-                dto.setDoctorEmail("doctor@example.com");
-                dto.setDoctorPhone("0000000000");
-                dto.setSpecialty("General");
-            }
-
-            // 3. Prepare request map
-            Map<String, Object> request = new HashMap<>();
-            request.put("appointment", dto);
-            request.put("eventType", eventType);
-
-            // 4. Call notification service
-            notificationServiceClient.sendAppointmentNotifications(request);
-            log.info("Notification sent for appointment {} event {}", appointment.getId(), eventType);
-        } catch (Exception e) {
-            log.error("Failed to send notification: {}", e.getMessage());
-        }
-    }
     /**
      * Book a new appointment
      *
@@ -279,9 +221,6 @@ public class AppointmentService {
         Appointment savedAppointment = appointmentRepository.save(appointment);
         log.info("Appointment created with ID: {} (status: PENDING_PAYMENT)", savedAppointment.getId());
 
-        // Notify: appointment created
-        sendNotification(savedAppointment, "created");
-
         // 6. Prepare payment request
         PaymentRequest paymentReq = new PaymentRequest();
         paymentReq.setAppointmentId(savedAppointment.getId());
@@ -323,7 +262,6 @@ public class AppointmentService {
 
         // 8. Update appointment with payment intent ID
         savedAppointment.setPaymentIntentId(paymentResponse.getPaymentIntentId());
-        savedAppointment.setTransactionId(paymentResponse.getTransactionId());
         savedAppointment.setPaymentStatus(paymentResponse.getStatus());
         appointmentRepository.save(savedAppointment);
 
@@ -331,7 +269,6 @@ public class AppointmentService {
         AppointmentResponse response = buildResponse(savedAppointment, patient, doctor);
         response.setClientSecret(paymentResponse.getClientSecret());
         response.setPaymentIntentId(paymentResponse.getPaymentIntentId());
-        response.setTransactionId(paymentResponse.getTransactionId());
         response.setPaymentStatus(paymentResponse.getStatus());
 
         log.info("Payment intent created: {}", paymentResponse.getPaymentIntentId());
@@ -341,7 +278,7 @@ public class AppointmentService {
 
 
     @Transactional
-    public AppointmentResponse confirmPaymentAndUpdateStatus(Long appointmentId, String paymentIntentId, String transactionId) {
+    public AppointmentResponse confirmPaymentAndUpdateStatus(Long appointmentId, String paymentIntentId) {
         log.info("Confirming payment for appointment: {}", appointmentId);
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -351,30 +288,15 @@ public class AppointmentService {
             throw new RuntimeException("Payment intent mismatch");
         }
 
-        // Confirm/update payment-service transaction status (idempotent)
-        String effectiveTransactionId = (transactionId != null && !transactionId.isBlank())
-                ? transactionId
-                : appointment.getTransactionId();
-        if (effectiveTransactionId != null && !effectiveTransactionId.isBlank()) {
-            PaymentConfirmationRequest confirmation = new PaymentConfirmationRequest();
-            confirmation.setAppointmentId(appointmentId);
-            confirmation.setPaymentIntentId(paymentIntentId);
-            confirmation.setTransactionId(effectiveTransactionId);
-            paymentServiceClient.confirmPayment(confirmation);
-        } else {
-            log.warn("No transactionId available for appointment {}. Payment-service confirm will be skipped.", appointmentId);
-        }
-
         // Optionally verify payment status with payment service (uncomment if needed)
         // boolean isPaid = paymentServiceClient.isAppointmentPaid(appointmentId);
         // if (!isPaid) throw new RuntimeException("Payment not confirmed");
 
-        // Payment succeeded; move to PENDING so the doctor can accept/reject.
-        appointment.setStatus(AppointmentStatus.PENDING);
+        appointment.setStatus(AppointmentStatus.CONFIRMED);
         appointment.setPaymentStatus("succeeded");
         appointmentRepository.save(appointment);
 
-        log.info("Appointment {} payment succeeded; awaiting doctor confirmation", appointmentId);
+        log.info("Appointment {} confirmed after successful payment", appointmentId);
 
         DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
         PatientDTO patient;
@@ -514,33 +436,13 @@ public class AppointmentService {
             appointment.setNotes(request.getNotes());
         }
 
-        // Status side-effects
+        // If status is CONFIRMED, generate consultation link
         if (request.getStatus() == AppointmentStatus.CONFIRMED) {
             String consultationLink = generateConsultationLink(id);
             appointment.setConsultationLink(consultationLink);
-
-            // Best-effort: reserve the slot in doctor-service to prevent double booking.
-            try {
-                doctorServiceClient.bookTimeSlot(appointment.getDoctorId(), appointment.getAppointmentTime());
-            } catch (Exception e) {
-                log.warn("Failed to book doctor slot for appointment {}: {}", id, e.getMessage());
-            }
-        } else if (request.getStatus() == AppointmentStatus.CANCELLED) {
-            // Capture cancellation metadata when doctors cancel/reject via status endpoint.
-            appointment.setCancellationReason(request.getNotes());
-            appointment.setCancelledAt(LocalDateTime.now());
         }
 
         Appointment updatedAppointment = appointmentRepository.save(appointment);
-
-        // Notify: selected status transitions
-        if (request.getStatus() == AppointmentStatus.CONFIRMED) {
-            sendNotification(updatedAppointment, "confirmed");
-        } else if (request.getStatus() == AppointmentStatus.COMPLETED) {
-            sendNotification(updatedAppointment, "completed");
-        } else if (request.getStatus() == AppointmentStatus.CANCELLED) {
-            sendNotification(updatedAppointment, "cancelled");
-        }
 
         // Use mock data instead of calling external services
         PatientDTO patient = new PatientDTO();
@@ -589,9 +491,6 @@ public class AppointmentService {
         appointment.setCancelledAt(LocalDateTime.now());
 
         Appointment cancelledAppointment = appointmentRepository.save(appointment);
-
-        // Notify: appointment cancelled
-        sendNotification(cancelledAppointment, "cancelled");
 
         // Use mock data instead of calling external services
         PatientDTO patient = new PatientDTO();
@@ -809,10 +708,7 @@ public class AppointmentService {
                 .consultationLink(appointment.getConsultationLink())
                 .prescriptionIssued(appointment.isPrescriptionIssued())
                 .createdAt(appointment.getCreatedAt())
-                .updatedAt(appointment.getUpdatedAt())
-                .paymentIntentId(appointment.getPaymentIntentId())
-                .transactionId(appointment.getTransactionId())
-                .paymentStatus(appointment.getPaymentStatus());
+                .updatedAt(appointment.getUpdatedAt());
 
         if (patient != null) {
             builder.patientName(patient.getFullName());
