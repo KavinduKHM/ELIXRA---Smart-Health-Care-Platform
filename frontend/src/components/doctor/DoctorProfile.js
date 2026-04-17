@@ -18,8 +18,13 @@ import './DoctorProfile.css';
 const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' }) => {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState(profile);
+  const isVerified = profile?.status === 'VERIFIED';
 
   const handleSave = async () => {
+    if (!isVerified) {
+      alert('Only VERIFIED doctors can edit profile details.');
+      return;
+    }
     try {
       await updateDoctorProfile(doctorId, formData);
       onProfileUpdate(formData);
@@ -78,9 +83,15 @@ const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' })
                   </div>
                 </div>
 
-                <button type="button" className="doctorProfilePrimaryBtn" onClick={() => setEditMode(true)}>
-                  <FiEdit2 /> Edit Profile
-                </button>
+                {isVerified ? (
+                  <button type="button" className="doctorProfilePrimaryBtn" onClick={() => setEditMode(true)}>
+                    <FiEdit2 /> Edit Profile
+                  </button>
+                ) : (
+                  <p className="muted" style={{ marginTop: '0.6rem' }}>
+                    Profile editing is enabled after admin verification.
+                  </p>
+                )}
               </aside>
             )}
 

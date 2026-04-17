@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDoctorAvailability, setAvailability, deleteAvailability } from '../../services/doctorService';
 
-const AvailabilityManager = ({ doctorId }) => {
+const AvailabilityManager = ({ doctorId, isVerified = false }) => {
   const [availabilities, setAvailabilities] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,6 +26,10 @@ const AvailabilityManager = ({ doctorId }) => {
   }, [doctorId]);
 
   const handleSubmit = async () => {
+    if (!isVerified) {
+      alert('Only VERIFIED doctors can set availability.');
+      return;
+    }
     if (!formData.date) {
       alert('Please select a date');
       return;
@@ -57,7 +61,8 @@ const AvailabilityManager = ({ doctorId }) => {
   return (
     <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
       <h2>Availability Schedule</h2>
-      <button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Add Availability'}</button>
+      {!isVerified && <p className="muted">Only VERIFIED doctors can create availability slots.</p>}
+      <button onClick={() => setShowForm(!showForm)} disabled={!isVerified}>{showForm ? 'Cancel' : 'Add Availability'}</button>
       {showForm && (
         <div style={{ marginTop: '1rem' }}>
           <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />

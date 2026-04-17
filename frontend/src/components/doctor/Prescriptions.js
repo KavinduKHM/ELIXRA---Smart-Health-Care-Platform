@@ -4,7 +4,7 @@ import { getDoctorPrescriptions, issuePrescription } from '../../services/doctor
 import { getDoctorAppointments } from '../../services/appointmentService';
 import './Prescriptions.css';
 
-const DoctorPrescriptions = ({ doctorId }) => {
+const DoctorPrescriptions = ({ doctorId, isVerified = false }) => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -76,6 +76,10 @@ const DoctorPrescriptions = ({ doctorId }) => {
   };
 
   const handleSubmit = async () => {
+    if (!isVerified) {
+      alert('Only VERIFIED doctors can issue prescriptions.');
+      return;
+    }
     const patientIdNum = Number(formData.patientId);
     const appointmentIdNum = Number(formData.appointmentId);
     const validUntil = normalizeLocalDateTime(formData.validUntil);
@@ -159,8 +163,9 @@ const DoctorPrescriptions = ({ doctorId }) => {
           <div>
             <h1 className="dp-title">Prescriptions</h1>
             <p className="dp-subtitle">Manage and issue pharmacological treatments for your patients.</p>
+            {!isVerified && <p className="muted">Only VERIFIED doctors can create prescriptions.</p>}
           </div>
-          <button type="button" className="dp-primaryBtn" onClick={() => setShowForm(!showForm)}>
+          <button type="button" className="dp-primaryBtn" onClick={() => setShowForm(!showForm)} disabled={!isVerified}>
             {showForm ? 'Cancel' : 'Issue New Prescription'}
           </button>
         </div>

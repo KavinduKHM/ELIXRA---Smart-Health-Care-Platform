@@ -4,11 +4,12 @@ import DoctorPrescriptions from '../../components/doctor/Prescriptions';
 import './DoctorPrescriptionsPage.css';
 
 const DoctorPrescriptionsPage = () => {
-  const { doctorId } = useOutletContext();
+  const { doctorId, profile } = useOutletContext();
+  const isVerified = profile?.status === 'VERIFIED';
 
   return (
     <div className="doctor-prescriptions-page">
-      <DoctorPrescriptions doctorId={doctorId} />
+      <DoctorPrescriptions doctorId={doctorId} isVerified={isVerified} />
     </div>
   );
 };

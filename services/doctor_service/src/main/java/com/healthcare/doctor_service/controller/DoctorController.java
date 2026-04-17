@@ -171,6 +171,16 @@ public class DoctorController {
         return ResponseEntity.ok(doctors);
     }
 
+    /**
+     * Get all pending doctors (Admin only)
+     * GET /api/doctors/pending
+     */
+    @GetMapping("/pending")
+    public ResponseEntity<List<DoctorDTO>> getPendingDoctors() {
+        List<DoctorDTO> doctors = doctorService.getPendingDoctors();
+        return ResponseEntity.ok(doctors);
+    }
+
     // ==================== Admin Endpoints ====================
 
     /**
@@ -190,6 +200,16 @@ public class DoctorController {
     @PutMapping("/{doctorId}/suspend")
     public ResponseEntity<DoctorDTO> suspendDoctor(@PathVariable Long doctorId) {
         DoctorDTO doctor = doctorService.suspendDoctor(doctorId);
+        return ResponseEntity.ok(doctor);
+    }
+
+    /**
+     * Reject doctor (Admin only)
+     * PUT /api/doctors/{doctorId}/reject
+     */
+    @PutMapping("/{doctorId}/reject")
+    public ResponseEntity<DoctorDTO> rejectDoctor(@PathVariable Long doctorId) {
+        DoctorDTO doctor = doctorService.rejectDoctor(doctorId);
         return ResponseEntity.ok(doctor);
     }
 
