@@ -17,6 +17,7 @@ import DoctorPrescriptionsPage from './pages/doctor/DoctorPrescriptionsPage';
 import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
 import DoctorRegistrationPage from './pages/doctor/DoctorRegistrationPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagementPage from './pages/admin/UserManagement';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           </Route>
 
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/user-management" element={<UserManagementPage />} />
 
           <Route path="/video-call/:channelName/:userAccount" element={<VideoCallComponent />} />
           <Route path="/" element={<Navigate to="/patient" replace />} />
