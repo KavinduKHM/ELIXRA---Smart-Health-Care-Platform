@@ -1,0 +1,82 @@
+.doctorProfilePage {
+  display: grid;
+  gap: 1rem;
+}
+
+.doctorProfilePageTopBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #dce8ea;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fcfc 0%, #eff6f7 100%);
+}
+
+.doctorProfilePageTopBar h1 {
+  margin: 0;
+  color: #1b363a;
+  font-size: 1.9rem;
+}
+
+.doctorProfilePageTopBar p {
+  margin: 0.35rem 0 0;
+  color: #60797e;
+  max-width: 650px;
+}
+
+.doctorProfilePageActions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.doctorProfilePageSearch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid #d3e3e5;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  min-width: 300px;
+}
+
+.doctorProfilePageSearch svg {
+  color: #6e868b;
+}
+
+.doctorProfilePageSearch input {
+  margin: 0;
+  width: 100%;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0.35rem 0.25rem;
+}
+
+.doctorProfilePageSearch input:focus {
+  box-shadow: none;
+}
+
+.doctorProfilePageSettingsBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 940px) {
+  .doctorProfilePageTopBar {
+    flex-direction: column;
+  }
+
+  .doctorProfilePageActions,
+  .doctorProfilePageSearch {
+    width: 100%;
+  }
+}
+

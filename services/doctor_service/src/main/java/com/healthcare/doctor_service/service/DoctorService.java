@@ -18,6 +18,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,14 +35,15 @@ public class DoctorService {
 
     @Transactional
     public DoctorDTO registerDoctor(DoctorRegistrationRequest request) {
-        log.info("Registering new doctor for user ID: {}", request.getUserId());
+        Long resolvedUserId = resolveOrGenerateUserId(request.getUserId());
+        log.info("Registering new doctor for user ID: {}", resolvedUserId);
 
-        if (doctorRepository.findByUserId(request.getUserId()).isPresent()) {
+        if (doctorRepository.findByUserId(resolvedUserId).isPresent()) {
             throw new RuntimeException("Doctor profile already exists for this user");
         }
 
         Doctor doctor = Doctor.builder()
-                .userId(request.getUserId())
+                .userId(resolvedUserId)
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -62,6 +64,21 @@ public class DoctorService {
         return DoctorDTO.fromEntity(savedDoctor);
     }
 
+    private Long resolveOrGenerateUserId(Long requestedUserId) {
+        if (requestedUserId != null) {
+            return requestedUserId;
+        }
+
+        for (int attempt = 0; attempt < 16; attempt++) {
+            long candidate = ThreadLocalRandom.current().nextLong(1_000_000_000L, 9_999_999_999L);
+            if (!doctorRepository.existsByUserId(candidate)) {
+                return candidate;
+            }
+        }
+
+        throw new RuntimeException("Unable to allocate unique user ID for doctor registration");
+    }
+
     public DoctorDTO getDoctorById(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + doctorId));
@@ -80,6 +97,8 @@ public class DoctorService {
 
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + doctorId));
+
+        requireVerifiedDoctor(doctor, "update profile");
 
         doctor.setFirstName(request.getFirstName());
         doctor.setLastName(request.getLastName());
@@ -147,6 +166,12 @@ public class DoctorService {
                 .collect(Collectors.toList());
     }
 
+    public List<DoctorDTO> getPendingDoctors() {
+        return doctorRepository.findByStatus(Doctor.DoctorStatus.PENDING).stream()
+                .map(DoctorDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public DoctorDTO verifyDoctor(Long doctorId) {
         log.info("Verifying doctor ID: {}", doctorId);
@@ -178,6 +203,21 @@ public class DoctorService {
         return DoctorDTO.fromEntity(suspendedDoctor);
     }
 
+    @Transactional
+    public DoctorDTO rejectDoctor(Long doctorId) {
+        log.info("Rejecting doctor ID: {}", doctorId);
+
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + doctorId));
+
+        doctor.setStatus(Doctor.DoctorStatus.SUSPENDED);
+        doctor.setActive(false);
+        Doctor rejectedDoctor = doctorRepository.save(doctor);
+
+        log.info("Doctor rejected successfully");
+        return DoctorDTO.fromEntity(rejectedDoctor);
+    }
+
     // ==================== Availability Management ====================
 
     @Transactional
@@ -186,6 +226,8 @@ public class DoctorService {
 
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + doctorId));
+
+        requireVerifiedDoctor(doctor, "set availability");
 
         if (request.getEndTime().isBefore(request.getStartTime())) {
             throw new RuntimeException("End time must be after start time");
@@ -250,9 +292,7 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + doctorId));
 
-        if (doctor.getStatus() != Doctor.DoctorStatus.VERIFIED) {
-            throw new RuntimeException("Doctor must be verified to issue prescriptions");
-        }
+        requireVerifiedDoctor(doctor, "issue prescriptions");
 
         DigitalPrescription prescription = DigitalPrescription.builder()
                 .doctor(doctor)
@@ -325,6 +365,12 @@ public class DoctorService {
         }
 
         return dto;
+    }
+
+    private void requireVerifiedDoctor(Doctor doctor, String action) {
+        if (doctor.getStatus() != Doctor.DoctorStatus.VERIFIED) {
+            throw new RuntimeException("Doctor must be VERIFIED to " + action);
+        }
     }
 
     public List<PrescriptionDTO> getDoctorPrescriptions(Long doctorId) {

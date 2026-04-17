@@ -378,6 +378,50 @@ const Profile = ({
 
   if (!profile) return <p>Loading profile...</p>;
 
+  const viewGroups = [
+    {
+      key: 'personal',
+      title: 'Personal Information',
+      items: [
+        { label: 'Full Name', value: patientDisplayName },
+        { label: 'Email Address', value: profile?.email },
+        { label: 'Phone Number', value: profile?.phoneNumber },
+        { label: 'Date of Birth', value: profile?.dateOfBirth },
+        { label: 'Gender', value: profile?.gender },
+      ],
+    },
+    {
+      key: 'medical',
+      title: 'Medical Details',
+      items: [
+        { label: 'Blood Group', value: profile?.bloodGroup },
+        { label: 'Allergies', value: profile?.allergies },
+        { label: 'Chronic Conditions', value: profile?.chronicConditions },
+        { label: 'Current Medications', value: profile?.currentMedications },
+      ],
+    },
+    {
+      key: 'address',
+      title: 'Residential Address',
+      items: [
+        { label: 'Street Address', value: [profile?.addressLine1, profile?.addressLine2].filter(Boolean).join(', ') },
+        { label: 'City', value: profile?.city },
+        { label: 'State', value: profile?.state },
+        { label: 'Postal Code', value: profile?.postalCode },
+        { label: 'Country', value: profile?.country },
+      ],
+    },
+    {
+      key: 'emergency',
+      title: 'Emergency Contact',
+      items: [
+        { label: 'Name', value: profile?.emergencyContactName },
+        { label: 'Relationship', value: profile?.emergencyContactRelation },
+        { label: 'Phone Number', value: profile?.emergencyContactPhone },
+      ],
+    },
+  ];
+
   return (
     <div className="profile-card">
       {message.text && (
@@ -449,12 +493,25 @@ const Profile = ({
       </div>
 
       {!editMode ? (
-        <div className="profile-grid">
-          {PROFILE_FIELDS.map((field) => (
-            <div key={field.key} className="profile-view-item">
-              <span className="profile-view-label">{field.label}</span>
-              <span className="profile-view-value">{profile?.[field.key] || '-'}</span>
-            </div>
+        <div className="profile-section-grid">
+          {viewGroups.map((group) => (
+            <section key={group.key} className="profile-section">
+              <div className="profile-section-head">
+                <h3 className="profile-section-title">{group.title}</h3>
+              </div>
+              <div className="profile-section-body">
+                {group.items
+                  .filter((item) => item.label)
+                  .map((item) => (
+                    <div key={`${group.key}-${item.label}`} className="profile-kv">
+                      <div className="profile-kv-label">{item.label}</div>
+                      <div className="profile-kv-value">
+                        {String(item.value || '').trim() ? String(item.value) : '-'}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </section>
           ))}
         </div>
       ) : (

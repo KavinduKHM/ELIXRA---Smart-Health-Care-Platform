@@ -11,6 +11,15 @@ const DoctorShell = () => {
 
   const doctorIdNum = useMemo(() => Number(doctorId), [doctorId]);
 
+  const doctorDisplayName = useMemo(() => {
+    const name = String(profile?.name || '').trim();
+    if (name) return name;
+    const first = String(profile?.firstName || '').trim();
+    const last = String(profile?.lastName || '').trim();
+    const full = [first, last].filter(Boolean).join(' ').trim();
+    return full || 'Doctor';
+  }, [profile]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -45,6 +54,14 @@ const DoctorShell = () => {
     };
   }, [doctorIdNum]);
 
+  useEffect(() => {
+    const name = String(doctorDisplayName || '').trim();
+    if (name) {
+      localStorage.setItem('elixra.userName', name);
+      localStorage.setItem('elixra.userRole', 'Doctor');
+    }
+  }, [doctorDisplayName]);
+
   const outletContext = useMemo(
     () => ({ doctorId: doctorIdNum, profile, setProfile }),
     [doctorIdNum, profile]
@@ -54,7 +71,7 @@ const DoctorShell = () => {
     <div className="shell">
       <aside className="sidebar">
         <div>
-          <h3 className="sidebarTitle">Doctor</h3>
+          <h3 className="sidebarTitle">{doctorDisplayName}</h3>
           <div className="sidebarMeta">ID: {doctorId}</div>
         </div>
         <nav className="sidebarNav">
@@ -79,7 +96,16 @@ const DoctorShell = () => {
           </NavLink>
         </nav>
         <div style={{ marginTop: '1rem' }}>
-          <Link to="/doctor" style={{ color: 'white' }}>Switch doctor</Link>
+          <Link
+            to="/doctor"
+            style={{ color: 'white' }}
+            onClick={() => {
+              localStorage.removeItem('elixra.userName');
+              localStorage.removeItem('elixra.userRole');
+            }}
+          >
+            Switch doctor
+          </Link>
         </div>
       </aside>
 

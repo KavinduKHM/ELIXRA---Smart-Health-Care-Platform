@@ -15,6 +15,8 @@ import DoctorShell from './pages/doctor/DoctorShell';
 import DoctorAppointmentsPage from './pages/doctor/DoctorAppointmentsPage';
 import DoctorPrescriptionsPage from './pages/doctor/DoctorPrescriptionsPage';
 import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
+import DoctorRegistrationPage from './pages/doctor/DoctorRegistrationPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function App() {
   return (
@@ -32,12 +34,15 @@ function App() {
           </Route>
 
           <Route path="/doctor" element={<DoctorDashboard />} />
+          <Route path="/doctor/register" element={<DoctorRegistrationPage />} />
           <Route path="/doctor/:doctorId" element={<DoctorShell />}>
             <Route index element={<Navigate to="appointments" replace />} />
             <Route path="appointments" element={<DoctorAppointmentsPage />} />
             <Route path="prescriptions" element={<DoctorPrescriptionsPage />} />
             <Route path="profile" element={<DoctorProfilePage />} />
           </Route>
+
+          <Route path="/admin" element={<AdminDashboard />} />
 
           <Route path="/video-call/:channelName/:userAccount" element={<VideoCallComponent />} />
           <Route path="/" element={<Navigate to="/patient" replace />} />

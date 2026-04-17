@@ -1,10 +1,8 @@
 // src/components/patient/BookAppointment.js
 import React, { useState } from 'react';
 import { searchDoctors, getAvailableSlots, bookAppointment } from '../../services/appointmentService';
-import axios from 'axios';
 import StripePayment from '../common/StripePayment';
 
-const PAYMENT_API = 'http://localhost:8087/api/payments';
 const APPOINTMENT_API = 'http://localhost:8084/api/appointments';
 
 const isProfileActive = (profile) => {
@@ -115,24 +113,6 @@ const BookAppointment = ({ patientId, profile }) => {
       setMessage(finalMessage);
     }
   };
-
-  // Mock payment – calls confirm-payment endpoint with dummy IDs
-  const handleMockPayment = async () => {
-    if (!createdAppointment) return;
-    try {
-      await axios.post(`${APPOINTMENT_API}/${createdAppointment.id}/confirm-payment`, {
-        paymentIntentId: 'mock_pi_' + createdAppointment.id,
-        transactionId: 'mock_txn_' + createdAppointment.id
-      });
-      setMessage('✅ Payment successful! Appointment confirmed. Consultation link will appear soon.');
-      setShowPayment(false);
-      // Optionally, you could fetch the updated appointment to show consultation link
-    } catch (err) {
-      console.error(err);
-      alert('Mock payment failed. Check payment service or confirm endpoint.');
-    }
-  };
-
 
   return (
     <div className="quick-booking-card">

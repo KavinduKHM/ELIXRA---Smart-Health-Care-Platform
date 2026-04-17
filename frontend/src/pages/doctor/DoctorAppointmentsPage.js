@@ -6,7 +6,8 @@ import VideoConsultation from '../../components/doctor/VideoConsultation';
 import './DoctorAppointmentsPage.css';
 
 const DoctorAppointmentsPage = () => {
-  const { doctorId } = useOutletContext();
+  const { doctorId, profile } = useOutletContext();
+  const isVerified = profile?.status === 'VERIFIED';
 
   return (
     <div className="doctor-appointments-theme">
@@ -20,7 +21,7 @@ const DoctorAppointmentsPage = () => {
 
       <div className="doctor-appointments-layout">
         <section className="doctor-appointments-main">
-          <AvailabilityManager doctorId={doctorId} />
+          <AvailabilityManager doctorId={doctorId} isVerified={isVerified} />
           <AppointmentRequests doctorId={doctorId} />
         </section>
         <aside className="doctor-appointments-side">

@@ -50,8 +50,8 @@
 
 .appointments-theme-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 330px;
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 1.05rem;
   align-items: start;
 }
 
@@ -373,11 +373,11 @@
 }
 
 .symptom-chat-card {
-  border: 1px solid #d9e6ea;
+  border: 1px solid rgba(219, 233, 234, 0.95);
   border-radius: 18px;
-  background: #f8fbfc;
+  background: rgba(255, 255, 255, 0.9);
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
 }
 
 .symptom-chat-head {
@@ -385,15 +385,19 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  background: #0d7179;
-  color: #fff;
-  padding: 0.7rem 0.85rem;
+  background:
+    radial-gradient(420px 120px at 0% 0%, rgba(26, 163, 154, 0.20), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 251, 252, 0.92));
+  color: #153c58;
+  padding: 0.78rem 0.9rem;
+  border-bottom: 1px solid rgba(219, 233, 234, 0.95);
 }
 
 .symptom-chat-head h2 {
   margin: 0;
   font-size: 1rem;
-  color: #fff;
+  color: #0d5660;
+  letter-spacing: -0.01em;
 }
 
 .symptom-chat-head-actions {
@@ -402,19 +406,26 @@
 }
 
 .symptom-chat-head-actions button {
-  background: transparent;
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  box-shadow: none;
-  padding: 0.26rem 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  color: #0d5660;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+  padding: 0.28rem 0.55rem;
+  border-radius: 12px;
+}
+
+.symptom-chat-head-actions button:hover {
+  background: #ffffff;
 }
 
 .symptom-chat-log {
   margin: 0;
-  height: 260px;
+  height: 300px;
   overflow-y: auto;
-  background: linear-gradient(180deg, #eef6f8 0%, #dceff2 100%);
-  padding: 0.7rem;
+  background:
+    radial-gradient(520px 180px at 20% 0%, rgba(26, 163, 154, 0.12), transparent 70%),
+    rgba(246, 251, 252, 0.85);
+  padding: 0.8rem;
 }
 
 .symptom-chat-row {
@@ -433,39 +444,47 @@
 .symptom-chat-bubble {
   max-width: 86%;
   white-space: pre-wrap;
-  padding: 0.5rem 0.65rem;
-  border-radius: 14px;
-  border: 1px solid #d7e6eb;
-  font-size: 0.86rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 16px;
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  font-size: 0.88rem;
+  line-height: 1.25;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
 }
 
 .symptom-chat-bubble-user {
-  background: #c7ecef;
-  color: #1d4457;
+  background: linear-gradient(180deg, rgba(26, 163, 154, 0.16), rgba(26, 163, 154, 0.10));
+  color: #123b57;
 }
 
 .symptom-chat-bubble-bot {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.95);
   color: #284862;
 }
 
 .symptom-chat-input-row {
-  padding: 0.65rem;
+  padding: 0.75rem;
   display: flex;
   gap: 0.6rem;
   align-items: flex-end;
-  background: #edf4f5;
+  background: rgba(255, 255, 255, 0.9);
+  border-top: 1px solid rgba(219, 233, 234, 0.95);
 }
 
 .symptom-chat-input {
   flex: 1;
   margin: 0;
   resize: vertical;
-  min-height: 44px;
+  min-height: 46px;
+  border-radius: 16px;
+  background: rgba(246, 251, 252, 0.9);
+  border: 1px solid rgba(219, 233, 234, 0.95);
 }
 
 .symptom-chat-send-btn {
-  min-width: 82px;
+  min-width: 92px;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
 }
 
 .symptom-chat-error {

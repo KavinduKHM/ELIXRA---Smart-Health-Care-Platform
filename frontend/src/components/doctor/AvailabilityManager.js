@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDoctorAvailability, setAvailability, deleteAvailability } from '../../services/doctorService';
 
-const AvailabilityManager = ({ doctorId }) => {
+const AvailabilityManager = ({ doctorId, isVerified = false }) => {
   const [availabilities, setAvailabilities] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,6 +26,10 @@ const AvailabilityManager = ({ doctorId }) => {
   }, [doctorId]);
 
   const handleSubmit = async () => {
+    if (!isVerified) {
+      alert('Only VERIFIED doctors can set availability.');
+      return;
+    }
     if (!formData.date) {
       alert('Please select a date');
       return;
@@ -60,8 +64,9 @@ const AvailabilityManager = ({ doctorId }) => {
         <div>
           <h2 className="doctor-ui-card-title">Availability Schedule</h2>
           <p className="doctor-ui-card-subtitle">Set your working window and slot duration.</p>
+          {!isVerified && <p className="doctor-ui-card-subtitle">Only VERIFIED doctors can create availability slots.</p>}
         </div>
-        <button type="button" className="doctor-ui-btn" onClick={() => setShowForm(!showForm)}>
+        <button type="button" className="doctor-ui-btn" onClick={() => setShowForm(!showForm)} disabled={!isVerified}>
           {showForm ? 'Cancel' : 'Add Availability'}
         </button>
       </div>
