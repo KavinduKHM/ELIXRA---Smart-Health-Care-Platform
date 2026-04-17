@@ -44,7 +44,7 @@ spring:
 # Twilio Configuration (WhatsApp)
 twilio:
   account-sid: AC9bb02e250714fc4811af1fba72ecb518
-  auth-token: 5561f4668c81e9f26b8e6e5a77d4925b
+  auth-token: f2425e47e040f424497a32e5a22358ed
   whatsapp-number: whatsapp:+14155238886
 
 # Eureka (disable for now)

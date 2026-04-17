@@ -5,12 +5,22 @@ import { Link } from 'react-router-dom';
 const Layout = ({ children }) => {
   return (
     <div>
-      <nav style={{ background: '#2c3e50', padding: '1rem', color: 'white', display: 'flex', gap: '1rem' }}>
-        <Link to="/patient" style={{ color: 'white', textDecoration: 'none' }}>Patient Dashboard</Link>
-        <Link to="/doctor" style={{ color: 'white', textDecoration: 'none' }}>Doctor Dashboard (Coming Soon)</Link>
-        <Link to="/admin" style={{ color: 'white', textDecoration: 'none' }}>Admin Dashboard (Coming Soon)</Link>
+      <nav className="topNav">
+        <div className="container topNavInner">
+          <div className="brand">
+            <div className="brandDot" aria-hidden="true" />
+            <div>ELIXRA</div>
+          </div>
+          <div className="topNavLinks">
+            <Link to="/patient" className="topNavLink">Patient</Link>
+            <Link to="/doctor" className="topNavLink">Doctor</Link>
+            <Link to="/admin" className="topNavLink">Admin (Coming Soon)</Link>
+          </div>
+        </div>
       </nav>
-      <main style={{ padding: '2rem' }}>{children}</main>
+      <main className="layoutMain">
+        <div className="container">{children}</div>
+      </main>
     </div>
   );
 };

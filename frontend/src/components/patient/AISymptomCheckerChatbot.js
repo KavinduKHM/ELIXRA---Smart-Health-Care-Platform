@@ -122,9 +122,9 @@ const AISymptomCheckerChatbot = () => {
   };
 
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12, marginTop: 16 }}>
+    <div className="card cardSubtle">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <h2 style={{ margin: 0 }}>AI Symptom Checker (Chatbot)</h2>
+        <h2 style={{ margin: 0 }}>AI Symptom Checker</h2>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => setOpen((v) => !v)}>{open ? 'Hide' : 'Show'}</button>
           <button onClick={clearChat} disabled={loading}>Clear</button>
@@ -139,9 +139,9 @@ const AISymptomCheckerChatbot = () => {
               marginTop: 10,
               height: 240,
               overflowY: 'auto',
-              background: '#fafafa',
-              border: '1px solid #eee',
-              borderRadius: 8,
+              background: 'rgba(255,255,255,0.75)',
+              border: '1px solid rgba(219, 233, 234, 0.9)',
+              borderRadius: 14,
               padding: 10
             }}
           >
@@ -152,9 +152,9 @@ const AISymptomCheckerChatbot = () => {
                     maxWidth: '85%',
                     whiteSpace: 'pre-wrap',
                     padding: '8px 10px',
-                    borderRadius: 10,
-                    background: m.role === 'user' ? '#d9e8ff' : '#fff',
-                    border: '1px solid #e6e6e6'
+                    borderRadius: 14,
+                    background: m.role === 'user' ? 'rgba(26, 163, 154, 0.14)' : '#fff',
+                    border: '1px solid rgba(219, 233, 234, 0.95)'
                   }}
                 >
                   {m.text}
@@ -170,7 +170,7 @@ const AISymptomCheckerChatbot = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
               placeholder="Type symptoms and press Enter to send (Shift+Enter for newline)"
-              style={{ flex: 1, resize: 'vertical' }}
+              style={{ flex: 1, resize: 'vertical', margin: 0 }}
               disabled={loading}
             />
             <button onClick={send} disabled={!canSend} style={{ minWidth: 90 }}>
