@@ -114,7 +114,10 @@ const BookAppointment = ({ patientId, profile }) => {
 
   return (
     <div className="quick-booking-card">
-      <h2>Quick Booking</h2>
+      <div className="quick-booking-head">
+        <h2>Quick Booking</h2>
+        <p>Find specialists, pick a slot, and complete checkout in one flow.</p>
+      </div>
       {!patientIsActive && (
         <p className="quick-booking-warning">
           Profile is deactive (0). Activate profile to book appointments.
@@ -124,15 +127,19 @@ const BookAppointment = ({ patientId, profile }) => {
 
       {/* Step 1: Specialty and Date */}
       <div className="quick-booking-form">
+        <label className="quick-booking-label" htmlFor="quick-book-specialty">Medical Specialty</label>
         <input
+          id="quick-book-specialty"
           type="text"
-          placeholder="Select Specialty"
+          placeholder="Cardiology, Dermatology, Neurology..."
           value={specialty}
           onChange={(e) => setSpecialty(e.target.value)}
           disabled={!patientIsActive}
           className="quick-booking-input"
         />
+        <label className="quick-booking-label" htmlFor="quick-book-date">Preferred Date</label>
         <input
+          id="quick-book-date"
           type="date"
           value={selectedDate}
           min={today}
@@ -140,7 +147,7 @@ const BookAppointment = ({ patientId, profile }) => {
           disabled={!patientIsActive}
           className="quick-booking-input"
         />
-        <button onClick={handleSearch} disabled={!patientIsActive} className="quick-booking-search-btn">Search Doctors</button>
+        <button type="button" onClick={handleSearch} disabled={!patientIsActive} className="quick-booking-search-btn">Search Doctors</button>
       </div>
 
       {/* Step 2: List of doctors */}
@@ -149,9 +156,10 @@ const BookAppointment = ({ patientId, profile }) => {
           <h3>Select a Doctor</h3>
           {doctors.map(doc => (
             <div key={doc.id} className="quick-booking-doctor-item">
-              <p><strong>{doc.name}</strong> - {doc.specialty}</p>
-              <p>Fee: ${doc.consultationFee}</p>
-              <button onClick={() => handleSelectDoctor(doc)} disabled={!patientIsActive}>Select & View Slots</button>
+              <p className="quick-booking-doctor-name"><strong>{doc.name}</strong></p>
+              <p className="quick-booking-doctor-meta">{doc.specialty}</p>
+              <p className="quick-booking-doctor-fee">Consultation fee: ${doc.consultationFee}</p>
+              <button type="button" className="quick-booking-select-btn" onClick={() => handleSelectDoctor(doc)} disabled={!patientIsActive}>Select & View Slots</button>
             </div>
           ))}
         </div>
@@ -162,18 +170,18 @@ const BookAppointment = ({ patientId, profile }) => {
         <div className="quick-booking-slots">
           <h3>Available Slots for Dr. {selectedDoctor.name} on {selectedDate}</h3>
           {slots.length === 0 ? (
-            <p>No available slots for this date.</p>
+            <p className="quick-booking-empty">No available slots for this date.</p>
           ) : (
             <ul className="quick-booking-slots-list">
               {slots.map(slot => (
                 <li key={slot.id}>
-                  {new Date(slot.startTime).toLocaleString()} - {new Date(slot.endTime).toLocaleString()}
-                  <button onClick={() => setSelectedSlot(slot)}>Select</button>
+                  <span>{new Date(slot.startTime).toLocaleString()} - {new Date(slot.endTime).toLocaleString()}</span>
+                  <button type="button" onClick={() => setSelectedSlot(slot)} className="quick-booking-slot-btn">Select</button>
                 </li>
               ))}
             </ul>
           )}
-          {selectedSlot && <p><strong>Selected slot:</strong> {new Date(selectedSlot.startTime).toLocaleString()}</p>}
+          {selectedSlot && <p className="quick-booking-selected-slot"><strong>Selected slot:</strong> {new Date(selectedSlot.startTime).toLocaleString()}</p>}
           <textarea
             placeholder="Describe your symptoms"
             rows="3"
@@ -182,7 +190,7 @@ const BookAppointment = ({ patientId, profile }) => {
             disabled={!patientIsActive}
             className="quick-booking-symptoms"
           />
-          <button onClick={handleBook} disabled={!patientIsActive}>Book Appointment</button>
+          <button type="button" className="quick-booking-confirm-btn" onClick={handleBook} disabled={!patientIsActive}>Book Appointment</button>
         </div>
       )}
 

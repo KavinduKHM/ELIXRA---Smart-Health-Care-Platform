@@ -3,17 +3,31 @@ import { useOutletContext } from 'react-router-dom';
 import AvailabilityManager from '../../components/doctor/AvailabilityManager';
 import AppointmentRequests from '../../components/doctor/AppointmentRequests';
 import VideoConsultation from '../../components/doctor/VideoConsultation';
+import './DoctorAppointmentsPage.css';
 
 const DoctorAppointmentsPage = () => {
   const { doctorId, profile } = useOutletContext();
   const isVerified = profile?.status === 'VERIFIED';
 
   return (
-    <div>
-      <h1>Appointments</h1>
-      <AvailabilityManager doctorId={doctorId} isVerified={isVerified} />
-      <AppointmentRequests doctorId={doctorId} />
-      <VideoConsultation doctorId={doctorId} />
+    <div className="doctor-appointments-theme">
+      <header className="doctor-appointments-head">
+        <div>
+          <h1>Appointments Hub</h1>
+          <p>Manage availability, review incoming requests, and launch consultations.</p>
+        </div>
+        <div className="doctor-appointments-head-badge">Doctor #{doctorId}</div>
+      </header>
+
+      <div className="doctor-appointments-layout">
+        <section className="doctor-appointments-main">
+          <AvailabilityManager doctorId={doctorId} isVerified={isVerified} />
+          <AppointmentRequests doctorId={doctorId} />
+        </section>
+        <aside className="doctor-appointments-side">
+          <VideoConsultation doctorId={doctorId} />
+        </aside>
+      </div>
     </div>
   );
 };

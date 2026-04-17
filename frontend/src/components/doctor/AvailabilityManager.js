@@ -59,30 +59,66 @@ const AvailabilityManager = ({ doctorId, isVerified = false }) => {
   };
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
-      <h2>Availability Schedule</h2>
-      {!isVerified && <p className="muted">Only VERIFIED doctors can create availability slots.</p>}
-      <button onClick={() => setShowForm(!showForm)} disabled={!isVerified}>{showForm ? 'Cancel' : 'Add Availability'}</button>
+    <div className="doctor-ui-card doctor-availability">
+      <div className="doctor-ui-card-header">
+        <div>
+          <h2 className="doctor-ui-card-title">Availability Schedule</h2>
+          <p className="doctor-ui-card-subtitle">Set your working window and slot duration.</p>
+          {!isVerified && <p className="doctor-ui-card-subtitle">Only VERIFIED doctors can create availability slots.</p>}
+        </div>
+        <button type="button" className="doctor-ui-btn" onClick={() => setShowForm(!showForm)} disabled={!isVerified}>
+          {showForm ? 'Cancel' : 'Add Availability'}
+        </button>
+      </div>
+
       {showForm && (
-        <div style={{ marginTop: '1rem' }}>
-          <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
-          <input type="time" value={formData.startTime} onChange={e => setFormData({...formData, startTime: e.target.value})} />
-          <input type="time" value={formData.endTime} onChange={e => setFormData({...formData, endTime: e.target.value})} />
-          <input type="number" placeholder="Slot Duration (min)" value={formData.slotDuration} onChange={e => setFormData({...formData, slotDuration: e.target.value})} />
-          <button onClick={handleSubmit}>Save</button>
+        <div className="doctor-form-grid">
+          <input
+            type="date"
+            value={formData.date}
+            onChange={e => setFormData({...formData, date: e.target.value})}
+          />
+          <input
+            type="number"
+            min="5"
+            placeholder="Slot Duration (min)"
+            value={formData.slotDuration}
+            onChange={e => setFormData({...formData, slotDuration: e.target.value})}
+          />
+          <input
+            type="time"
+            value={formData.startTime}
+            onChange={e => setFormData({...formData, startTime: e.target.value})}
+          />
+          <input
+            type="time"
+            value={formData.endTime}
+            onChange={e => setFormData({...formData, endTime: e.target.value})}
+          />
+          <button type="button" className="doctor-ui-btn doctor-form-full" onClick={handleSubmit}>Save Availability</button>
         </div>
       )}
+
       {availabilities.length === 0 ? (
-        <p>No availability set.</p>
+        <p className="doctor-empty">No availability set yet.</p>
       ) : (
-        <ul>
+        <div className="doctor-chip-list">
           {availabilities.map(a => (
-            <li key={a.id}>
-              {a.availableDate} {a.startTime} - {a.endTime} (slots: {a.slotDuration} min)
-              <button onClick={() => handleDelete(a.id)} style={{ marginLeft: '1rem' }}>Delete</button>
-            </li>
+            <div key={a.id} className="doctor-chip-item">
+              <div>
+                <div className="doctor-chip-main">{a.availableDate} • {a.startTime} - {a.endTime}</div>
+                <div className="doctor-chip-sub">Slot duration: {a.slotDuration} minutes</div>
+              </div>
+              <button
+                type="button"
+                className="doctor-ui-btn doctor-ui-btn-secondary"
+                onClick={() => handleDelete(a.id)}
+              >
+                Delete
+              </button>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
