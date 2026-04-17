@@ -17,6 +17,10 @@ const PatientAppointments = ({ patientId }) => {
   const [sessionActiveByAppointmentId, setSessionActiveByAppointmentId] = useState({});
   const [sessionAlert, setSessionAlert] = useState(null);
 
+  const [openReviewAppointmentId, setOpenReviewAppointmentId] = useState(null);
+  const [reviewDraftByAppointmentId, setReviewDraftByAppointmentId] = useState({});
+  const [submittedReviewByAppointmentId, setSubmittedReviewByAppointmentId] = useState({});
+
   const stompRef = useRef(null);
   const subscriptionsRef = useRef(new Map());
 
@@ -268,6 +272,48 @@ const PatientAppointments = ({ patientId }) => {
     const sessionActive = Number.isFinite(apptId) ? Boolean(sessionActiveByAppointmentId?.[apptId]) : false;
     const joinDisabled = category === 'confirmed' ? !sessionActive : false;
 
+    const submitted = Number.isFinite(apptId) ? submittedReviewByAppointmentId?.[apptId] : null;
+    const draft = Number.isFinite(apptId)
+      ? (reviewDraftByAppointmentId?.[apptId] ?? { rating: 0, review: '' })
+      : { rating: 0, review: '' };
+
+    const isReviewOpen = Number.isFinite(apptId) && openReviewAppointmentId === apptId;
+
+    const setDraft = (patch) => {
+      if (!Number.isFinite(apptId)) return;
+      setReviewDraftByAppointmentId((prev) => ({
+        ...prev,
+        [apptId]: {
+          rating: Number(prev?.[apptId]?.rating ?? 0),
+          review: String(prev?.[apptId]?.review ?? ''),
+          ...patch,
+        },
+      }));
+    };
+
+    const submitReview = () => {
+      if (!Number.isFinite(apptId)) return;
+      const rating = Number(draft?.rating ?? 0);
+      if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+        alert('Please choose a rating (1–5).');
+        return;
+      }
+
+      setSubmittedReviewByAppointmentId((prev) => ({
+        ...prev,
+        [apptId]: {
+          rating,
+          review: String(draft?.review ?? '').trim(),
+          createdAt: new Date().toISOString(),
+        },
+      }));
+      setOpenReviewAppointmentId(null);
+      setSessionAlert({
+        appointmentId: apt.id,
+        message: 'Review submitted (demo only).',
+      });
+    };
+
     return (
       <article key={apt.id} className="apt-card">
         <div className="apt-avatar" aria-hidden="true">{doctorName.charAt(0).toUpperCase()}</div>
@@ -279,11 +325,64 @@ const PatientAppointments = ({ patientId }) => {
         <div className="apt-actions">
           <span className={`apt-badge apt-badge-${category}`}>{String(apt.status || '').replace('_', ' ') || category}</span>
           {category === 'confirmed' ? (
-            <button type="button" className="apt-join-btn" onClick={() => joinVideo(apt)} disabled={joinDisabled}>
-              {joinDisabled ? 'Waiting for doctor' : 'Join Video Session'}
-            </button>
+            <div className="apt-action-stack">
+              <button type="button" className="apt-join-btn" onClick={() => joinVideo(apt)} disabled={joinDisabled}>
+                {joinDisabled ? 'Waiting for doctor' : 'Join Video Session'}
+              </button>
+
+              <button
+                type="button"
+                className="apt-review-btn"
+                onClick={() => setOpenReviewAppointmentId(isReviewOpen ? null : apptId)}
+                disabled={Boolean(submitted)}
+              >
+                {submitted ? 'Review submitted' : (isReviewOpen ? 'Close review' : 'Leave a review')}
+              </button>
+            </div>
           ) : null}
         </div>
+
+        {category === 'confirmed' && isReviewOpen && !submitted ? (
+          <div className="apt-review" aria-label="Submit review">
+            <div className="apt-review-head">
+              <strong>Rate your consultation</strong>
+              <span className="apt-review-hint">Demo only (not saved to backend)</span>
+            </div>
+
+            <div className="apt-review-stars" role="radiogroup" aria-label="Rating">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <label key={n} className={`apt-star ${Number(draft.rating) >= n ? 'apt-star-on' : ''}`}>
+                  <input
+                    type="radio"
+                    name={`rating-${apptId}`}
+                    value={n}
+                    checked={Number(draft.rating) === n}
+                    onChange={() => setDraft({ rating: n })}
+                  />
+                  <span aria-hidden="true">★</span>
+                  <span className="apt-star-sr">{n}</span>
+                </label>
+              ))}
+            </div>
+
+            <textarea
+              className="apt-review-text"
+              value={draft.review}
+              onChange={(e) => setDraft({ review: e.target.value })}
+              placeholder="Write a short review (optional)…"
+              rows={3}
+            />
+
+            <div className="apt-review-actions">
+              <button type="button" onClick={submitReview}>
+                Submit review
+              </button>
+              <button type="button" className="apt-review-secondary" onClick={() => setOpenReviewAppointmentId(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : null}
       </article>
     );
   };

@@ -68,7 +68,29 @@ const DoctorRegistrationPage = () => {
     try {
       const response = await registerDoctor(payload);
       const createdDoctorId = response?.data?.id;
-      navigate(createdDoctorId ? `/doctor/${encodeURIComponent(createdDoctorId)}/appointments` : '/doctor');
+      const doctorName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim();
+
+      if (createdDoctorId) {
+        localStorage.setItem('doctorId', String(createdDoctorId));
+        localStorage.setItem('elixra.doctorId', String(createdDoctorId));
+      }
+
+      if (doctorName) {
+        localStorage.setItem('elixra.userName', doctorName);
+        localStorage.setItem('elixra.userRole', 'Doctor');
+      }
+
+      navigate('/', {
+        replace: true,
+        state: {
+          flashMessage: {
+            type: 'success',
+            text: createdDoctorId
+              ? `Doctor registration saved successfully. Welcome Dr. ${doctorName || 'to ELIXRA'}.`
+              : 'Doctor registration saved successfully.',
+          },
+        },
+      });
     } catch (error) {
       const responseData = error?.response?.data;
       const firstValidationError = responseData?.errors

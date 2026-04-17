@@ -82,7 +82,12 @@ const PatientShell = () => {
       localStorage.setItem('elixra.userName', name);
       localStorage.setItem('elixra.userRole', 'Patient');
     }
-  }, [patientName]);
+
+    if (Number.isFinite(patientIdNum) && patientIdNum > 0) {
+      localStorage.setItem('patientId', String(patientIdNum));
+      localStorage.setItem('elixra.patientId', String(patientIdNum));
+    }
+  }, [patientName, patientIdNum]);
 
   const refreshDocuments = useCallback(async () => {
     const docsRes = await getPatientDocuments(patientIdNum);

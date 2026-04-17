@@ -164,6 +164,12 @@
   gap: 0.4rem;
 }
 
+.apt-action-stack {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: end;
+}
+
 .apt-badge {
   font-size: 0.63rem;
   text-transform: uppercase;
@@ -199,6 +205,118 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.apt-review-btn {
+  background: #ffffff;
+  color: #153c58;
+  border: 1px solid #d9e7ed;
+  border-radius: 999px;
+  padding: 0.48rem 0.88rem;
+  font-size: 0.85rem;
+  box-shadow: none;
+}
+
+.apt-review-btn:hover {
+  background: #f3f9fb;
+}
+
+.apt-review-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.apt-review {
+  grid-column: 1 / -1;
+  margin-top: 0.75rem;
+  border-radius: 16px;
+  border: 1px solid #d9e6ea;
+  background: linear-gradient(180deg, #fbfefe, #f3f9fb);
+  padding: 0.9rem;
+  box-shadow: 0 14px 22px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.apt-review-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.apt-review-hint {
+  color: #5a7288;
+  font-size: 0.82rem;
+}
+
+.apt-review-stars {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.apt-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid #d9e7ed;
+  background: #ffffff;
+  color: #9db0bf;
+  cursor: pointer;
+  user-select: none;
+}
+
+.apt-star input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.apt-star-on {
+  color: #0d7179;
+  border-color: #bfdde2;
+  background: #eef7f7;
+}
+
+.apt-star-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.apt-review-text {
+  width: 100%;
+  margin: 0;
+  border-radius: 14px;
+}
+
+.apt-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.apt-review-secondary {
+  background: #ffffff;
+  color: #153c58;
+  border: 1px solid #d9e7ed;
+  box-shadow: none;
+}
+
+.apt-review-secondary:hover {
+  background: #f3f9fb;
 }
 
 .apt-session-alert {

@@ -2,6 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/common/Layout';
+import HomePage from './pages/HomePage';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import VideoCallComponent from './components/telemedicine/VideoCall';
@@ -47,7 +48,7 @@ function App() {
           <Route path="/admin/user-management" element={<UserManagementPage />} />
 
           <Route path="/video-call/:channelName/:userAccount" element={<VideoCallComponent />} />
-          <Route path="/" element={<Navigate to="/patient" replace />} />
+          <Route path="/" element={<HomePage />} />
         </Routes>
       </Layout>
     </Router>
