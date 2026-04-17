@@ -32,24 +32,46 @@ const AppointmentRequests = ({ doctorId }) => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="doctor-empty">Loading appointment requests...</p>;
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
-      <h2>Appointment Requests</h2>
+    <div className="doctor-ui-card doctor-requests">
+      <div className="doctor-ui-card-header">
+        <div>
+          <h2 className="doctor-ui-card-title">Appointment Requests</h2>
+          <p className="doctor-ui-card-subtitle">Review and confirm incoming patient requests.</p>
+        </div>
+      </div>
+
       {appointments.length === 0 ? (
-        <p>No pending requests.</p>
+        <p className="doctor-empty">No pending requests.</p>
       ) : (
-        appointments.map(apt => (
-          <div key={apt.id} style={{ borderBottom: '1px solid #eee', marginBottom: '0.5rem', paddingBottom: '0.5rem' }}>
-            <p><strong>Patient:</strong> {apt.patientName} (ID: {apt.patientId})</p>
-            <p><strong>Time:</strong> {new Date(apt.appointmentTime).toLocaleString()}</p>
-            <p><strong>Symptoms:</strong> {apt.symptoms}</p>
-            <p><strong>Status:</strong> {apt.status}</p>
-            <button onClick={() => handleStatus(apt.id, 'CONFIRMED', 'Confirmed by doctor')}>Confirm</button>
-            <button onClick={() => handleStatus(apt.id, 'CANCELLED', 'Cancelled by doctor')}>Cancel</button>
-          </div>
-        ))
+        <div className="doctor-requests-stack">
+          {appointments.map(apt => (
+            <article key={apt.id} className="doctor-request-card">
+              <span className="doctor-request-status">{apt.status}</span>
+              <p className="doctor-request-meta"><strong>Patient:</strong> {apt.patientName} (ID: {apt.patientId})</p>
+              <p className="doctor-request-meta"><strong>Time:</strong> {new Date(apt.appointmentTime).toLocaleString()}</p>
+              <p className="doctor-request-meta"><strong>Symptoms:</strong> {apt.symptoms || 'Not provided'}</p>
+              <div className="doctor-action-row">
+                <button
+                  type="button"
+                  className="doctor-ui-btn"
+                  onClick={() => handleStatus(apt.id, 'CONFIRMED', 'Confirmed by doctor')}
+                >
+                  Confirm
+                </button>
+                <button
+                  type="button"
+                  className="doctor-ui-btn doctor-ui-btn-danger"
+                  onClick={() => handleStatus(apt.id, 'CANCELLED', 'Cancelled by doctor')}
+                >
+                  Cancel
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
       )}
     </div>
   );

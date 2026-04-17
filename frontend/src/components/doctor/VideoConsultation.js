@@ -4,7 +4,6 @@ import { getUpcomingAppointmentsForDoctor, updateAppointmentStatus } from '../..
 
 const VideoConsultation = ({ doctorId }) => {
   const [appointments, setAppointments] = useState([]);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
     loadUpcoming();
@@ -38,19 +37,37 @@ const VideoConsultation = ({ doctorId }) => {
   };
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
-      <h2>Video Consultations</h2>
+    <div className="doctor-ui-card doctor-video-consultations">
+      <div className="doctor-ui-card-header">
+        <div>
+          <h2 className="doctor-ui-card-title">Video Consultations</h2>
+          <p className="doctor-ui-card-subtitle">Start calls for confirmed appointments and complete sessions.</p>
+        </div>
+      </div>
+
       {appointments.length === 0 ? (
-        <p>No upcoming confirmed appointments.</p>
+        <p className="doctor-empty">No upcoming confirmed appointments.</p>
       ) : (
-        appointments.map(apt => (
-          <div key={apt.id} style={{ borderBottom: '1px solid #eee', marginBottom: '0.5rem', paddingBottom: '0.5rem' }}>
-            <p><strong>Patient:</strong> {apt.patientName} (ID: {apt.patientId})</p>
-            <p><strong>Time:</strong> {new Date(apt.appointmentTime).toLocaleString()}</p>
-            <button onClick={() => handleStartCall(apt)}>Start Video Call</button>
-            <button onClick={() => handleComplete(apt.id)}>Complete Consultation</button>
-          </div>
-        ))
+        <div className="doctor-video-stack">
+          {appointments.map(apt => (
+            <article key={apt.id} className="doctor-video-card">
+              <p className="doctor-video-meta"><strong>Patient:</strong> {apt.patientName} (ID: {apt.patientId})</p>
+              <p className="doctor-video-meta"><strong>Time:</strong> {new Date(apt.appointmentTime).toLocaleString()}</p>
+              <div className="doctor-action-row">
+                <button type="button" className="doctor-ui-btn" onClick={() => handleStartCall(apt)}>
+                  Start Video Call
+                </button>
+                <button
+                  type="button"
+                  className="doctor-ui-btn doctor-ui-btn-secondary"
+                  onClick={() => handleComplete(apt.id)}
+                >
+                  Complete Consultation
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
       )}
     </div>
   );
