@@ -129,24 +129,24 @@ const BookAppointment = ({ patientId, profile }) => {
 
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
-      <h2>Book New Appointment</h2>
+    <div className="quick-booking-card">
+      <h2>Quick Booking</h2>
       {!patientIsActive && (
-        <p style={{ color: '#b42318', fontWeight: 600 }}>
+        <p className="quick-booking-warning">
           Profile is deactive (0). Activate profile to book appointments.
         </p>
       )}
-      {message && <p style={{ color: message.includes('successful') ? 'green' : 'blue' }}>{message}</p>}
+      {message && <p className={`quick-booking-message ${message.includes('successful') ? 'quick-booking-message-success' : ''}`}>{message}</p>}
 
       {/* Step 1: Specialty and Date */}
-      <div>
+      <div className="quick-booking-form">
         <input
           type="text"
-          placeholder="Specialty (e.g., Cardiology)"
+          placeholder="Select Specialty"
           value={specialty}
           onChange={(e) => setSpecialty(e.target.value)}
           disabled={!patientIsActive}
-          style={{ marginRight: '0.5rem' }}
+          className="quick-booking-input"
         />
         <input
           type="date"
@@ -154,17 +154,17 @@ const BookAppointment = ({ patientId, profile }) => {
           min={today}
           onChange={(e) => setSelectedDate(e.target.value)}
           disabled={!patientIsActive}
-          style={{ marginRight: '0.5rem' }}
+          className="quick-booking-input"
         />
-        <button onClick={handleSearch} disabled={!patientIsActive}>Search Doctors</button>
+        <button onClick={handleSearch} disabled={!patientIsActive} className="quick-booking-search-btn">Search Doctors</button>
       </div>
 
       {/* Step 2: List of doctors */}
       {doctors.length > 0 && (
-        <div>
+        <div className="quick-booking-doctors">
           <h3>Select a Doctor</h3>
           {doctors.map(doc => (
-            <div key={doc.id} style={{ border: '1px solid #ddd', margin: '0.5rem 0', padding: '0.5rem' }}>
+            <div key={doc.id} className="quick-booking-doctor-item">
               <p><strong>{doc.name}</strong> - {doc.specialty}</p>
               <p>Fee: ${doc.consultationFee}</p>
               <button onClick={() => handleSelectDoctor(doc)} disabled={!patientIsActive}>Select & View Slots</button>
@@ -175,16 +175,16 @@ const BookAppointment = ({ patientId, profile }) => {
 
       {/* Step 3: Available slots for selected doctor */}
       {selectedDoctor && (
-        <div>
+        <div className="quick-booking-slots">
           <h3>Available Slots for Dr. {selectedDoctor.name} on {selectedDate}</h3>
           {slots.length === 0 ? (
             <p>No available slots for this date.</p>
           ) : (
-            <ul>
+            <ul className="quick-booking-slots-list">
               {slots.map(slot => (
                 <li key={slot.id}>
                   {new Date(slot.startTime).toLocaleString()} - {new Date(slot.endTime).toLocaleString()}
-                  <button onClick={() => setSelectedSlot(slot)} style={{ marginLeft: '0.5rem' }}>Select</button>
+                  <button onClick={() => setSelectedSlot(slot)}>Select</button>
                 </li>
               ))}
             </ul>
@@ -196,7 +196,7 @@ const BookAppointment = ({ patientId, profile }) => {
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
             disabled={!patientIsActive}
-            style={{ width: '100%', marginTop: '0.5rem' }}
+            className="quick-booking-symptoms"
           />
           <button onClick={handleBook} disabled={!patientIsActive}>Book Appointment</button>
         </div>
@@ -204,23 +204,23 @@ const BookAppointment = ({ patientId, profile }) => {
 
       {/* Step 4: Mock payment (appears after booking) */}
       {showPayment && createdAppointment && (
-  <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '8px' }}>
-    <h4>Complete Payment</h4>
-    <p>Appointment ID: {createdAppointment.id}</p>
-    <p>Amount: Consultation fee (${selectedDoctor?.consultationFee || '1500'})</p>
-    <StripePayment
-      appointmentId={createdAppointment.id}
-      amount={selectedDoctor?.consultationFee || 1500}
-      clientSecret={createdAppointment.clientSecret}
-      onSuccess={() => {
-        setMessage('✅ Payment successful! Appointment confirmed.');
-        setShowPayment(false);
-        // Optionally refresh appointment list or redirect
-      }}
-      onError={(err) => setMessage(`❌ Payment failed: ${err}`)}
-    />
-  </div>
-)}
+        <div className="quick-booking-payment">
+          <h4>Complete Payment</h4>
+          <p>Appointment ID: {createdAppointment.id}</p>
+          <p>Amount: Consultation fee (${selectedDoctor?.consultationFee || '1500'})</p>
+          <StripePayment
+            appointmentId={createdAppointment.id}
+            amount={selectedDoctor?.consultationFee || 1500}
+            clientSecret={createdAppointment.clientSecret}
+            onSuccess={() => {
+              setMessage('✅ Payment successful! Appointment confirmed.');
+              setShowPayment(false);
+              // Optionally refresh appointment list or redirect
+            }}
+            onError={(err) => setMessage(`❌ Payment failed: ${err}`)}
+          />
+        </div>
+      )}
     </div>
   );
 };

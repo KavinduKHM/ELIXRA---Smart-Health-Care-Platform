@@ -1,0 +1,97 @@
+.prescriptions-theme {
+  display: grid;
+  gap: 1rem;
+}
+
+.prescriptions-theme-head {
+  border-bottom: 1px solid #dce7eb;
+  padding-bottom: 0.8rem;
+}
+
+.prescriptions-theme-head h1 {
+  margin: 0;
+  color: #0d5660;
+  font-size: 2rem;
+}
+
+.prescriptions-theme-head p {
+  margin: 0.2rem 0 0;
+  color: #4f667d;
+}
+
+.prescriptions-board {
+  border: 1px solid #d9e6ea;
+  border-radius: 18px;
+  padding: 1rem;
+  background: #f9fdfd;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.prescriptions-board-title {
+  margin: 0 0 0.85rem;
+  color: #153c58;
+}
+
+.prescriptions-empty {
+  color: #5f738b;
+}
+
+.prescriptions-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.prescriptions-item {
+  border: 1px solid #d9e7ed;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 0.78rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.prescriptions-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.prescriptions-item-top h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #102538;
+}
+
+.prescriptions-validity {
+  border-radius: 999px;
+  background: #d6f2ee;
+  color: #0d5f5a;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.58rem;
+  font-weight: 700;
+}
+
+.prescriptions-doctor {
+  margin: 0;
+  color: #3f5f78;
+  font-weight: 600;
+}
+
+.prescriptions-medicines {
+  margin: 0;
+  color: #27435d;
+}
+
+@media (max-width: 860px) {
+  .prescriptions-item-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

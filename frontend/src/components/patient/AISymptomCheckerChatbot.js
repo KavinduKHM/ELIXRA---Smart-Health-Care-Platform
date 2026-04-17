@@ -122,10 +122,10 @@ const AISymptomCheckerChatbot = () => {
   };
 
   return (
-    <div className="card cardSubtle">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <h2 style={{ margin: 0 }}>AI Symptom Checker</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
+    <div className="symptom-chat-card">
+      <div className="symptom-chat-head">
+        <h2>Symptom Checker</h2>
+        <div className="symptom-chat-head-actions">
           <button onClick={() => setOpen((v) => !v)}>{open ? 'Hide' : 'Show'}</button>
           <button onClick={clearChat} disabled={loading}>Clear</button>
         </div>
@@ -135,27 +135,12 @@ const AISymptomCheckerChatbot = () => {
         <>
           <div
             ref={listRef}
-            style={{
-              marginTop: 10,
-              height: 240,
-              overflowY: 'auto',
-              background: 'rgba(255,255,255,0.75)',
-              border: '1px solid rgba(219, 233, 234, 0.9)',
-              borderRadius: 14,
-              padding: 10
-            }}
+            className="symptom-chat-log"
           >
             {messages.map((m) => (
-              <div key={m.id} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 10 }}>
+              <div key={m.id} className={`symptom-chat-row ${m.role === 'user' ? 'symptom-chat-row-user' : 'symptom-chat-row-bot'}`}>
                 <div
-                  style={{
-                    maxWidth: '85%',
-                    whiteSpace: 'pre-wrap',
-                    padding: '8px 10px',
-                    borderRadius: 14,
-                    background: m.role === 'user' ? 'rgba(26, 163, 154, 0.14)' : '#fff',
-                    border: '1px solid rgba(219, 233, 234, 0.95)'
-                  }}
+                  className={`symptom-chat-bubble ${m.role === 'user' ? 'symptom-chat-bubble-user' : 'symptom-chat-bubble-bot'}`}
                 >
                   {m.text}
                 </div>
@@ -163,23 +148,23 @@ const AISymptomCheckerChatbot = () => {
             ))}
           </div>
 
-          <div style={{ marginTop: 10, display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+          <div className="symptom-chat-input-row">
             <textarea
               rows={2}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
               placeholder="Type symptoms and press Enter to send (Shift+Enter for newline)"
-              style={{ flex: 1, resize: 'vertical', margin: 0 }}
+              className="symptom-chat-input"
               disabled={loading}
             />
-            <button onClick={send} disabled={!canSend} style={{ minWidth: 90 }}>
+            <button onClick={send} disabled={!canSend} className="symptom-chat-send-btn">
               {loading ? 'Sending…' : 'Send'}
             </button>
           </div>
 
           {error && (
-            <div style={{ marginTop: 8, color: '#b00020', whiteSpace: 'pre-wrap' }}>
+            <div className="symptom-chat-error">
               {error}
             </div>
           )}

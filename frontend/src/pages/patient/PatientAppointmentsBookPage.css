@@ -1,0 +1,404 @@
+.appointments-theme {
+  display: grid;
+  gap: 1rem;
+}
+
+.appointments-theme-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #dce7eb;
+  padding-bottom: 0.8rem;
+}
+
+.appointments-theme-head h1 {
+  margin: 0;
+  color: #0d5660;
+  font-size: 2rem;
+}
+
+.appointments-theme-head p {
+  margin: 0.2rem 0 0;
+  color: #4f667d;
+}
+
+.appointments-theme-cta {
+  background: #0d7179;
+  border-radius: 999px;
+  padding: 0.72rem 1.2rem;
+  font-weight: 700;
+}
+
+.appointments-theme-cta:hover {
+  background: #0f5f5a;
+}
+
+.appointments-theme-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 1rem;
+  align-items: start;
+}
+
+.appointments-board {
+  border: 1px solid #d9e6ea;
+  border-radius: 18px;
+  padding: 1rem;
+  background: #f9fdfd;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.appointments-board-title {
+  margin: 0 0 0.85rem;
+  color: #153c58;
+}
+
+.appointments-group {
+  margin-top: 1rem;
+}
+
+.appointments-group-title {
+  display: inline-flex;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.65rem;
+  margin: 0 0 0.65rem;
+}
+
+.appointments-group-title-confirmed {
+  color: #0f5f5a;
+  background: #c8efe9;
+}
+
+.appointments-group-title-pending {
+  color: #8d4f18;
+  background: #f9ddc0;
+}
+
+.appointments-group-title-other {
+  color: #435466;
+  background: #dce6ee;
+}
+
+.appointments-stack {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.apt-card {
+  border: 1px solid #d9e7ed;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 0.78rem;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.apt-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #e3eef1, #d0dce0);
+  color: #375064;
+  font-weight: 800;
+}
+
+.apt-content h4 {
+  margin: 0;
+  font-size: 1.08rem;
+  color: #102538;
+}
+
+.apt-specialty {
+  margin: 0.2rem 0;
+  color: #5a7288;
+}
+
+.apt-time {
+  margin: 0;
+  color: #3c596f;
+  font-size: 0.86rem;
+}
+
+.apt-actions {
+  display: grid;
+  justify-items: end;
+  gap: 0.4rem;
+}
+
+.apt-badge {
+  font-size: 0.63rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 999px;
+  padding: 0.2rem 0.58rem;
+}
+
+.apt-badge-confirmed {
+  background: #d6f2ee;
+  color: #0d5f5a;
+}
+
+.apt-badge-pending {
+  background: #fde6d2;
+  color: #8d4f18;
+}
+
+.apt-badge-other {
+  background: #e4ebf2;
+  color: #435466;
+}
+
+.apt-join-btn {
+  background: #0d7179;
+  border-radius: 999px;
+  padding: 0.5rem 0.88rem;
+  font-size: 0.85rem;
+}
+
+.appointments-empty {
+  color: #5f738b;
+}
+
+.appointments-error {
+  color: #8f1111;
+}
+
+.appointments-theme-side {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.quick-booking-card {
+  border: 1px solid #d9e6ea;
+  border-radius: 18px;
+  background: #f8fbfc;
+  padding: 1rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.quick-booking-card h2 {
+  margin: 0 0 0.8rem;
+  color: #153c58;
+}
+
+.quick-booking-warning {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.quick-booking-message {
+  color: #255a7f;
+  font-weight: 600;
+}
+
+.quick-booking-message-success {
+  color: #0e6b2f;
+}
+
+.quick-booking-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.quick-booking-input {
+  width: 100%;
+  margin: 0;
+  border-radius: 999px;
+  background: #edf2f4;
+  border: 1px solid #d7e3e8;
+}
+
+.quick-booking-search-btn {
+  width: 100%;
+  border-radius: 999px;
+}
+
+.quick-booking-doctors,
+.quick-booking-slots,
+.quick-booking-payment {
+  margin-top: 0.9rem;
+  border-top: 1px solid #dce7eb;
+  padding-top: 0.8rem;
+}
+
+.quick-booking-doctors h3,
+.quick-booking-slots h3,
+.quick-booking-payment h4 {
+  margin: 0 0 0.5rem;
+  color: #27435d;
+}
+
+.quick-booking-doctor-item {
+  border: 1px solid #dde7eb;
+  border-radius: 12px;
+  padding: 0.6rem;
+  background: #ffffff;
+  margin-bottom: 0.45rem;
+}
+
+.quick-booking-doctor-item p {
+  margin: 0.2rem 0;
+}
+
+.quick-booking-slots-list {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.quick-booking-slots-list li {
+  color: #334f67;
+}
+
+.quick-booking-slots-list button {
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.65rem;
+}
+
+.quick-booking-symptoms {
+  width: 100%;
+  margin: 0.5rem 0 0;
+}
+
+.symptom-chat-card {
+  border: 1px solid #d9e6ea;
+  border-radius: 18px;
+  background: #f8fbfc;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.symptom-chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  background: #0d7179;
+  color: #fff;
+  padding: 0.7rem 0.85rem;
+}
+
+.symptom-chat-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.symptom-chat-head-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.symptom-chat-head-actions button {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  box-shadow: none;
+  padding: 0.26rem 0.5rem;
+}
+
+.symptom-chat-log {
+  margin: 0;
+  height: 260px;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #eef6f8 0%, #dceff2 100%);
+  padding: 0.7rem;
+}
+
+.symptom-chat-row {
+  display: flex;
+  margin-bottom: 0.55rem;
+}
+
+.symptom-chat-row-user {
+  justify-content: flex-end;
+}
+
+.symptom-chat-row-bot {
+  justify-content: flex-start;
+}
+
+.symptom-chat-bubble {
+  max-width: 86%;
+  white-space: pre-wrap;
+  padding: 0.5rem 0.65rem;
+  border-radius: 14px;
+  border: 1px solid #d7e6eb;
+  font-size: 0.86rem;
+}
+
+.symptom-chat-bubble-user {
+  background: #c7ecef;
+  color: #1d4457;
+}
+
+.symptom-chat-bubble-bot {
+  background: #ffffff;
+  color: #284862;
+}
+
+.symptom-chat-input-row {
+  padding: 0.65rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-end;
+  background: #edf4f5;
+}
+
+.symptom-chat-input {
+  flex: 1;
+  margin: 0;
+  resize: vertical;
+  min-height: 44px;
+}
+
+.symptom-chat-send-btn {
+  min-width: 82px;
+}
+
+.symptom-chat-error {
+  margin: 0;
+  padding: 0 0.65rem 0.65rem;
+  color: #8f1111;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 1180px) {
+  .appointments-theme-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .appointments-theme-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .appointments-theme-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .appointments-theme-side {
+    grid-template-columns: 1fr;
+  }
+
+  .apt-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .apt-actions {
+    grid-column: 1 / -1;
+    justify-items: start;
+    margin-top: 0.25rem;
+  }
+}

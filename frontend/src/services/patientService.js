@@ -63,6 +63,11 @@ export const uploadDocument = (patientId, formData) =>
     headers: { 'Content-Type': 'multipart/form-data' }
   });
 
+export const updatePatientDocument = (patientId, documentId, formData) =>
+  PATIENT_UPLOAD_API.put(`/${patientId}/documents/${documentId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+
 export const uploadPatientProfilePicture = (patientId, formData) =>
   PATIENT_UPLOAD_API.post(`/${patientId}/profile-picture`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
@@ -73,6 +78,12 @@ export const getPatientPrescriptions = (patientId) =>
 
 export const getPatientMedicalHistory = (patientId) => 
   PATIENT_API.get(`/${patientId}/medical-history/all`);
+
+export const addPatientMedicalHistoryRecord = (patientId, payload) =>
+  PATIENT_API.post(`/${patientId}/medical-history`, payload);
+
+export const updatePatientMedicalHistoryRecord = (historyId, payload) =>
+  PATIENT_API.put(`/medical-history/${historyId}`, payload);
 
 export const deletePatientDocument = (patientId, documentId) =>
   PATIENT_API.delete(`/${patientId}/documents/${documentId}`);
