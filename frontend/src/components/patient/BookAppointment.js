@@ -7,7 +7,18 @@ import StripePayment from '../common/StripePayment';
 const PAYMENT_API = 'http://localhost:8087/api/payments';
 const APPOINTMENT_API = 'http://localhost:8084/api/appointments';
 
-const BookAppointment = ({ patientId }) => {
+const isProfileActive = (profile) => {
+  if (!profile) return true;
+  if (profile.status === 0 || profile.status === '0') return false;
+  if (profile.status === 1 || profile.status === '1') return true;
+  const statusText = String(profile.status || '').toUpperCase();
+  if (statusText === 'INACTIVE' || statusText === 'DEACTIVE' || statusText === 'DEACTIVATED') return false;
+  if (statusText === 'ACTIVE' || statusText === 'ACTIVATED') return true;
+  if (profile.active === false) return false;
+  return true;
+};
+
+const BookAppointment = ({ patientId, profile }) => {
   const [specialty, setSpecialty] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [doctors, setDoctors] = useState([]);
@@ -18,11 +29,20 @@ const BookAppointment = ({ patientId }) => {
   const [message, setMessage] = useState('');
   const [createdAppointment, setCreatedAppointment] = useState(null); // store after booking
   const [showPayment, setShowPayment] = useState(false);
+  const patientIsActive = isProfileActive(profile);
+
+  const showActivationPrompt = () => {
+    alert('Patient is deactive (0). Please activate profile from the Profile tab to continue.');
+  };
 
   // Get today's date in YYYY-MM-DD for min attribute
   const today = new Date().toISOString().split('T')[0];
 
   const handleSearch = async () => {
+    if (!patientIsActive) {
+      showActivationPrompt();
+      return;
+    }
     if (!specialty) return;
     try {
       const res = await searchDoctors(specialty);
@@ -41,6 +61,10 @@ const BookAppointment = ({ patientId }) => {
 
   // When user selects a doctor, fetch available slots for the chosen date
   const handleSelectDoctor = async (doctor) => {
+    if (!patientIsActive) {
+      showActivationPrompt();
+      return;
+    }
     if (!selectedDate) {
       alert('Please select a date first');
       return;
@@ -60,6 +84,10 @@ const BookAppointment = ({ patientId }) => {
 
   // Book appointment (no payment yet)
   const handleBook = async () => {
+    if (!patientIsActive) {
+      showActivationPrompt();
+      return;
+    }
     if (!selectedDoctor || !selectedSlot) {
       alert('Select a doctor and a time slot');
       return;
@@ -101,38 +129,45 @@ const BookAppointment = ({ patientId }) => {
 
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
-      <h2>Book New Appointment</h2>
-      {message && <p style={{ color: message.includes('successful') ? 'green' : 'blue' }}>{message}</p>}
+    <div className="quick-booking-card">
+      <h2>Quick Booking</h2>
+      {!patientIsActive && (
+        <p className="quick-booking-warning">
+          Profile is deactive (0). Activate profile to book appointments.
+        </p>
+      )}
+      {message && <p className={`quick-booking-message ${message.includes('successful') ? 'quick-booking-message-success' : ''}`}>{message}</p>}
 
       {/* Step 1: Specialty and Date */}
-      <div>
+      <div className="quick-booking-form">
         <input
           type="text"
-          placeholder="Specialty (e.g., Cardiology)"
+          placeholder="Select Specialty"
           value={specialty}
           onChange={(e) => setSpecialty(e.target.value)}
-          style={{ marginRight: '0.5rem' }}
+          disabled={!patientIsActive}
+          className="quick-booking-input"
         />
         <input
           type="date"
           value={selectedDate}
           min={today}
           onChange={(e) => setSelectedDate(e.target.value)}
-          style={{ marginRight: '0.5rem' }}
+          disabled={!patientIsActive}
+          className="quick-booking-input"
         />
-        <button onClick={handleSearch}>Search Doctors</button>
+        <button onClick={handleSearch} disabled={!patientIsActive} className="quick-booking-search-btn">Search Doctors</button>
       </div>
 
       {/* Step 2: List of doctors */}
       {doctors.length > 0 && (
-        <div>
+        <div className="quick-booking-doctors">
           <h3>Select a Doctor</h3>
           {doctors.map(doc => (
-            <div key={doc.id} style={{ border: '1px solid #ddd', margin: '0.5rem 0', padding: '0.5rem' }}>
+            <div key={doc.id} className="quick-booking-doctor-item">
               <p><strong>{doc.name}</strong> - {doc.specialty}</p>
               <p>Fee: ${doc.consultationFee}</p>
-              <button onClick={() => handleSelectDoctor(doc)}>Select & View Slots</button>
+              <button onClick={() => handleSelectDoctor(doc)} disabled={!patientIsActive}>Select & View Slots</button>
             </div>
           ))}
         </div>
@@ -140,16 +175,16 @@ const BookAppointment = ({ patientId }) => {
 
       {/* Step 3: Available slots for selected doctor */}
       {selectedDoctor && (
-        <div>
+        <div className="quick-booking-slots">
           <h3>Available Slots for Dr. {selectedDoctor.name} on {selectedDate}</h3>
           {slots.length === 0 ? (
             <p>No available slots for this date.</p>
           ) : (
-            <ul>
+            <ul className="quick-booking-slots-list">
               {slots.map(slot => (
                 <li key={slot.id}>
                   {new Date(slot.startTime).toLocaleString()} - {new Date(slot.endTime).toLocaleString()}
-                  <button onClick={() => setSelectedSlot(slot)} style={{ marginLeft: '0.5rem' }}>Select</button>
+                  <button onClick={() => setSelectedSlot(slot)}>Select</button>
                 </li>
               ))}
             </ul>
@@ -160,31 +195,32 @@ const BookAppointment = ({ patientId }) => {
             rows="3"
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
-            style={{ width: '100%', marginTop: '0.5rem' }}
+            disabled={!patientIsActive}
+            className="quick-booking-symptoms"
           />
-          <button onClick={handleBook}>Book Appointment</button>
+          <button onClick={handleBook} disabled={!patientIsActive}>Book Appointment</button>
         </div>
       )}
 
       {/* Step 4: Mock payment (appears after booking) */}
       {showPayment && createdAppointment && (
-  <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '8px' }}>
-    <h4>Complete Payment</h4>
-    <p>Appointment ID: {createdAppointment.id}</p>
-    <p>Amount: Consultation fee (${selectedDoctor?.consultationFee || '1500'})</p>
-    <StripePayment
-      appointmentId={createdAppointment.id}
-      amount={selectedDoctor?.consultationFee || 1500}
-      clientSecret={createdAppointment.clientSecret}
-      onSuccess={() => {
-        setMessage('✅ Payment successful! Appointment confirmed.');
-        setShowPayment(false);
-        // Optionally refresh appointment list or redirect
-      }}
-      onError={(err) => setMessage(`❌ Payment failed: ${err}`)}
-    />
-  </div>
-)}
+        <div className="quick-booking-payment">
+          <h4>Complete Payment</h4>
+          <p>Appointment ID: {createdAppointment.id}</p>
+          <p>Amount: Consultation fee (${selectedDoctor?.consultationFee || '1500'})</p>
+          <StripePayment
+            appointmentId={createdAppointment.id}
+            amount={selectedDoctor?.consultationFee || 1500}
+            clientSecret={createdAppointment.clientSecret}
+            onSuccess={() => {
+              setMessage('✅ Payment successful! Appointment confirmed.');
+              setShowPayment(false);
+              // Optionally refresh appointment list or redirect
+            }}
+            onError={(err) => setMessage(`❌ Payment failed: ${err}`)}
+          />
+        </div>
+      )}
     </div>
   );
 };
