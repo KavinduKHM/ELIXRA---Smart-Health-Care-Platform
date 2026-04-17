@@ -1,0 +1,86 @@
+.adminDashboardRoot {
+  display: grid;
+  gap: 1rem;
+}
+
+.adminDashboardHeader {
+  margin-bottom: 0;
+}
+
+.adminDashboardBody {
+  margin-bottom: 0;
+}
+
+.adminDashboardTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.adminDashboardError {
+  border: 1px solid #f3c2c2;
+  background: #fff0f0;
+  color: #912f2f;
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.adminDoctorList {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.adminDoctorCard {
+  border: 1px solid #dbe8ea;
+  border-radius: 12px;
+  background: #f9fcfc;
+  padding: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.adminDoctorCard h3 {
+  margin: 0 0 0.35rem;
+}
+
+.adminDoctorCard p {
+  margin: 0.2rem 0;
+  color: #2f3e4f;
+}
+
+.adminDoctorActions {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.adminVerifyBtn {
+  background: #0f7d75;
+}
+
+.adminRejectBtn {
+  background: #c23e3e;
+}
+
+.adminRejectBtn:hover {
+  background: #a53333;
+}
+
+@media (max-width: 880px) {
+  .adminDoctorCard {
+    flex-direction: column;
+  }
+
+  .adminDoctorActions {
+    width: 100%;
+  }
+
+  .adminDoctorActions button {
+    flex: 1;
+  }
+}
+

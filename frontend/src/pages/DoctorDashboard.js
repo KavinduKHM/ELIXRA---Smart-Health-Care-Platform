@@ -14,6 +14,10 @@ const DoctorDashboard = () => {
     }
   };
 
+  const handleRegister = () => {
+    navigate('/doctor/register');
+  };
+
   return (
     <div style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}>
       <div className="card" style={{ width: 'min(640px, 100%)' }}>
@@ -28,6 +32,7 @@ const DoctorDashboard = () => {
             style={{ flex: '1 1 220px', margin: 0 }}
           />
           <button onClick={handleLoad}>Continue</button>
+          <button type="button" onClick={handleRegister}>Register</button>
         </div>
       </div>
     </div>

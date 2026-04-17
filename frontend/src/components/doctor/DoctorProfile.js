@@ -1,12 +1,30 @@
 // src/components/doctor/DoctorProfile.js
 import React, { useState } from 'react';
 import { updateDoctorProfile } from '../../services/doctorService';
+import {
+  FiAward,
+  FiBookOpen,
+  FiCalendar,
+  FiDollarSign,
+  FiEdit2,
+  FiMail,
+  FiPhone,
+  FiSave,
+  FiUser,
+  FiX,
+} from 'react-icons/fi';
+import './DoctorProfile.css';
 
-const DoctorProfile = ({ profile, doctorId, onProfileUpdate }) => {
+const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' }) => {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState(profile);
+  const isVerified = profile?.status === 'VERIFIED';
 
   const handleSave = async () => {
+    if (!isVerified) {
+      alert('Only VERIFIED doctors can edit profile details.');
+      return;
+    }
     try {
       await updateDoctorProfile(doctorId, formData);
       onProfileUpdate(formData);
@@ -18,37 +36,164 @@ const DoctorProfile = ({ profile, doctorId, onProfileUpdate }) => {
     }
   };
 
-  if (!profile) return <p>Loading profile...</p>;
+  if (!profile) return <div className="doctorProfileLoading">Loading profile...</div>;
+
+  const fullName = `Dr. ${profile.firstName || ''} ${profile.lastName || ''}`.trim();
+  const initials = `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`.toUpperCase() || 'DR';
+
+  const normalizedSearch = String(searchQuery || '').trim().toLowerCase();
+  const hasSearch = normalizedSearch.length > 0;
+
+  const contains = (...values) => values
+    .filter((value) => value !== null && value !== undefined)
+    .some((value) => String(value).toLowerCase().includes(normalizedSearch));
+
+  const sectionMatches = {
+    summary: !hasSearch || contains(fullName, profile.specialty, profile.experienceYears, profile.consultationFee, profile.status),
+    personal: !hasSearch || contains(profile.firstName, profile.lastName, profile.email, profile.phoneNumber),
+    professional: !hasSearch || contains(profile.specialty, profile.qualification, profile.experienceYears, profile.consultationFee),
+    bio: !hasSearch || contains(profile.bio),
+  };
+
+  const hasAnyMatch = sectionMatches.summary || sectionMatches.personal || sectionMatches.professional || sectionMatches.bio;
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
-      <h2>Doctor Profile</h2>
+    <div className="doctorProfileRoot">
       {!editMode ? (
-        <div>
-          <p><strong>Name:</strong> Dr. {profile.firstName} {profile.lastName}</p>
-          <p><strong>Email:</strong> {profile.email}</p>
-          <p><strong>Phone:</strong> {profile.phoneNumber}</p>
-          <p><strong>Specialty:</strong> {profile.specialty}</p>
-          <p><strong>Qualification:</strong> {profile.qualification}</p>
-          <p><strong>Experience:</strong> {profile.experienceYears} years</p>
-          <p><strong>Consultation Fee:</strong> ${profile.consultationFee}</p>
-          <p><strong>Bio:</strong> {profile.bio}</p>
-          <button onClick={() => setEditMode(true)}>Edit Profile</button>
-        </div>
+        hasAnyMatch ? (
+          <div className="doctorProfileGrid">
+            {sectionMatches.summary && (
+              <aside className="doctorProfileCard doctorProfileSummary">
+                <div className="doctorProfileAvatar">{initials}</div>
+                <h2>{fullName}</h2>
+                <p className="doctorProfileRole">{profile.specialty || 'Specialty not set'}</p>
+
+                <div className="doctorProfileStats">
+                  <div>
+                    <strong>{profile.experienceYears ?? 0}+</strong>
+                    <span>Years</span>
+                  </div>
+                  <div>
+                    <strong>${profile.consultationFee ?? 0}</strong>
+                    <span>Fee</span>
+                  </div>
+                  <div>
+                    <strong>{profile.status || 'ACTIVE'}</strong>
+                    <span>Status</span>
+                  </div>
+                </div>
+
+                {isVerified ? (
+                  <button type="button" className="doctorProfilePrimaryBtn" onClick={() => setEditMode(true)}>
+                    <FiEdit2 /> Edit Profile
+                  </button>
+                ) : (
+                  <p className="muted" style={{ marginTop: '0.6rem' }}>
+                    Profile editing is enabled after admin verification.
+                  </p>
+                )}
+              </aside>
+            )}
+
+            <section className="doctorProfileDetails">
+              {sectionMatches.personal && (
+                <div className="doctorProfileCard">
+                  <div className="doctorProfileCardHeader">
+                    <h3><FiUser /> Personal Information</h3>
+                  </div>
+                  <div className="doctorProfileInfoGrid">
+                    <div><span>First Name</span><strong>{profile.firstName || '-'}</strong></div>
+                    <div><span>Last Name</span><strong>{profile.lastName || '-'}</strong></div>
+                    <div><span><FiMail /> Email</span><strong>{profile.email || '-'}</strong></div>
+                    <div><span><FiPhone /> Phone</span><strong>{profile.phoneNumber || '-'}</strong></div>
+                  </div>
+                </div>
+              )}
+
+              {(sectionMatches.professional || sectionMatches.bio) && (
+                <div className="doctorProfileCard doctorProfileTwoCol">
+                  {sectionMatches.professional && (
+                    <div>
+                      <div className="doctorProfileCardHeader">
+                        <h3><FiAward /> Professional Details</h3>
+                      </div>
+                      <div className="doctorProfileInfoList">
+                        <p><span>Specialty</span><strong>{profile.specialty || '-'}</strong></p>
+                        <p><span>Qualification</span><strong>{profile.qualification || '-'}</strong></p>
+                        <p><span><FiCalendar /> Experience</span><strong>{profile.experienceYears ?? 0} years</strong></p>
+                        <p><span><FiDollarSign /> Consultation Fee</span><strong>${profile.consultationFee ?? 0}</strong></p>
+                      </div>
+                    </div>
+                  )}
+                  {sectionMatches.bio && (
+                    <div>
+                      <div className="doctorProfileCardHeader">
+                        <h3><FiBookOpen /> Biography</h3>
+                      </div>
+                      <p className="doctorProfileBio">{profile.bio || 'No biography added yet.'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
+        ) : (
+          <div className="doctorProfileNoResults">
+            <h3>No matching profile details</h3>
+            <p>Try a different keyword like name, email, specialty, qualification, or bio text.</p>
+          </div>
+        )
       ) : (
-        <div>
-          <input type="text" placeholder="First Name" value={formData.firstName || ''} onChange={e => setFormData({...formData, firstName: e.target.value})} />
-          <input type="text" placeholder="Last Name" value={formData.lastName || ''} onChange={e => setFormData({...formData, lastName: e.target.value})} />
-          <input type="email" placeholder="Email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} />
-          <input type="tel" placeholder="Phone" value={formData.phoneNumber || ''} onChange={e => setFormData({...formData, phoneNumber: e.target.value})} />
-          <input type="text" placeholder="Specialty" value={formData.specialty || ''} onChange={e => setFormData({...formData, specialty: e.target.value})} />
-          <input type="text" placeholder="Qualification" value={formData.qualification || ''} onChange={e => setFormData({...formData, qualification: e.target.value})} />
-          <input type="number" placeholder="Experience Years" value={formData.experienceYears || ''} onChange={e => setFormData({...formData, experienceYears: e.target.value})} />
-          <input type="number" placeholder="Consultation Fee" value={formData.consultationFee || ''} onChange={e => setFormData({...formData, consultationFee: e.target.value})} />
-          <textarea placeholder="Bio" value={formData.bio || ''} onChange={e => setFormData({...formData, bio: e.target.value})} />
-          <button onClick={handleSave}>Save</button>
-          <button onClick={() => setEditMode(false)}>Cancel</button>
-        </div>
+        <section className="doctorProfileCard doctorProfileEditCard">
+          <div className="doctorProfileCardHeader">
+            <h3><FiEdit2 /> Edit Doctor Profile</h3>
+          </div>
+
+          <div className="doctorProfileFormGrid">
+            <label>
+              First Name
+              <input type="text" placeholder="First Name" value={formData.firstName || ''} onChange={e => setFormData({...formData, firstName: e.target.value})} />
+            </label>
+            <label>
+              Last Name
+              <input type="text" placeholder="Last Name" value={formData.lastName || ''} onChange={e => setFormData({...formData, lastName: e.target.value})} />
+            </label>
+            <label>
+              Email
+              <input type="email" placeholder="Email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} />
+            </label>
+            <label>
+              Phone
+              <input type="tel" placeholder="Phone" value={formData.phoneNumber || ''} onChange={e => setFormData({...formData, phoneNumber: e.target.value})} />
+            </label>
+            <label>
+              Specialty
+              <input type="text" placeholder="Specialty" value={formData.specialty || ''} onChange={e => setFormData({...formData, specialty: e.target.value})} />
+            </label>
+            <label>
+              Qualification
+              <input type="text" placeholder="Qualification" value={formData.qualification || ''} onChange={e => setFormData({...formData, qualification: e.target.value})} />
+            </label>
+            <label>
+              Experience Years
+              <input type="number" placeholder="Experience Years" value={formData.experienceYears || ''} onChange={e => setFormData({...formData, experienceYears: e.target.value})} />
+            </label>
+            <label>
+              Consultation Fee
+              <input type="number" placeholder="Consultation Fee" value={formData.consultationFee || ''} onChange={e => setFormData({...formData, consultationFee: e.target.value})} />
+            </label>
+          </div>
+
+          <label className="doctorProfileBioField">
+            Biography
+            <textarea placeholder="Bio" value={formData.bio || ''} onChange={e => setFormData({...formData, bio: e.target.value})} />
+          </label>
+
+          <div className="doctorProfileActions">
+            <button type="button" className="doctorProfilePrimaryBtn" onClick={handleSave}><FiSave /> Save</button>
+            <button type="button" className="doctorProfileGhostBtn" onClick={() => setEditMode(false)}><FiX /> Cancel</button>
+          </div>
+        </section>
       )}
     </div>
   );

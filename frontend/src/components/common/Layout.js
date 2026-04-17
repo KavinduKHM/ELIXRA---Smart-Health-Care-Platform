@@ -64,6 +64,10 @@ const Layout = ({ children }) => {
               </span>
               <span className="appUserChipName" title={headerLabel}>{headerLabel}</span>
             </div>
+          <div className="topNavLinks">
+            <Link to="/patient" className="topNavLink">Patient</Link>
+            <Link to="/doctor" className="topNavLink">Doctor</Link>
+            <Link to="/admin" className="topNavLink">Admin</Link>
           </div>
         </div>
       </header>

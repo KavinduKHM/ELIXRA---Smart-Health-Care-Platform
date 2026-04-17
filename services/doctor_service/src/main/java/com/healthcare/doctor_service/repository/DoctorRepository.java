@@ -23,6 +23,11 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     Optional<Doctor> findByUserId(Long userId);
 
     /**
+     * Check if user ID already exists.
+     */
+    boolean existsByUserId(Long userId);
+
+    /**
      * Find doctors by specialty
      */
     List<Doctor> findBySpecialty(String specialty);
