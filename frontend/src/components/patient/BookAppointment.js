@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { searchDoctors, getAvailableSlots, bookAppointment } from '../../services/appointmentService';
 import StripePayment from '../common/StripePayment';
 
-const APPOINTMENT_API = 'http://localhost:8084/api/appointments';
-
 const isProfileActive = (profile) => {
   if (!profile) return true;
   if (profile.status === 0 || profile.status === '0') return false;
