@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
           <div className="topNavLinks">
             <Link to="/patient" className="topNavLink">Patient</Link>
             <Link to="/doctor" className="topNavLink">Doctor</Link>
-            <Link to="/admin" className="topNavLink">Admin (Coming Soon)</Link>
+            <Link to="/admin" className="topNavLink">Admin</Link>
           </div>
         </div>
       </nav>
