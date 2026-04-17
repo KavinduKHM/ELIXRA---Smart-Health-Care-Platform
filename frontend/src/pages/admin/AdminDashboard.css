@@ -1,22 +1,108 @@
 .adminDashboardRoot {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: calc(100vh - 82px);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #d8e3e5;
+  background: #edf2f3;
+}
+
+.adminSidebar {
+  background: #f5f8f9;
+  border-right: 1px solid #d9e4e6;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.adminSidebar h2 {
+  margin: 0;
+  color: #0f555c;
+  font-size: 1.9rem;
+}
+
+.adminSidebar p {
+  margin: 0.3rem 0 0.9rem;
+  color: #6c8388;
+  font-size: 0.92rem;
+}
+
+.adminSidebarNav {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.adminSidebarItem {
+  text-decoration: none;
+  color: #2f5156;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 650;
+}
+
+.adminSidebarItemActive {
+  background: #e4ecee;
+  color: #0e656e;
+}
+
+.adminSidebarFooter {
+  margin-top: auto;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.adminSidebarLogout {
+  color: #b12626;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.8rem;
+  font-weight: 650;
+}
+
+.adminMain {
+  padding: 1.25rem;
 }
 
 .adminDashboardHeader {
-  margin-bottom: 0;
-}
-
-.adminDashboardBody {
-  margin-bottom: 0;
-}
-
-.adminDashboardTopRow {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 0.8rem;
-  margin-bottom: 0.8rem;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.adminDashboardHeader h1 {
+  margin: 0;
+  color: #0f5960;
+  font-size: 3rem;
+  letter-spacing: -0.02em;
+}
+
+.adminDashboardHeader p {
+  margin: 0.35rem 0 0;
+  color: #4b6367;
+  font-size: 1.08rem;
+}
+
+.adminRefreshBtn {
+  border-radius: 999px;
+  padding: 0.72rem 1.2rem;
+  background: #ffffff;
+  border: 1px solid #d4e2e4;
+  color: #0f5d63;
+  box-shadow: none;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.adminRefreshBtn:hover {
+  background: #eef5f6;
 }
 
 .adminDashboardError {
@@ -24,8 +110,40 @@
   background: #fff0f0;
   color: #912f2f;
   border-radius: 10px;
-  padding: 0.7rem 0.8rem;
-  margin-bottom: 0.8rem;
+  padding: 0.72rem 0.85rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.adminContentGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 1rem;
+}
+
+.adminPendingSection h2 {
+  margin: 0 0 0.85rem;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.adminSectionAccent {
+  width: 10px;
+  height: 36px;
+  background: #0f7a80;
+  border-radius: 12px;
+}
+
+.adminStateCard {
+  border: 1px dashed #ccdddf;
+  border-radius: 12px;
+  background: #f8fbfb;
+  color: #5e757a;
+  padding: 1rem;
 }
 
 .adminDoctorList {
@@ -35,52 +153,262 @@
 
 .adminDoctorCard {
   border: 1px solid #dbe8ea;
-  border-radius: 12px;
-  background: #f9fcfc;
-  padding: 0.9rem;
-  display: flex;
-  justify-content: space-between;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 1rem;
+}
+
+.adminDoctorTop {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
   gap: 1rem;
 }
 
-.adminDoctorCard h3 {
-  margin: 0 0 0.35rem;
+.adminDoctorAvatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #0e6c74, #123b69);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(18, 35, 70, 0.22);
 }
 
-.adminDoctorCard p {
-  margin: 0.2rem 0;
-  color: #2f3e4f;
+.adminDoctorHeaderLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.adminDoctorHeaderLine h3 {
+  margin: 0;
+  font-size: 2.05rem;
+  color: #0d4f58;
+}
+
+.adminDoctorBadge {
+  background: #f0e6dc;
+  color: #835537;
+  border-radius: 999px;
+  padding: 0.22rem 0.62rem;
+  font-weight: 700;
+}
+
+.adminDoctorTags {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.adminDoctorTags span {
+  background: #dde9ea;
+  color: #2d4f53;
+  border-radius: 999px;
+  padding: 0.26rem 0.62rem;
+  font-weight: 650;
+}
+
+.adminDoctorMetaGrid {
+  margin-top: 0.85rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.adminDoctorMetaGrid p {
+  margin: 0;
+}
+
+.adminDoctorMetaGrid small {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #83979b;
+  font-size: 0.72rem;
+}
+
+.adminDoctorMetaGrid strong {
+  display: block;
+  margin-top: 0.2rem;
+  color: #182e32;
+  font-size: 1.02rem;
+}
+
+.adminDoctorBottom {
+  margin-top: 0.95rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e1eaeb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.adminSubmittedText {
+  margin: 0;
+  color: #4f666b;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .adminDoctorActions {
   display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
+.adminRejectBtn,
 .adminVerifyBtn {
-  background: #0f7d75;
+  border-radius: 16px;
+  min-width: 152px;
+  height: 52px;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .adminRejectBtn {
-  background: #c23e3e;
+  background: #d31d1d;
 }
 
 .adminRejectBtn:hover {
-  background: #a53333;
+  background: #b71a1a;
 }
 
-@media (max-width: 880px) {
-  .adminDoctorCard {
+.adminVerifyBtn {
+  background: #07656b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.adminVerifyBtn:hover {
+  background: #05565c;
+}
+
+.adminStatsColumn {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.adminQueueCard {
+  background: linear-gradient(145deg, #0a6c72, #0a5c67);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.adminQueueCard p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.adminQueueCard h3 {
+  margin: 0.3rem 0;
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.adminQueueCard span {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.adminGuidelineCard {
+  border: 1px solid #dbe8ea;
+  border-radius: 16px;
+  background: #f8fbfb;
+  padding: 1rem;
+}
+
+.adminGuidelineCard h4 {
+  margin: 0;
+  color: #124f56;
+  font-size: 1.7rem;
+}
+
+.adminGuidelineCard ul {
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.adminGuidelineCard li {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  color: #2e4c50;
+  font-size: 1.07rem;
+}
+
+.adminGuidelineCard li svg {
+  color: #0d757d;
+}
+
+@media (max-width: 1280px) {
+  .adminDashboardRoot {
+    grid-template-columns: 1fr;
+  }
+
+  .adminSidebar {
+    border-right: none;
+    border-bottom: 1px solid #d9e4e6;
+  }
+
+  .adminSidebarFooter {
+    margin-top: 0.8rem;
+  }
+
+  .adminContentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .adminMain {
+    padding: 0.9rem;
+  }
+
+  .adminDashboardHeader,
+  .adminDoctorBottom {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .adminDoctorTop {
+    grid-template-columns: 1fr;
+  }
+
+  .adminDoctorAvatar {
+    width: 108px;
+    height: 108px;
+  }
+
+  .adminDoctorHeaderLine {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .adminDoctorMetaGrid,
+  .adminDoctorActions {
+    grid-template-columns: 1fr;
   }
 
   .adminDoctorActions {
-    width: 100%;
+    display: grid;
   }
 
-  .adminDoctorActions button {
-    flex: 1;
+  .adminRejectBtn,
+  .adminVerifyBtn {
+    width: 100%;
   }
 }
 
