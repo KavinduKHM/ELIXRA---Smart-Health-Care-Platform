@@ -16,7 +16,9 @@
   --radius: 16px;
   --radius-sm: 12px;
 
-  --container: 1200px;
+  --container: 1400px;
+
+  --app-header-offset: 5.4rem;
 }
 
 * {
@@ -117,6 +119,16 @@ textarea {
   padding: 0 1.25rem;
 }
 
+.portalMain {
+  padding-top: 1rem;
+}
+
+.portalContainer {
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
 .topNav {
   position: sticky;
   top: 0;
@@ -124,6 +136,158 @@ textarea {
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(219, 233, 234, 0.8);
+}
+
+/* Shared header/footer (applies to every page) */
+.appHeader {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(219, 233, 234, 0.85);
+}
+
+.appHeaderInner {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) minmax(0, 1fr) minmax(220px, 360px);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 0;
+}
+
+.appBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.appBrandText {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.appBrandTitle {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.appBrandSubtitle {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.appHeaderNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.appHeaderLink {
+  color: var(--text);
+  text-decoration: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 750;
+}
+
+.appHeaderLink:hover {
+  background: rgba(26, 163, 154, 0.10);
+  border-color: rgba(26, 163, 154, 0.16);
+}
+
+.appHeaderLinkActive {
+  background: rgba(26, 163, 154, 0.14);
+  border-color: rgba(26, 163, 154, 0.22);
+  color: #0d5660;
+}
+
+.appHeaderUser {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.appUserChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.appUserChipAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(26, 163, 154, 0.22), rgba(19, 122, 115, 0.18));
+  color: #0d5660;
+  font-weight: 900;
+}
+
+.appUserChipName {
+  font-weight: 800;
+  color: #24495a;
+  font-size: 0.92rem;
+  max-width: 22ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appFooter {
+  border-top: 1px solid rgba(219, 233, 234, 0.85);
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(10px);
+}
+
+.appFooterInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.appFooterBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.appFooterTitle {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.appFooterSubtitle {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.appFooterLinks {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #4f667d;
+  font-weight: 700;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.appFooterLink {
+  color: #4f667d;
+}
+
+.appFooterDot {
+  opacity: 0.7;
 }
 
 .topNavInner {
@@ -190,7 +354,7 @@ textarea {
   padding: 1.1rem;
   box-shadow: var(--shadow);
   position: sticky;
-  top: 5.2rem;
+  top: var(--app-header-offset);
 }
 
 .sidebarTitle {
@@ -281,16 +445,165 @@ textarea {
     width: 100%;
     justify-content: flex-start;
   }
+
+  .appHeaderInner {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .appHeaderNav {
+    justify-content: flex-start;
+  }
+
+  .appHeaderUser {
+    justify-content: flex-start;
+  }
+
+  .appFooterInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* Patient portal look inspired by provided reference */
+.patient-portal {
+  display: grid;
+  gap: 1rem;
+}
+
+.patient-portal-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(243, 251, 251, 0.86);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(219, 233, 234, 0.9);
+  border-radius: 18px;
+  padding: 0.75rem 0.85rem;
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr) minmax(220px, 360px);
+  align-items: center;
+  gap: 0.85rem;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+}
+
+.patient-portal-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.patient-portal-brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-800));
+  box-shadow: 0 12px 26px rgba(26, 163, 154, 0.22);
+}
+
+.patient-portal-brand-title {
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: #0d5660;
+}
+
+.patient-portal-brand-subtitle {
+  font-size: 0.78rem;
+  color: #5f738b;
+  margin-top: 0.1rem;
+}
+
+.patient-portal-search {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.patient-portal-search-icon {
+  color: #567088;
+  font-weight: 800;
+}
+
+.patient-portal-search-input {
+  width: 100%;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.patient-portal-search-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.patient-portal-topbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.patient-portal-iconbtn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0d5660;
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.patient-portal-iconbtn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.patient-portal-userchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(219, 233, 234, 0.95);
+}
+
+.patient-portal-userchip-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(26, 163, 154, 0.22), rgba(19, 122, 115, 0.18));
+  color: #0d5660;
+  font-weight: 900;
+}
+
+.patient-portal-userchip-name {
+  font-weight: 750;
+  color: #24495a;
+  font-size: 0.92rem;
+  max-width: 18ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .patient-shell {
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr);
   gap: 1.1rem;
   align-items: flex-start;
-  margin-left: -3.25rem;
-  width: calc(100% + 3.25rem);
+  width: 100%;
 }
 
 .patient-shell .patient-sidebar {
@@ -299,15 +612,14 @@ textarea {
   height: auto;
   align-self: flex-start;
   position: sticky;
-  top: 5.2rem;
-  max-height: calc(100vh - 5.2rem);
+  top: var(--app-header-offset);
+  max-height: calc(100vh - var(--app-header-offset));
   overflow: auto;
-  border-radius: 0 18px 18px 0;
-  background: #f6f8fc;
-  border: 1px solid #d9e4ee;
-  border-left: 0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(219, 233, 234, 0.95);
   color: #375064;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
   padding: 1rem 0.9rem;
 }
 
@@ -368,35 +680,52 @@ textarea {
 .patient-shell .sidebarLink {
   color: #496079;
   background: transparent;
-  border: 0;
-  border-left: 3px solid transparent;
-  border-radius: 12px;
+  border: 1px solid transparent;
+  border-radius: 14px;
   padding: 0.72rem 0.78rem;
   font-weight: 600;
 }
 
 .patient-shell .sidebarLink:hover {
-  background: #e8edf5;
-  color: #23374a;
-  border-left-color: #7b94ac;
+  background: rgba(26, 163, 154, 0.10);
+  color: #153c58;
+  border-color: rgba(26, 163, 154, 0.16);
 }
 
 .patient-shell .sidebarLinkActive {
-  background: #e8edf5;
-  color: #123b57;
-  border-left-color: #0d7179;
+  background: rgba(26, 163, 154, 0.14);
+  color: #0d5660;
+  border-color: rgba(26, 163, 154, 0.22);
 }
 
 .patient-shell .patient-sidebar-foot {
   margin-top: 1rem;
   padding-top: 0.8rem;
-  border-top: 1px solid #d9e4ee;
+  border-top: 1px solid rgba(219, 233, 234, 0.95);
+  display: grid;
+  gap: 0.55rem;
 }
 
 .patient-shell .patient-switch-link {
   color: #44627b;
   text-decoration: none;
   font-weight: 600;
+}
+
+.patient-shell .patient-sidebar-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-800));
+  color: #ffffff;
+  border: 1px solid rgba(26, 163, 154, 0.30);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.patient-shell .patient-sidebar-cta:hover {
+  background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
 }
 
 .patient-shell .patient-logout-link {
@@ -409,9 +738,9 @@ textarea {
 
 .patient-shell .patient-content {
   border-radius: 20px;
-  background: rgba(246, 251, 252, 0.94);
-  border: 1px solid #dce9ec;
-  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
   padding: 1rem 1.1rem;
 }
 
@@ -496,5 +825,15 @@ textarea {
     top: auto;
     max-height: none;
     overflow: visible;
+  }
+
+  .patient-portal-topbar {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .patient-portal-topbar-right {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 }

@@ -212,6 +212,66 @@
   gap: 0.88rem 0.95rem;
 }
 
+/* Enhanced portal-like view mode */
+.profile-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.95rem;
+}
+
+.profile-section {
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.9rem;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
+}
+
+.profile-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.profile-section-title {
+  margin: 0;
+  color: #153c58;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.profile-section-body {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.profile-kv {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 16px;
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  background: rgba(246, 251, 252, 0.85);
+}
+
+.profile-kv-label {
+  font-size: 0.78rem;
+  color: #5a7288;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.profile-kv-value {
+  font-weight: 750;
+  color: #173047;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
 .profile-view-item {
   border: 1px solid #dae8eb;
   border-radius: 14px;
@@ -235,6 +295,20 @@
 .profile-field {
   display: grid;
   gap: 0.25rem;
+}
+
+@media (max-width: 920px) {
+  .profile-section-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-kv {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-kv-value {
+    text-align: left;
+  }
 }
 
 .profile-field > span {
