@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@stomp/stompjs": "^7.2.1",
     "@stripe/react-stripe-js": "^6.2.0",
     "@stripe/stripe-js": "^9.2.0",
@@ -20,6 +21,7 @@
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.1",
     "react-scripts": "5.0.1",
+    "recharts": "^3.8.1",
     "sockjs-client": "^1.6.1",
     "web-vitals": "^2.1.4"
   },
