@@ -9,17 +9,38 @@ import {
 
 const PROFILE_IMAGE_CANDIDATE_KEYS = [
   'profilePictureUrl',
+  'profilePicture',
   'profileImageUrl',
   'imageUrl',
   'avatarUrl',
   'photoUrl',
 ];
 
+const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8082').replace(/\/$/, '');
+
+const isValidImageValue = (value) => {
+  if (value === null || value === undefined) return false;
+  const text = String(value).trim();
+  if (!text) return false;
+  const lower = text.toLowerCase();
+  return lower !== 'null' && lower !== 'undefined' && lower !== 'n/a';
+};
+
+const normalizeImageUrl = (value) => {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  if (/^https?:\/\//i.test(text) || text.startsWith('data:') || text.startsWith('blob:')) return text;
+  return text.startsWith('/') ? `${API_BASE_URL}${text}` : `${API_BASE_URL}/${text}`;
+};
+
+const getFallbackProfileImage = (patientId) =>
+  patientId ? `${API_BASE_URL}/api/patients/${patientId}/profile-picture` : '';
+
 const resolveProfileImage = (profile, patientId) => {
   for (const key of PROFILE_IMAGE_CANDIDATE_KEYS) {
-    if (profile?.[key]) return profile[key];
+    if (isValidImageValue(profile?.[key])) return normalizeImageUrl(profile[key]);
   }
-  return patientId ? `http://localhost:8082/api/patients/${patientId}/profile-picture` : '';
+  return getFallbackProfileImage(patientId);
 };
 
 const getPatientDisplayName = (profile) => {
@@ -37,6 +58,8 @@ const PatientShell = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [logoutPopup, setLogoutPopup] = useState(null);
+  const [sidebarImageSrc, setSidebarImageSrc] = useState('');
+  const [triedSidebarFallback, setTriedSidebarFallback] = useState(false);
 
   const [profile, setProfile] = useState(null);
   const [documents, setDocuments] = useState([]);
@@ -46,6 +69,12 @@ const PatientShell = () => {
   const patientIdNum = useMemo(() => Number(patientId), [patientId]);
   const patientName = useMemo(() => getPatientDisplayName(profile), [profile]);
   const patientImage = useMemo(() => resolveProfileImage(profile, patientIdNum), [profile, patientIdNum]);
+  const fallbackPatientImage = useMemo(() => getFallbackProfileImage(patientIdNum), [patientIdNum]);
+
+  useEffect(() => {
+    setSidebarImageSrc(patientImage || '');
+    setTriedSidebarFallback(false);
+  }, [patientImage]);
 
   const refreshDocuments = useCallback(async () => {
     const docsRes = await getPatientDocuments(patientIdNum);
@@ -145,13 +174,18 @@ const PatientShell = () => {
           <div className="patient-sidebar-user">
             <div className="patient-sidebar-avatar-wrap" aria-hidden="true">
               <span className="patient-sidebar-avatar-fallback">{patientName.charAt(0).toUpperCase()}</span>
-              {patientImage ? (
+              {sidebarImageSrc ? (
                 <img
-                  src={patientImage}
+                  src={sidebarImageSrc}
                   alt=""
                   className="patient-sidebar-avatar"
-                  onError={(event) => {
-                    event.currentTarget.style.display = 'none';
+                  onError={() => {
+                    if (!triedSidebarFallback && fallbackPatientImage && sidebarImageSrc !== fallbackPatientImage) {
+                      setSidebarImageSrc(fallbackPatientImage);
+                      setTriedSidebarFallback(true);
+                      return;
+                    }
+                    setSidebarImageSrc('');
                   }}
                 />
               ) : null}
