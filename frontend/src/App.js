@@ -6,6 +6,7 @@ import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import VideoCallComponent from './components/telemedicine/VideoCall';
 import PatientShell from './pages/patient/PatientShell';
+import PatientRegister from './components/patient/PatientRegister';
 import PatientAppointmentsBookPage from './pages/patient/PatientAppointmentsBookPage';
 import PatientPrescriptionsPage from './pages/patient/PatientPrescriptionsPage';
 import PatientHistoryDocumentsPage from './pages/patient/PatientHistoryDocumentsPage';
@@ -21,6 +22,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/patient" element={<PatientDashboard />} />
+          <Route path="/patient/register" element={<PatientRegister />} />
           <Route path="/patient/:patientId" element={<PatientShell />}>
             <Route index element={<Navigate to="appointments" replace />} />
             <Route path="appointments" element={<PatientAppointmentsBookPage />} />

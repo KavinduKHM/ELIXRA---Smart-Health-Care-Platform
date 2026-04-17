@@ -28,6 +28,7 @@ const PatientDashboard = () => {
             style={{ flex: '1 1 220px', margin: 0 }}
           />
           <button onClick={handleLoad}>Continue</button>
+          <button type="button" onClick={() => navigate('/patient/register')}>New Patient Registration</button>
         </div>
       </div>
     </div>
