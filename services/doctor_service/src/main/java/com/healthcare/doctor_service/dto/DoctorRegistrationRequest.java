@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class DoctorRegistrationRequest {
 
-    @NotNull(message = "User ID is required")
+    // Optional: backend can auto-generate when frontend does not send userId.
     private Long userId;
 
     @NotBlank(message = "First name is required")

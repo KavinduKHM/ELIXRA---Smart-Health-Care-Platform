@@ -1,0 +1,432 @@
+.dp-root {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.dp-main {
+  min-width: 0;
+}
+
+.dp-topicGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.dp-topicStat {
+  background: #f7fbfb;
+  border: 1px solid #dce9ea;
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+}
+
+.dp-topicLabel {
+  margin: 0;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #73888d;
+}
+
+.dp-topicStat h3 {
+  margin: 0.2rem 0;
+  font-size: 1.35rem;
+  color: #1e3437;
+}
+
+.dp-topicStat span {
+  font-size: 0.85rem;
+  color: #678086;
+}
+
+.dp-topicContainer {
+  background: #f1f7f8;
+  border: 1px solid #d9e6e8;
+  border-radius: 14px;
+  padding: 0.95rem;
+  margin-bottom: 0.9rem;
+}
+
+.dp-sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.dp-sectionHeader h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  color: #1f3539;
+}
+
+.dp-sectionHeader p {
+  margin: 0.25rem 0 0;
+  color: #667d82;
+  font-size: 0.9rem;
+}
+
+.dp-headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.95rem;
+}
+
+.dp-title {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  color: #1d2c2f;
+}
+
+.dp-subtitle {
+  margin: 0.35rem 0 0;
+  color: #607378;
+  max-width: 620px;
+}
+
+.dp-primaryBtn {
+  border-radius: 999px;
+  padding: 0.72rem 1.3rem;
+  background: #0d7880;
+  border-color: #0d7880;
+  box-shadow: 0 10px 18px rgba(13, 120, 128, 0.2);
+}
+
+.dp-primaryBtn:hover {
+  background: #0c6a72;
+}
+
+.dp-secondaryBtn {
+  border-radius: 999px;
+  background: #e8f2f3;
+  color: #28575d;
+  border-color: #c8dcdf;
+  box-shadow: none;
+}
+
+.dp-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dp-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dp-chip {
+  border-radius: 999px;
+  background: #dfe8ea;
+  color: #4f666b;
+  border-color: transparent;
+  box-shadow: none;
+  padding: 0.32rem 0.8rem;
+  font-size: 0.78rem;
+}
+
+.dp-chipActive {
+  background: #0f6a71;
+  color: #ffffff;
+}
+
+.dp-sort {
+  color: #5f7579;
+  font-size: 0.92rem;
+}
+
+.dp-formCard {
+  background: #f7fbfc;
+  border: 1px solid #dce8ea;
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dp-formTitle {
+  margin: 0 0 0.75rem;
+  color: #1f3135;
+}
+
+.dp-formHint {
+  margin: -0.35rem 0 0.75rem;
+  color: #688084;
+  font-size: 0.9rem;
+}
+
+.dp-formSubTitle {
+  margin: 0.7rem 0;
+}
+
+.dp-grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.55rem;
+}
+
+.dp-medicineList {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.dp-medicineRow {
+  display: grid;
+  grid-template-columns: 1.1fr repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.dp-formActions {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.dp-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.dp-card {
+  background: #fbfcfc;
+  border: 1px solid #dde8ea;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+}
+
+.dp-cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid #e4ecee;
+}
+
+.dp-patient {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1e3235;
+}
+
+.dp-drugLine {
+  margin-top: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #5d6f74;
+  font-size: 0.95rem;
+}
+
+.dp-drugName {
+  color: #167278;
+  font-weight: 700;
+}
+
+.dp-issuedWrap {
+  text-align: right;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.dp-issuedLabel {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: #809399;
+}
+
+.dp-cardBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  padding-top: 0.7rem;
+}
+
+.dp-metaRow {
+  display: flex;
+  gap: 1rem;
+  color: #4d656a;
+  font-size: 0.92rem;
+}
+
+.dp-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dp-iconBtn {
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: transparent;
+  border-color: #d3e2e4;
+  color: #40666c;
+  box-shadow: none;
+}
+
+.dp-iconBtn:hover {
+  background: #edf3f4;
+}
+
+.dp-detailBtn {
+  border-radius: 999px;
+  padding: 0.42rem 0.92rem;
+  background: #eaf1f2;
+  color: #2f5459;
+  border-color: #d4e1e3;
+  box-shadow: none;
+}
+
+.dp-note {
+  margin: 0.65rem 0 0;
+  color: #516b70;
+}
+
+.dp-medicineSummary {
+  margin: 0.45rem 0 0;
+  color: #4e6368;
+}
+
+.dp-empty {
+  border: 1px dashed #cadbdd;
+  border-radius: 12px;
+  padding: 1rem;
+  color: #567075;
+  background: #f8fbfb;
+}
+
+.dp-sidePanel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.dp-aiCard,
+.dp-sideList {
+  background: #f5f8f9;
+  border: 1px solid #dce7e9;
+  border-radius: 14px;
+  padding: 0.9rem;
+}
+
+.dp-aiCard h3 {
+  margin: 0;
+  color: #1f3539;
+}
+
+.dp-cardTopic {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #658187;
+  font-weight: 700;
+}
+
+.dp-cardTopicLight {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dp-aiStatus,
+.dp-metricLabel {
+  margin: 0.25rem 0 0.6rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #67848a;
+}
+
+.dp-aiPrompt {
+  background: #bfeef0;
+  color: #275a5f;
+  border-radius: 10px;
+  padding: 0.7rem;
+  margin-bottom: 0.6rem;
+}
+
+.dp-aiAnswer {
+  background: #edf2f3;
+  border-radius: 10px;
+  padding: 0.7rem;
+  color: #3f585d;
+  line-height: 1.42;
+}
+
+.dp-metricCard {
+  background: #075f66;
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.dp-metricCard h2 {
+  margin: 0.2rem 0;
+  font-size: 2.2rem;
+}
+
+.dp-metricCard p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.dp-sideItem {
+  background: #ffffff;
+  border: 1px solid #dde8ea;
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  font-weight: 600;
+  color: #2a4e54;
+}
+
+.dp-sideItem + .dp-sideItem {
+  margin-top: 0.55rem;
+}
+
+@media (max-width: 1120px) {
+  .dp-root {
+    grid-template-columns: 1fr;
+  }
+
+  .dp-sidePanel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .dp-headerRow,
+  .dp-toolbar,
+  .dp-sectionHeader,
+  .dp-cardTop,
+  .dp-cardBottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dp-topicGrid,
+  .dp-grid2,
+  .dp-medicineRow,
+  .dp-sidePanel {
+    grid-template-columns: 1fr;
+  }
+
+  .dp-issuedWrap {
+    text-align: left;
+  }
+}
+
+
+

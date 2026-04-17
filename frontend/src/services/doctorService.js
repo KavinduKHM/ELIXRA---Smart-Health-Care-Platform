@@ -2,6 +2,18 @@
 import { DOCTOR_API } from './api';
 
 // Doctor profile
+export const registerDoctor = (data) =>
+  DOCTOR_API.post('/register', data);
+
+export const getPendingDoctors = () =>
+  DOCTOR_API.get('/pending');
+
+export const verifyDoctor = (doctorId) =>
+  DOCTOR_API.put(`/${doctorId}/verify`);
+
+export const rejectDoctor = (doctorId) =>
+  DOCTOR_API.put(`/${doctorId}/reject`);
+
 export const getDoctorProfile = (doctorId) => 
   DOCTOR_API.get(`/${doctorId}`);
 
