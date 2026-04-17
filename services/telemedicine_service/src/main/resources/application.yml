@@ -9,7 +9,8 @@ spring:
   
   # Database Configuration
   datasource:
-    url: jdbc:mysql://localhost:3306/telemedicine_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    # allowPublicKeyRetrieval fixes: "Public Key Retrieval is not allowed" (common with MySQL 8 caching_sha2_password)
+    url: jdbc:mysql://localhost:3306/telemedicine_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -34,11 +35,12 @@ eureka:
   instance:
     prefer-ip-address: true
 
-# Agora Configuration (Replace with your actual credentials from agora.io)
+# Agora Configuration
+# Do not hardcode credentials in source control. Provide these via environment variables.
 agora:
-  app-id: 0285c138d0d34d71ba6b7a6a0440cc1b          # Get from Agora Console
-  app-certificate: a26ef39826a24a3599b281f64b60207f  # Get from Agora Console
-  token-expiration: 7200              # Token validity in seconds (1 hour)
+  app-id: ${AGORA_APP_ID:}
+  app-certificate: ${AGORA_APP_CERTIFICATE:}
+  token-expiration: ${AGORA_TOKEN_EXPIRATION:7200}
 
 # Logging
 logging:

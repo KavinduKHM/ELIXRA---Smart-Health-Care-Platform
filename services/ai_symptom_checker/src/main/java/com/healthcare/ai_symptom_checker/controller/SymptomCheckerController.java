@@ -32,12 +32,15 @@ public class SymptomCheckerController {
         SymptomCheckResponse analysis = geminiAiService.analyzeSymptoms(request.getSymptoms());
 
         // Step 2: Call Appointment Service to fetch doctors by recommended specialty
-        List<DoctorSearchResponse> doctors;
-        try {
-            doctors = appointmentServiceClient.searchDoctors(analysis.getRecommendedSpecialty());
-        } catch (Exception ex) {
-            log.warn("Doctor lookup failed for specialty '{}': {}", analysis.getRecommendedSpecialty(), ex.getMessage());
-            doctors = List.of();
+        List<DoctorSearchResponse> doctors = List.of();
+        String specialty = analysis == null ? null : analysis.getRecommendedSpecialty();
+        if (specialty != null && !specialty.isBlank()) {
+            try {
+                doctors = appointmentServiceClient.searchDoctors(specialty);
+            } catch (Exception ex) {
+                log.warn("Doctor lookup failed for specialty '{}': {}", specialty, ex.getMessage());
+                doctors = List.of();
+            }
         }
 
         // Step 3: Combine response

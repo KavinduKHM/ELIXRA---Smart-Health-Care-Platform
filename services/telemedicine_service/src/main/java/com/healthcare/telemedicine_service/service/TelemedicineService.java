@@ -337,6 +337,24 @@ public class TelemedicineService {
     }
 
 
+    /**
+     * Generates an Agora RTC token for a channel + user.
+     */
+    public TokenGenerateResponse generateToken(TokenGenerateRequest request) {
+        if (!agoraTokenService.isValidChannelName(request.getChannelName())) {
+            throw new IllegalArgumentException("Invalid channel name");
+        }
+
+        String token = agoraTokenService.generatePublisherToken(
+                request.getChannelName(),
+                request.getUserAccount()
+        );
+
+        return TokenGenerateResponse.builder()
+                .token(token)
+                .appId(agoraTokenService.getAppId())
+                .build();
+    }
 
     /**
      * Gets the Agora App ID for client-side SDK initialization.
