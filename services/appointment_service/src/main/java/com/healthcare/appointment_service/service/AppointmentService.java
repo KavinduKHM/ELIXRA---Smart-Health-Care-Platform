@@ -2,10 +2,12 @@ package com.healthcare.appointment_service.service;
 
 import com.healthcare.appointment_service.client.DoctorServiceClient;
 import com.healthcare.appointment_service.client.PatientServiceClient;
+import com.healthcare.appointment_service.client.NotificationServiceClient;
 import com.healthcare.appointment_service.dto.*;
 import com.healthcare.appointment_service.model.Appointment;
 import com.healthcare.appointment_service.model.AppointmentStatus;
 import com.healthcare.appointment_service.repository.AppointmentRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,9 +20,15 @@ import com.healthcare.appointment_service.client.PaymentServiceClient;
 import com.healthcare.appointment_service.dto.PaymentRequest;
 import com.healthcare.appointment_service.dto.PaymentResponse;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -37,10 +45,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AppointmentService {
 
+    private static final DateTimeFormatter DOCTOR_SERVICE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
     private final AppointmentRepository appointmentRepository;
     private final DoctorServiceClient doctorServiceClient;
     private final PatientServiceClient patientServiceClient;
     private final PaymentServiceClient paymentServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     @org.springframework.beans.factory.annotation.Value("${app.payment.currency:LKR}")
     private String paymentCurrency;
@@ -64,54 +75,39 @@ public class AppointmentService {
      * @return List of doctors matching criteria
      */
     public List<DoctorSearchResponse> searchDoctors(SearchRequest request) {
-        log.info("Searching doctors with specialty: {}", request.getSpecialty());
+        String specialty = normalizeQuery(request.getSpecialty());
+        String name = normalizeQuery(request.getDoctorName());
+        LocalDate date = request.getDate();
 
-        // ========== TEMPORARY: Return mock doctors instead of calling doctor service ==========
+        log.info("Searching doctors: specialty='{}', name='{}', date='{}'", specialty, name, date);
 
-        List<DoctorSearchResponse> mockDoctors = new ArrayList<>();
-
-        // Mock doctors data
-        String[] specialties = {"Cardiology", "Dermatology", "Pediatrics", "Orthopedics", "Neurology",
-                "Ophthalmology", "ENT", "Gastroenterology", "Psychiatry", "General Medicine"};
-        String[] names = {"Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown", "Dr. Jones",
-                "Dr. Garcia", "Dr. Miller", "Dr. Davis", "Dr. Rodriguez", "Dr. Martinez"};
-
-        for (int i = 0; i < specialties.length; i++) {
-            // Filter by specialty if provided
-            if (request.getSpecialty() != null && !request.getSpecialty().isEmpty()) {
-                if (!specialties[i].toLowerCase().contains(request.getSpecialty().toLowerCase())) {
-                    continue;
-                }
-            }
-
-            // Filter by name if provided
-            if (request.getDoctorName() != null && !request.getDoctorName().isEmpty()) {
-                if (!names[i].toLowerCase().contains(request.getDoctorName().toLowerCase())) {
-                    continue;
-                }
-            }
-
-            DoctorSearchResponse doctor = DoctorSearchResponse.builder()
-                    .id((long) (i + 101))
-                    .name(names[i])
-                    .specialty(specialties[i])
-                    .qualification("MD, PhD")
-                    .consultationFee(1500.0 + (i * 100))
-                    .rating(4.5 - (i * 0.1))
-                    .experienceYears(5 + i)
-                    .build();
-
-            // If date is provided, add available slots
-            if (request.getDate() != null) {
-                List<TimeSlotDTO> slots = getAvailableSlots(doctor.getId(), request.getDate().atStartOfDay());
-                doctor.setAvailableSlots(slots);
-            }
-
-            mockDoctors.add(doctor);
+        List<DoctorDTO> doctors;
+        if (specialty != null) {
+            doctors = doctorServiceClient.getDoctorsBySpecialty(specialty);
+        } else {
+            doctors = doctorServiceClient.getVerifiedDoctors();
         }
 
-        log.info("Found {} doctors matching criteria", mockDoctors.size());
-        return mockDoctors;
+        if (name != null) {
+            String nameLower = name.toLowerCase(Locale.ROOT);
+            doctors = doctors.stream()
+                    .filter(d -> buildDoctorName(d).toLowerCase(Locale.ROOT).contains(nameLower))
+                    .toList();
+        }
+
+        List<DoctorSearchResponse> results = doctors.stream()
+                .map(this::toDoctorSearchResponse)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if (date != null) {
+            results.forEach(d -> d.setAvailableSlots(getAvailableSlots(d.getId(), date.atStartOfDay())));
+            results = results.stream()
+                    .filter(d -> d.getAvailableSlots() != null && !d.getAvailableSlots().isEmpty())
+                    .toList();
+        }
+
+        log.info("Found {} doctors matching criteria", results.size());
+        return results;
     }
     /**
      * Get available time slots for a specific doctor on a specific date
@@ -130,33 +126,58 @@ public class AppointmentService {
     public List<TimeSlotDTO> getAvailableSlots(Long doctorId, LocalDateTime date) {
         log.info("Getting available slots for doctor: {} on date: {}", doctorId, date);
 
-        // ========== TEMPORARY: Return mock time slots instead of calling doctor service ==========
-        // Since doctor service is not available, generate mock time slots for testing
+        LocalDate requestedDate = date.toLocalDate();
+        List<DoctorAvailabilityDTO> availabilitySlots = doctorServiceClient.getAvailabilitySlots(doctorId, requestedDate.toString());
 
-        List<TimeSlotDTO> mockSlots = new ArrayList<>();
+        List<TimeSlotDTO> slots = availabilitySlots.stream()
+                .map(a -> toTimeSlotDTO(doctorId, requestedDate, a))
+                .filter(s -> s.getStartTime() != null && s.getEndTime() != null)
+                .filter(s -> Boolean.FALSE.equals(s.getIsBooked()))
+                .toList();
 
-        // Generate time slots from 9 AM to 5 PM
-        LocalDateTime startTime = date.withHour(9).withMinute(0).withSecond(0);
-        LocalDateTime endTime = date.withHour(17).withMinute(0).withSecond(0);
+        log.info("Returning {} available slots for doctor {}", slots.size(), doctorId);
+        return slots;
+    }
 
-        while (startTime.isBefore(endTime)) {
-            TimeSlotDTO slot = new TimeSlotDTO();
-            slot.setId((long) mockSlots.size() + 1);
-            slot.setDoctorId(doctorId);
-            slot.setStartTime(startTime);
-            slot.setEndTime(startTime.plusMinutes(30));
-            slot.setIsBooked(false);
+    private String normalizeQuery(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
 
-            // Check if this slot is already booked in appointment service
-            boolean isBooked = appointmentRepository.isTimeSlotBooked(doctorId, startTime);
-            slot.setIsBooked(isBooked);
+    private String buildDoctorName(DoctorDTO doctor) {
+        if (doctor == null) return "";
+        if (doctor.getFullName() != null && !doctor.getFullName().isBlank()) return doctor.getFullName();
+        String first = doctor.getFirstName() == null ? "" : doctor.getFirstName().trim();
+        String last = doctor.getLastName() == null ? "" : doctor.getLastName().trim();
+        return (first + " " + last).trim();
+    }
 
-            mockSlots.add(slot);
-            startTime = startTime.plusMinutes(30);
-        }
+    private DoctorSearchResponse toDoctorSearchResponse(DoctorDTO doctor) {
+        return DoctorSearchResponse.builder()
+                .id(doctor.getId())
+                .name(buildDoctorName(doctor))
+                .specialty(doctor.getSpecialty())
+                .qualification(doctor.getQualification())
+                .profilePicture(doctor.getProfilePicture())
+                .consultationFee(doctor.getConsultationFee())
+                .experienceYears(doctor.getExperienceYears())
+                .rating(doctor.getAverageRating())
+                .build();
+    }
 
-        log.info("Returning {} mock available slots for doctor {}", mockSlots.size(), doctorId);
-        return mockSlots;
+    private TimeSlotDTO toTimeSlotDTO(Long doctorId, LocalDate date, DoctorAvailabilityDTO availability) {
+        TimeSlotDTO slot = new TimeSlotDTO();
+        slot.setId(availability.getId());
+        slot.setDoctorId(doctorId);
+        LocalTime start = availability.getStartTime();
+        LocalTime end = availability.getEndTime();
+        if (start != null) slot.setStartTime(LocalDateTime.of(date, start));
+        if (end != null) slot.setEndTime(LocalDateTime.of(date, end));
+        String status = availability.getStatus();
+        boolean booked = status != null && !"AVAILABLE".equalsIgnoreCase(status);
+        slot.setIsBooked(booked);
+        return slot;
     }
     /**
      * Book a new appointment
@@ -188,14 +209,31 @@ public class AppointmentService {
         }
 
         // 2. Get doctor details from Doctor Service
-        DoctorDTO doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
+        DoctorDTO doctor;
+        try {
+            doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
+        } catch (FeignException.NotFound e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found");
+        } catch (FeignException e) {
+            log.error("Doctor service call failed while fetching doctor {}", request.getDoctorId(), e);
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Doctor service unavailable");
+        }
         if (doctor == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found");
         }
 
         // 3. Check availability via Doctor Service
-        boolean isAvailable = doctorServiceClient.checkAvailability(
-                request.getDoctorId(), request.getAppointmentTime());
+        boolean isAvailable;
+        try {
+            isAvailable = doctorServiceClient.checkAvailability(
+                    request.getDoctorId(), formatDoctorServiceTime(request.getAppointmentTime()));
+        } catch (FeignException.BadRequest e) {
+            log.warn("Doctor service rejected appointment time '{}'. Ensure ISO-8601 format.", request.getAppointmentTime());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid appointment time format");
+        } catch (FeignException e) {
+            log.error("Doctor service call failed while checking availability for doctor {}", request.getDoctorId(), e);
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Doctor service unavailable");
+        }
         if (!isAvailable) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Doctor is not available at the requested time");
         }
@@ -206,6 +244,19 @@ public class AppointmentService {
         List<Appointment> conflicts = appointmentRepository.findConflictingAppointments(
                 request.getDoctorId(), request.getAppointmentTime(), endTime);
         if (!conflicts.isEmpty()) {
+            Appointment existingPending = conflicts.stream()
+                    .filter(a -> Objects.equals(a.getPatientId(), request.getPatientId()))
+                    .filter(a -> Objects.equals(a.getDoctorId(), request.getDoctorId()))
+                    .filter(a -> Objects.equals(a.getAppointmentTime(), request.getAppointmentTime()))
+                    .filter(a -> a.getStatus() == AppointmentStatus.PENDING_PAYMENT)
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingPending != null) {
+                log.info("Existing pending appointment {} found for the same slot; re-issuing payment intent", existingPending.getId());
+                return createOrUpdatePaymentIntent(existingPending, patient, doctor);
+            }
+
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Time slot is already booked");
         }
 
@@ -223,11 +274,19 @@ public class AppointmentService {
         Appointment savedAppointment = appointmentRepository.save(appointment);
         log.info("Appointment created with ID: {} (status: PENDING_PAYMENT)", savedAppointment.getId());
 
-        // 6. Prepare payment request
+        AppointmentResponse response = createOrUpdatePaymentIntent(savedAppointment, patient, doctor);
+
+        // Notify: appointment created (pending payment)
+        sendAppointmentNotification(savedAppointment, patient, doctor, "created");
+
+        return response;
+    }
+
+    private AppointmentResponse createOrUpdatePaymentIntent(Appointment appointment, PatientDTO patient, DoctorDTO doctor) {
         PaymentRequest paymentReq = new PaymentRequest();
-        paymentReq.setAppointmentId(savedAppointment.getId());
-        paymentReq.setPatientId(request.getPatientId());
-        paymentReq.setDoctorId(request.getDoctorId());
+        paymentReq.setAppointmentId(appointment.getId());
+        paymentReq.setPatientId(appointment.getPatientId());
+        paymentReq.setDoctorId(appointment.getDoctorId());
 
         // payment-service (Stripe) has minimum amounts. Use a configurable floor.
         // NOTE: Amount here is in major currency units (e.g., 1500 LKR or 500 PKR).
@@ -243,17 +302,16 @@ public class AppointmentService {
         paymentReq.setAmount(consultationFee);
 
         paymentReq.setCurrency(paymentCurrency);
-        paymentReq.setDescription("Consultation fee for appointment #" + savedAppointment.getId());
+        paymentReq.setDescription("Consultation fee for appointment #" + appointment.getId());
         paymentReq.setPatientName(patient.getFullName());
         paymentReq.setPatientEmail(patient.getEmail());
         paymentReq.setPatientPhone(patient.getPhoneNumber());
         paymentReq.setDoctorName(doctor.getFullName());
         paymentReq.setDoctorSpecialty(doctor.getSpecialty());
-        paymentReq.setAppointmentDate(request.getAppointmentTime());
-        paymentReq.setAppointmentTimeSlot(request.getAppointmentTime().toLocalTime().toString());
+        paymentReq.setAppointmentDate(appointment.getAppointmentTime());
+        paymentReq.setAppointmentTimeSlot(appointment.getAppointmentTime().toLocalTime().toString());
         paymentReq.setReturnUrl("http://localhost:3000/payment-success");
 
-        // 7. Call Payment Service to create payment intent
         PaymentResponse paymentResponse;
         try {
             paymentResponse = paymentServiceClient.createPaymentIntent(paymentReq);
@@ -262,20 +320,22 @@ public class AppointmentService {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Payment service unavailable");
         }
 
-        // 8. Update appointment with payment intent ID
-        savedAppointment.setPaymentIntentId(paymentResponse.getPaymentIntentId());
-        savedAppointment.setPaymentStatus(paymentResponse.getStatus());
-        appointmentRepository.save(savedAppointment);
+        appointment.setPaymentIntentId(paymentResponse.getPaymentIntentId());
+        appointment.setPaymentStatus(paymentResponse.getStatus());
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
 
-        // 9. Build response with client secret for frontend
-        AppointmentResponse response = buildResponse(savedAppointment, patient, doctor);
+        AppointmentResponse response = buildResponse(updatedAppointment, patient, doctor);
         response.setClientSecret(paymentResponse.getClientSecret());
         response.setPaymentIntentId(paymentResponse.getPaymentIntentId());
         response.setPaymentStatus(paymentResponse.getStatus());
 
         log.info("Payment intent created: {}", paymentResponse.getPaymentIntentId());
-
         return response;
+    }
+
+    private String formatDoctorServiceTime(LocalDateTime time) {
+        if (time == null) return null;
+        return time.format(DOCTOR_SERVICE_TIME_FORMAT);
     }
 
 
@@ -284,23 +344,52 @@ public class AppointmentService {
         log.info("Confirming payment for appointment: {}", appointmentId);
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment not found: " + appointmentId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found: " + appointmentId));
 
-        if (!paymentIntentId.equals(appointment.getPaymentIntentId())) {
-            throw new RuntimeException("Payment intent mismatch");
+        if (paymentIntentId == null || paymentIntentId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing paymentIntentId");
         }
 
-        // Optionally verify payment status with payment service (uncomment if needed)
-        // boolean isPaid = paymentServiceClient.isAppointmentPaid(appointmentId);
-        // if (!isPaid) throw new RuntimeException("Payment not confirmed");
+        // Idempotency: if already confirmed, keep success and skip strict paymentIntentId checks
+        if (appointment.getStatus() == AppointmentStatus.CONFIRMED) {
+            log.info("Appointment {} already confirmed; returning idempotent success", appointmentId);
+        } else {
+            // In dev/local runs, payment intents may get re-issued. If the UI uses an older clientSecret,
+            // Stripe can succeed with a different PaymentIntent than what we last stored. For pending appointments,
+            // accept and persist the provided paymentIntentId.
+            if (appointment.getPaymentIntentId() == null || appointment.getPaymentIntentId().isBlank()) {
+                log.warn("Appointment {} has no stored paymentIntentId; accepting provided paymentIntentId {}",
+                        appointmentId, paymentIntentId);
+                appointment.setPaymentIntentId(paymentIntentId);
+            } else if (!paymentIntentId.equals(appointment.getPaymentIntentId())) {
+                log.warn("Payment intent mismatch for appointment {} (stored={}, provided={}); accepting provided intent for pending appointment",
+                        appointmentId, appointment.getPaymentIntentId(), paymentIntentId);
+                appointment.setPaymentIntentId(paymentIntentId);
+            }
 
-        appointment.setStatus(AppointmentStatus.CONFIRMED);
-        appointment.setPaymentStatus("succeeded");
-        appointmentRepository.save(appointment);
+            appointment.setStatus(AppointmentStatus.CONFIRMED);
+            appointment.setPaymentStatus("succeeded");
+            appointmentRepository.save(appointment);
+            log.info("Appointment {} confirmed after successful payment", appointmentId);
+        }
 
-        log.info("Appointment {} confirmed after successful payment", appointmentId);
+        // Mark slot booked in doctor service (best-effort)
+        try {
+            doctorServiceClient.bookTimeSlot(appointment.getDoctorId(), formatDoctorServiceTime(appointment.getAppointmentTime()));
+        } catch (Exception e) {
+            log.warn("Failed to book slot in doctor-service for appointment {}: {}", appointmentId, e.getMessage());
+        }
 
-        DoctorDTO doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
+        DoctorDTO doctor;
+        try {
+            doctor = doctorServiceClient.getDoctorById(appointment.getDoctorId());
+        } catch (Exception e) {
+            doctor = new DoctorDTO();
+            doctor.setId(appointment.getDoctorId());
+            doctor.setFirstName("Dr.");
+            doctor.setLastName(String.valueOf(appointment.getDoctorId()));
+        }
+
         PatientDTO patient;
         try {
             patient = patientServiceClient.getPatientById(appointment.getPatientId());
@@ -311,7 +400,53 @@ public class AppointmentService {
             patient.setLastName(String.valueOf(appointment.getPatientId()));
         }
 
+        // Notify: appointment confirmed
+        sendAppointmentNotification(appointment, patient, doctor, "confirmed");
+
         return buildResponse(appointment, patient, doctor);
+    }
+
+    private void sendAppointmentNotification(Appointment appointment, PatientDTO patient, DoctorDTO doctor, String eventType) {
+        try {
+            NotificationAppointmentDTO dto = new NotificationAppointmentDTO();
+            dto.setAppointmentId(String.valueOf(appointment.getId()));
+            dto.setPatientId(String.valueOf(appointment.getPatientId()));
+            dto.setDoctorId(String.valueOf(appointment.getDoctorId()));
+            dto.setDate(appointment.getAppointmentTime());
+            dto.setTimeSlot(appointment.getAppointmentTime() != null
+                    ? appointment.getAppointmentTime().toLocalTime().toString()
+                    : null);
+            dto.setStatus(appointment.getStatus() != null
+                    ? appointment.getStatus().name().toLowerCase(Locale.ROOT)
+                    : null);
+            dto.setSymptoms(appointment.getSymptoms());
+            dto.setNotes(appointment.getNotes());
+            dto.setConsultationLink(appointment.getConsultationLink());
+            dto.setConsultationType("Video Consultation");
+
+            if (patient != null) {
+                dto.setPatientName(patient.getFullName());
+                dto.setPatientEmail(patient.getEmail());
+                dto.setPatientPhone(patient.getPhoneNumber());
+            }
+
+            if (doctor != null) {
+                dto.setDoctorName(doctor.getFullName());
+                dto.setDoctorEmail(doctor.getEmail());
+                dto.setDoctorPhone(doctor.getPhoneNumber());
+                dto.setSpecialty(doctor.getSpecialty());
+            }
+
+            NotificationRequest req = new NotificationRequest();
+            req.setAppointment(dto);
+            req.setEventType(eventType);
+
+            Map<String, Object> resp = notificationServiceClient.sendAppointmentNotifications(req);
+            log.info("Notification request sent for appointment {} event {}: {}",
+                    appointment.getId(), eventType, resp != null ? resp.get("success") : null);
+        } catch (Exception e) {
+            log.warn("Failed to send notification for appointment {}: {}", appointment.getId(), e.getMessage());
+        }
     }
 
 

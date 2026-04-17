@@ -20,6 +20,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    @Value("${spring.mail.password:}")
+    private String mailPassword;
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
 
     public boolean sendEmail(String to, String subject, String htmlContent) {
@@ -28,6 +31,11 @@ public class EmailService {
         if (fromEmail == null || fromEmail.equals("your-email@gmail.com")) {
             logMockEmail(to, subject, htmlContent);
             return true;
+        }
+
+        if (mailPassword == null || mailPassword.isBlank()) {
+            log.warn("❌ Email not sent: SPRING_MAIL_PASSWORD is not configured");
+            return false;
         }
 
         try {

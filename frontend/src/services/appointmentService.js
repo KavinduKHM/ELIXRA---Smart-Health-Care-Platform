@@ -2,8 +2,13 @@
 import { APPOINTMENT_API } from './api';
 
 // ========== Patient-facing functions ==========
-export const searchDoctors = (specialty) => 
-  APPOINTMENT_API.get(`/doctors/search?specialty=${specialty}`);
+export const searchDoctors = (specialty, date) =>
+  APPOINTMENT_API.get('/doctors/search', {
+    params: {
+      specialty,
+      date: date || undefined,
+    },
+  });
 
 export const getAvailableSlots = (doctorId, date = '2026-04-20T00:00:00') => 
   APPOINTMENT_API.get(`/doctors/${doctorId}/slots?date=${date}`);

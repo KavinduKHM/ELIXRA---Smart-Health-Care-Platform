@@ -17,7 +17,9 @@ public class TwilioConfig {
 
     @PostConstruct
     public void init() {
-        if (accountSid != null && !accountSid.equals("your_account_sid_here")) {
+        if (accountSid != null && !accountSid.isBlank()
+                && authToken != null && !authToken.isBlank()
+                && !accountSid.equals("your_account_sid_here")) {
             Twilio.init(accountSid, authToken);
             System.out.println("✅ Twilio initialized successfully");
         } else {

@@ -46,7 +46,14 @@ const PaymentForm = ({ appointmentId, amount, clientSecret, onSuccess, onError }
           if (onSuccess) onSuccess(result.paymentIntent);
         } catch (err) {
           console.error(err);
-          setError('Payment confirmed but backend update failed');
+          const status = err?.response?.status;
+          const backendMessage = err?.response?.data?.message || err?.response?.data?.error;
+          const fallback = err?.message || 'Payment confirmed but backend update failed';
+          setError(
+            backendMessage
+              ? `Payment confirmed but backend update failed (${status}): ${backendMessage}`
+              : (status ? `Payment confirmed but backend update failed (${status}): ${fallback}` : fallback)
+          );
         }
       }
     }

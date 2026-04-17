@@ -10,13 +10,16 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import com.healthcare.doctor_service.dto.*;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.List;
 import com.healthcare.doctor_service.client.TelemedicineServiceClient;
 import com.healthcare.doctor_service.dto.telemedicine.CreateVideoSessionRequest;
@@ -92,19 +95,38 @@ public class DoctorController {
      * Handles both ISO-8601 and the format sent by Appointment Service.
      */
     private LocalDateTime parseDateTime(String timeStr) {
-        // Try ISO format first (yyyy-MM-ddTHH:mm:ss)
-        try {
-            return LocalDateTime.parse(timeStr, java.time.format.DateTimeFormatter.ISO_DATE_TIME);
-        } catch (java.time.format.DateTimeParseException e1) {
-            // Try the format used by Appointment Service: "M/d/yy, h:mm a"
-            try {
-                java.time.format.DateTimeFormatter formatter =
-                        java.time.format.DateTimeFormatter.ofPattern("M/d/yy, h:mm a");
-                return LocalDateTime.parse(timeStr, formatter);
-            } catch (java.time.format.DateTimeParseException e2) {
-                throw new RuntimeException("Unsupported date format: " + timeStr);
-            }
+        if (timeStr == null || timeStr.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing time parameter");
         }
+
+        // 1) ISO date-time with optional offset, e.g. 2026-04-20T10:30:00Z
+        try {
+            return OffsetDateTime.parse(timeStr, DateTimeFormatter.ISO_DATE_TIME).toLocalDateTime();
+        } catch (DateTimeParseException ignored) {
+            // continue
+        }
+
+        // 2) ISO local date-time (accepts with/without seconds), e.g. 2026-04-20T10:30 or 2026-04-20T10:30:00
+        try {
+            return LocalDateTime.parse(timeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        } catch (DateTimeParseException ignored) {
+            // continue
+        }
+
+        // 3) Legacy formats (avoid failing hard with a 500)
+        try {
+            return LocalDateTime.parse(timeStr, DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm"));
+        } catch (DateTimeParseException ignored) {
+            // continue
+        }
+
+        try {
+            return LocalDateTime.parse(timeStr, DateTimeFormatter.ofPattern("M/d/yy, h:mm a", Locale.US));
+        } catch (DateTimeParseException ignored) {
+            // continue
+        }
+
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported date format: " + timeStr);
     }
 
     /**

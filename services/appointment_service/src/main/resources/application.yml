@@ -25,3 +25,10 @@ logging:
   level:
     com.healthcare.appointment_service: DEBUG
 
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 5000
+
