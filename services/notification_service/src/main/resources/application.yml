@@ -7,9 +7,9 @@ spring:
 
   # MySQL Database Configuration (same as appointment service)
   datasource:
-    url: jdbc:mysql://localhost:3307/notification_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/notification_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # JPA Configuration
@@ -26,8 +26,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 465
-    username: oshadha72mihiran@gmail.com
-    password: fxswvzorkzedtijm
+    username: ${SPRING_MAIL_USERNAME:oshadha72mihiran@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:}
     properties:
       mail:
         debug: true
@@ -43,9 +43,9 @@ spring:
 
 # Twilio Configuration (WhatsApp)
 twilio:
-  account-sid: AC9bb02e250714fc4811af1fba72ecb518
-  auth-token: f2425e47e040f424497a32e5a22358ed
-  whatsapp-number: whatsapp:+14155238886
+  account-sid: ${TWILIO_ACCOUNT_SID:}
+  auth-token: ${TWILIO_AUTH_TOKEN:}
+  whatsapp-number: ${TWILIO_WHATSAPP_NUMBER:whatsapp:+14155238886}
 
 # Eureka (disable for now)
 eureka:

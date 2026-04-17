@@ -45,7 +45,7 @@ const BookAppointment = ({ patientId, profile }) => {
     }
     if (!specialty) return;
     try {
-      const res = await searchDoctors(specialty);
+      const res = await searchDoctors(specialty, selectedDate);
       setDoctors(res.data);
       setSelectedDoctor(null);
       setSlots([]);
@@ -106,7 +106,13 @@ const BookAppointment = ({ patientId, profile }) => {
       setMessage('Appointment created! Please complete payment to confirm.');
     } catch (err) {
       console.error(err);
-      alert('Booking failed. Check appointment service logs.');
+      const backendMessage = err?.response?.data?.message || err?.response?.data?.error;
+      const status = err?.response?.status;
+      const fallback = err?.message || 'Booking failed.';
+      const finalMessage = backendMessage
+        ? `❌ Booking failed (${status}): ${backendMessage}`
+        : `❌ Booking failed${status ? ` (${status})` : ''}: ${fallback}`;
+      setMessage(finalMessage);
     }
   };
 

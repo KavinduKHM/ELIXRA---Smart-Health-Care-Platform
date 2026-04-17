@@ -14,6 +14,7 @@ public class DoctorDTO {
     private Long id;
     private String firstName;
     private String lastName;
+    private String profilePicture;
     private String specialty;
     private String qualification;
     private String email;
@@ -21,10 +22,15 @@ public class DoctorDTO {
 
     private Double consultationFee;
 
+    private Integer experienceYears;
+    private Double averageRating;
+
     private Boolean available;
     private List<TimeSlotDTO> availableSlots;
 
     public String getFullName() {
-        return firstName + " " + lastName;
+        String first = firstName == null ? "" : firstName;
+        String last = lastName == null ? "" : lastName;
+        return (first + " " + last).trim();
     }
 }
