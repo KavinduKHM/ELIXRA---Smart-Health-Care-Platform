@@ -1,0 +1,254 @@
+.doctor-appointments-theme {
+  --doctor-ink: #123844;
+  --doctor-muted: #5f7b8c;
+  --doctor-line: #d8e7ea;
+  --doctor-surface: #f8fcfd;
+  --doctor-accent: #0f6f79;
+  --doctor-accent-2: #0f5366;
+
+  display: grid;
+  gap: 1rem;
+  position: relative;
+}
+
+.doctor-appointments-theme::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: 22px;
+  background:
+    radial-gradient(420px 170px at 12% 8%, rgba(15, 111, 121, 0.12), transparent 70%),
+    radial-gradient(460px 190px at 88% 18%, rgba(15, 83, 102, 0.13), transparent 72%);
+}
+
+.doctor-appointments-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.6rem 0.2rem 0.85rem;
+  border-bottom: 1px solid var(--doctor-line);
+}
+
+.doctor-appointments-head h1 {
+  margin: 0;
+  color: var(--doctor-ink);
+  letter-spacing: -0.02em;
+  font-size: clamp(1.65rem, 2.7vw, 2.15rem);
+}
+
+.doctor-appointments-head p {
+  margin: 0.34rem 0 0;
+  color: var(--doctor-muted);
+  max-width: 620px;
+}
+
+.doctor-appointments-head-badge {
+  border: 1px solid #c6dee5;
+  color: #1c4f5f;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.43rem 0.8rem;
+  background: linear-gradient(180deg, #ebf5f8, #dceef3);
+}
+
+.doctor-appointments-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 1rem;
+  align-items: start;
+}
+
+.doctor-appointments-main,
+.doctor-appointments-side {
+  display: grid;
+  gap: 1rem;
+}
+
+.doctor-ui-card {
+  border: 1px solid var(--doctor-line);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 253, 0.98));
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+  padding: 1rem;
+  animation: doctorFadeSlide 360ms ease both;
+}
+
+.doctor-ui-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.85rem;
+}
+
+.doctor-ui-card-title {
+  margin: 0;
+  color: #153f4d;
+  font-size: 1.16rem;
+}
+
+.doctor-ui-card-subtitle {
+  margin: 0.24rem 0 0;
+  color: var(--doctor-muted);
+  font-size: 0.9rem;
+}
+
+.doctor-ui-btn {
+  border-radius: 999px;
+  padding: 0.52rem 0.92rem;
+  font-size: 0.85rem;
+}
+
+.doctor-ui-btn-secondary {
+  background: #e5f2f5;
+  color: #164451;
+  border: 1px solid #c5dfe5;
+  box-shadow: none;
+}
+
+.doctor-ui-btn-secondary:hover {
+  background: #d8ebf0;
+}
+
+.doctor-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+}
+
+.doctor-form-grid .doctor-form-full {
+  grid-column: 1 / -1;
+}
+
+.doctor-chip-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.doctor-chip-item {
+  border: 1px solid #d7e6eb;
+  border-radius: 14px;
+  padding: 0.62rem 0.7rem;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.doctor-chip-main {
+  color: #1e4453;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.doctor-chip-sub {
+  color: #637d8c;
+  font-size: 0.82rem;
+}
+
+.doctor-empty {
+  margin: 0;
+  color: #637d8c;
+}
+
+.doctor-requests-stack,
+.doctor-video-stack {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.doctor-request-card,
+.doctor-video-card {
+  border: 1px solid #d5e5ea;
+  border-radius: 14px;
+  padding: 0.76rem;
+  background: #ffffff;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04);
+}
+
+.doctor-request-meta,
+.doctor-video-meta {
+  margin: 0.24rem 0;
+  color: #385467;
+}
+
+.doctor-request-status {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.15rem 0.52rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #d6f0f1;
+  color: #0f5f68;
+  margin-bottom: 0.42rem;
+}
+
+.doctor-action-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.48rem;
+}
+
+.doctor-ui-btn-danger {
+  background: #fbe7e4;
+  color: #8b2d22;
+  border: 1px solid #f3c7c0;
+  box-shadow: none;
+}
+
+.doctor-ui-btn-danger:hover {
+  background: #f8d8d1;
+}
+
+.doctor-video-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.doctor-video-card::after {
+  content: "";
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(13, 113, 121, 0.12), rgba(13, 113, 121, 0));
+  right: -55px;
+  top: -55px;
+}
+
+@keyframes doctorFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1180px) {
+  .doctor-appointments-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .doctor-appointments-head {
+    flex-direction: column;
+  }
+
+  .doctor-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
