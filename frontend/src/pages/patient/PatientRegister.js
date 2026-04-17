@@ -250,9 +250,16 @@ const PatientRegister = () => {
 			});
 
 			const patientId = response?.data?.id;
+			const patientName = [trimValue(form.firstName), trimValue(form.lastName)].filter(Boolean).join(' ').trim();
 
 			if (patientId) {
 				localStorage.setItem('patientId', String(patientId));
+				localStorage.setItem('elixra.patientId', String(patientId));
+			}
+
+			if (patientName) {
+				localStorage.setItem('elixra.userName', patientName);
+				localStorage.setItem('elixra.userRole', 'Patient');
 			}
 
 			if (profilePicture && patientId) {
@@ -267,14 +274,17 @@ const PatientRegister = () => {
 				});
 			}
 
-			setCreatedPatientId(patientId || null);
-			setMessage({
-				type: 'success',
-				text: patientId
-					? `Patient registration saved successfully. New Patient ID: ${patientId}`
-					: 'Patient registration saved successfully.',
+			navigate('/', {
+				replace: true,
+				state: {
+					flashMessage: {
+						type: 'success',
+						text: patientId
+							? `Patient registration saved successfully. Welcome ${patientName || 'to ELIXRA'}.`
+							: 'Patient registration saved successfully.',
+					},
+				},
 			});
-			resetForm();
 		} catch (error) {
 			const errorText =
 				error?.response?.data?.message ||

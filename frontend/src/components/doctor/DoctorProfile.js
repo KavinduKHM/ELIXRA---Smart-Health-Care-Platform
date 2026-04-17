@@ -1,18 +1,6 @@
 // src/components/doctor/DoctorProfile.js
 import React, { useState } from 'react';
 import { updateDoctorProfile } from '../../services/doctorService';
-import {
-  FiAward,
-  FiBookOpen,
-  FiCalendar,
-  FiDollarSign,
-  FiEdit2,
-  FiMail,
-  FiPhone,
-  FiSave,
-  FiUser,
-  FiX,
-} from 'react-icons/fi';
 import './DoctorProfile.css';
 
 const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' }) => {
@@ -85,7 +73,7 @@ const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' })
 
                 {isVerified ? (
                   <button type="button" className="doctorProfilePrimaryBtn" onClick={() => setEditMode(true)}>
-                    <FiEdit2 /> Edit Profile
+                    Edit Profile
                   </button>
                 ) : (
                   <p className="muted" style={{ marginTop: '0.6rem' }}>
@@ -99,13 +87,13 @@ const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' })
               {sectionMatches.personal && (
                 <div className="doctorProfileCard">
                   <div className="doctorProfileCardHeader">
-                    <h3><FiUser /> Personal Information</h3>
+                      <h3>Personal Information</h3>
                   </div>
                   <div className="doctorProfileInfoGrid">
                     <div><span>First Name</span><strong>{profile.firstName || '-'}</strong></div>
                     <div><span>Last Name</span><strong>{profile.lastName || '-'}</strong></div>
-                    <div><span><FiMail /> Email</span><strong>{profile.email || '-'}</strong></div>
-                    <div><span><FiPhone /> Phone</span><strong>{profile.phoneNumber || '-'}</strong></div>
+                      <div><span>Email</span><strong>{profile.email || '-'}</strong></div>
+                      <div><span>Phone</span><strong>{profile.phoneNumber || '-'}</strong></div>
                   </div>
                 </div>
               )}
@@ -115,20 +103,20 @@ const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' })
                   {sectionMatches.professional && (
                     <div>
                       <div className="doctorProfileCardHeader">
-                        <h3><FiAward /> Professional Details</h3>
+                        <h3>Professional Details</h3>
                       </div>
                       <div className="doctorProfileInfoList">
                         <p><span>Specialty</span><strong>{profile.specialty || '-'}</strong></p>
                         <p><span>Qualification</span><strong>{profile.qualification || '-'}</strong></p>
-                        <p><span><FiCalendar /> Experience</span><strong>{profile.experienceYears ?? 0} years</strong></p>
-                        <p><span><FiDollarSign /> Consultation Fee</span><strong>${profile.consultationFee ?? 0}</strong></p>
+                        <p><span>Experience</span><strong>{profile.experienceYears ?? 0} years</strong></p>
+                        <p><span>Consultation Fee</span><strong>${profile.consultationFee ?? 0}</strong></p>
                       </div>
                     </div>
                   )}
                   {sectionMatches.bio && (
                     <div>
                       <div className="doctorProfileCardHeader">
-                        <h3><FiBookOpen /> Biography</h3>
+                        <h3>Biography</h3>
                       </div>
                       <p className="doctorProfileBio">{profile.bio || 'No biography added yet.'}</p>
                     </div>
@@ -146,7 +134,7 @@ const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' })
       ) : (
         <section className="doctorProfileCard doctorProfileEditCard">
           <div className="doctorProfileCardHeader">
-            <h3><FiEdit2 /> Edit Doctor Profile</h3>
+            <h3>Edit Doctor Profile</h3>
           </div>
 
           <div className="doctorProfileFormGrid">
@@ -190,8 +178,8 @@ const DoctorProfile = ({ profile, doctorId, onProfileUpdate, searchQuery = '' })
           </label>
 
           <div className="doctorProfileActions">
-            <button type="button" className="doctorProfilePrimaryBtn" onClick={handleSave}><FiSave /> Save</button>
-            <button type="button" className="doctorProfileGhostBtn" onClick={() => setEditMode(false)}><FiX /> Cancel</button>
+            <button type="button" className="doctorProfilePrimaryBtn" onClick={handleSave}>Save</button>
+            <button type="button" className="doctorProfileGhostBtn" onClick={() => setEditMode(false)}>Cancel</button>
           </div>
         </section>
       )}
