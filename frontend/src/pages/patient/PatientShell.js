@@ -76,6 +76,14 @@ const PatientShell = () => {
     setTriedSidebarFallback(false);
   }, [patientImage]);
 
+  useEffect(() => {
+    const name = String(patientName || '').trim();
+    if (name) {
+      localStorage.setItem('elixra.userName', name);
+      localStorage.setItem('elixra.userRole', 'Patient');
+    }
+  }, [patientName]);
+
   const refreshDocuments = useCallback(async () => {
     const docsRes = await getPatientDocuments(patientIdNum);
     setDocuments(Array.isArray(docsRes.data) ? docsRes.data : []);
@@ -156,6 +164,8 @@ const PatientShell = () => {
 
   const closeLogoutPopup = () => {
     setLogoutPopup(null);
+    localStorage.removeItem('elixra.userName');
+    localStorage.removeItem('elixra.userRole');
     navigate('/patient', {
       replace: true,
       state: {
@@ -224,7 +234,20 @@ const PatientShell = () => {
           </NavLink>
         </nav>
         <div className="patient-sidebar-foot">
-          <Link to="/patient" className="patient-switch-link patient-logout-link" onClick={handleLogoutClick}>logout</Link>
+          <Link
+            to="appointments"
+            className="patient-switch-link patient-sidebar-cta"
+            aria-label="Book appointment"
+          >
+            Book Appointment
+          </Link>
+          <Link
+            to="/patient"
+            className="patient-switch-link patient-logout-link"
+            onClick={handleLogoutClick}
+          >
+            Logout
+          </Link>
         </div>
       </aside>
 

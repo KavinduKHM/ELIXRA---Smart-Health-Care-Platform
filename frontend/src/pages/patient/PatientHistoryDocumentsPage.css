@@ -8,19 +8,45 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border-bottom: 1px solid #dce7eb;
-  padding-bottom: 0.8rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(219, 233, 234, 0.95);
 }
 
 .historydocs-theme-head h1 {
   margin: 0;
   color: #0d5660;
-  font-size: 2rem;
+  font-size: 2.05rem;
 }
 
 .historydocs-theme-head p {
   margin: 0.2rem 0 0;
   color: #4f667d;
+}
+
+.historydocs-theme-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.historydocs-action-primary {
+  border-radius: 999px;
+  padding: 0.7rem 1.05rem;
+}
+
+.historydocs-action-secondary {
+  border-radius: 999px;
+  padding: 0.7rem 1.05rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.historydocs-action-secondary:hover {
+  background: #ffffff;
 }
 
 .historydocs-theme-layout {
@@ -38,11 +64,11 @@
 
 .history-card,
 .documents-card {
-  border: 1px solid #d9e6ea;
+  border: 1px solid rgba(219, 233, 234, 0.95);
   border-radius: 18px;
-  background: #f9fdfd;
+  background: rgba(255, 255, 255, 0.88);
   padding: 1rem;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
 }
 
 .history-card-head,
@@ -81,8 +107,8 @@
   width: 100%;
   margin: 0;
   border-radius: 12px;
-  background: #edf2f4;
-  border: 1px solid #d7e3e8;
+  background: rgba(238, 247, 247, 0.85);
+  border: 1px solid rgba(219, 233, 234, 0.95);
 }
 
 .history-form textarea {
@@ -129,10 +155,34 @@
 
 .history-item,
 .documents-item {
-  border: 1px solid #d9e7ed;
-  border-radius: 14px;
-  background: #fff;
-  padding: 0.72rem;
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.75rem 0.75rem 0.75rem 0.9rem;
+  position: relative;
+}
+
+.history-item::before {
+  content: '';
+  position: absolute;
+  left: 0.55rem;
+  top: 1.05rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(26, 163, 154, 0.95);
+  box-shadow: 0 8px 18px rgba(26, 163, 154, 0.22);
+}
+
+.history-item::after {
+  content: '';
+  position: absolute;
+  left: 0.58rem;
+  top: 1.6rem;
+  bottom: 0.7rem;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(26, 163, 154, 0.24), rgba(26, 163, 154, 0));
 }
 
 .history-item h4,
@@ -188,6 +238,93 @@
 .documents-empty {
   margin: 0.2rem 0 0;
   color: #5f738b;
+}
+
+/* Summary cards (right side) */
+.historydocs-summary {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.historydocs-summary-card {
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  padding: 0.95rem;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
+}
+
+.historydocs-summary-title {
+  font-weight: 850;
+  color: #0d5660;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.6rem;
+}
+
+.historydocs-summary-metric {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(26, 163, 154, 0.18), rgba(19, 122, 115, 0.10));
+  border: 1px solid rgba(26, 163, 154, 0.20);
+}
+
+.historydocs-summary-metric-value {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #0d5660;
+}
+
+.historydocs-summary-metric-label {
+  font-size: 0.88rem;
+  color: #4f667d;
+  font-weight: 700;
+}
+
+.historydocs-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.historydocs-summary-stat {
+  border-radius: 16px;
+  border: 1px solid rgba(219, 233, 234, 0.95);
+  background: rgba(246, 251, 252, 0.85);
+  padding: 0.6rem;
+}
+
+.historydocs-summary-stat-value {
+  font-weight: 900;
+  color: #153c58;
+  font-size: 1.2rem;
+}
+
+.historydocs-summary-stat-label {
+  color: #5f738b;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.historydocs-summary-text {
+  margin: 0;
+  color: #3c596f;
+}
+
+.historydocs-summary-list {
+  margin: 0;
+  padding-left: 1.05rem;
+  color: #3c596f;
+  display: grid;
+  gap: 0.35rem;
+}
+
+@media (max-width: 1100px) {
+  .historydocs-theme-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .historydocs-popup-overlay {
