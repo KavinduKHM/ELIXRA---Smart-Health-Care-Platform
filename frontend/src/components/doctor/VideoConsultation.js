@@ -1,9 +1,11 @@
 // src/components/doctor/VideoConsultation.js
 import React, { useState, useEffect } from 'react';
 import { getUpcomingAppointmentsForDoctor, updateAppointmentStatus } from '../../services/appointmentService';
+import { createVideoSession, getSessionsByAppointment, joinVideoSession } from '../../services/telemedicineService';
 
 const VideoConsultation = ({ doctorId }) => {
   const [appointments, setAppointments] = useState([]);
+  const [startingId, setStartingId] = useState(null);
 
   useEffect(() => {
     loadUpcoming();
@@ -19,9 +21,47 @@ const VideoConsultation = ({ doctorId }) => {
   };
 
   const handleStartCall = async (apt) => {
-    const channelName = `appointment_${apt.id}`;
-    const url = `/video-call/${encodeURIComponent(channelName)}/${encodeURIComponent(doctorId)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    if (!apt?.id) return;
+    setStartingId(apt.id);
+    try {
+      const appointmentId = Number(apt.id);
+      let sessions = [];
+      try {
+        const existing = await getSessionsByAppointment(appointmentId);
+        sessions = Array.isArray(existing?.data) ? existing.data : [];
+      } catch {
+        sessions = [];
+      }
+
+      let session = sessions[0];
+      if (!session?.id) {
+        const payload = {
+          appointmentId,
+          patientId: apt.patientId,
+          doctorId: Number(doctorId),
+          scheduledStartTime: apt.appointmentTime,
+        };
+        const created = await createVideoSession(payload);
+        session = created?.data;
+      }
+
+      if (session?.id) {
+        await joinVideoSession({
+          sessionId: session.id,
+          userId: Number(doctorId),
+          userRole: 'DOCTOR',
+        });
+      }
+
+      const channelName = `appointment_${apt.id}`;
+      const url = `/video-call/${encodeURIComponent(channelName)}/${encodeURIComponent(doctorId)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error(err);
+      alert('Unable to start the video session right now.');
+    } finally {
+      setStartingId(null);
+    }
   };
 
   const handleComplete = async (aptId) => {
@@ -55,7 +95,7 @@ const VideoConsultation = ({ doctorId }) => {
               <p className="doctor-video-meta"><strong>Time:</strong> {new Date(apt.appointmentTime).toLocaleString()}</p>
               <div className="doctor-action-row">
                 <button type="button" className="doctor-ui-btn" onClick={() => handleStartCall(apt)}>
-                  Start Video Call
+                  {startingId === apt.id ? 'Starting…' : 'Start Video Call'}
                 </button>
                 <button
                   type="button"

@@ -1,0 +1,306 @@
+.vcPage {
+  min-height: calc(100vh - var(--app-header-offset));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0 1.25rem;
+}
+
+.vcHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.vcTitle {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.vcSubtitle {
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.vcMainGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .vcMainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vcStage {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.vcStageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.vcStageHeaderTitle {
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.vcPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.vcPillStrong {
+  border-color: var(--primary);
+  color: var(--primary-800);
+}
+
+.vcTileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.vcTile {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.vcVideoFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 200px;
+  background: var(--surface-2);
+}
+
+.vcVideoSurface {
+  width: 100%;
+  height: 100%;
+}
+
+.vcOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.vcPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.65rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.vcPlaceholderTitle {
+  font-weight: 950;
+}
+
+.vcPlaceholderText {
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+.vcTileFooter {
+  padding: 0.75rem 0.85rem;
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 0.25rem;
+}
+
+.vcTileTitle {
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.vcTileMeta {
+  color: var(--muted);
+  font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vcSidebar {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+
+@media (max-width: 1024px) {
+  .vcSidebar {
+    min-height: 360px;
+  }
+}
+
+.vcSidebarHeader {
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.vcSidebarTitle {
+  font-weight: 950;
+  letter-spacing: -0.01em;
+}
+
+.vcMessages {
+  flex: 1;
+  padding: 0.9rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.vcEmpty {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.vcMessage {
+  max-width: 85%;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.vcMessageMine {
+  align-self: flex-end;
+}
+
+.vcMessageOther {
+  align-self: flex-start;
+}
+
+.vcMessageLabel {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.vcMessageBubble {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 0.55rem 0.7rem;
+  border-radius: 14px;
+  white-space: pre-wrap;
+}
+
+.vcMessageBubbleMine {
+  border-color: var(--primary);
+}
+
+.vcComposer {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.85rem 0.9rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.vcComposerInput {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+}
+
+.vcButtonSecondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.vcButtonSecondary:hover {
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+
+.vcButtonOutline {
+  background: transparent;
+  color: var(--primary-800);
+  border: 1px solid var(--primary-700);
+  box-shadow: none;
+}
+
+.vcButtonOutline:hover {
+  background: var(--surface-2);
+}
+
+.vcControls {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.vcStatusPage {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.2rem;
+}
+
+.vcStatusTitle {
+  font-weight: 950;
+  margin: 0;
+}
+
+.vcStatusText {
+  margin-top: 0.35rem;
+  color: var(--muted);
+}

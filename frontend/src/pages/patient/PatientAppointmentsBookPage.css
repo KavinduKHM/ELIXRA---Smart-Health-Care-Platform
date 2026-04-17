@@ -194,6 +194,23 @@
   font-size: 0.85rem;
 }
 
+.apt-join-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.apt-session-alert {
+  margin: 0 0 0.85rem;
+  border-radius: 16px;
+  border: 1px solid #f4b4b4;
+  background: linear-gradient(180deg, #fff1f1, #ffe7e7);
+  color: #7a0b0b;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 14px 22px rgba(143, 17, 17, 0.10);
+}
+
 .appointments-empty {
   color: #5f738b;
 }

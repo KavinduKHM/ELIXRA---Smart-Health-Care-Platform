@@ -5,9 +5,11 @@ import com.healthcare.telemedicine_service.model.VideoSession;
 import com.healthcare.telemedicine_service.repository.VideoSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -29,6 +31,7 @@ public class TelemedicineService {
 
     private final VideoSessionRepository sessionRepository;
     private final AgoraTokenService agoraTokenService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     // Constants for Agora user roles
     private static final int AGORA_ROLE_PUBLISHER = 1;  // Can send audio/video
@@ -110,6 +113,12 @@ public class TelemedicineService {
             throw new RuntimeException("Session was missed");
         }
 
+        // Gate patient join until the doctor actually starts the session.
+        if ("PATIENT".equalsIgnoreCase(request.getUserRole())
+                && session.getStatus() == VideoSession.SessionStatus.SCHEDULED) {
+            throw new RuntimeException("Session has not started yet");
+        }
+
         // Generate Agora token for the user
         String token = agoraTokenService.generatePublisherToken(
                 session.getChannelName(),
@@ -123,14 +132,37 @@ public class TelemedicineService {
             session.setDoctorToken(token);
         }
 
-        // If this is the first user joining, mark session as ACTIVE
-        if (session.getStatus() == VideoSession.SessionStatus.SCHEDULED) {
+        // Doctor join transitions session from SCHEDULED -> ACTIVE
+        boolean startedNow = false;
+        if ("DOCTOR".equalsIgnoreCase(request.getUserRole())
+                && session.getStatus() == VideoSession.SessionStatus.SCHEDULED) {
             session.setStatus(VideoSession.SessionStatus.ACTIVE);
             session.setActualStartTime(LocalDateTime.now());
-            log.info("Session {} became ACTIVE", session.getId());
+            startedNow = true;
+            log.info("Session {} became ACTIVE (started by doctor)", session.getId());
         }
 
         sessionRepository.save(session);
+
+        if (startedNow) {
+            try {
+                VideoSessionEvent event = VideoSessionEvent.builder()
+                        .type("SESSION_STARTED")
+                        .sessionId(session.getId())
+                        .appointmentId(session.getAppointmentId())
+                        .channelName(session.getChannelName())
+                        .doctorId(session.getDoctorId())
+                        .timestamp(Instant.now())
+                        .build();
+
+                messagingTemplate.convertAndSend(
+                        "/topic/video.session." + session.getChannelName(),
+                        event
+                );
+            } catch (Exception ex) {
+                log.warn("Failed to broadcast SESSION_STARTED event for session {}", session.getId(), ex);
+            }
+        }
 
         // Build response for client
         return JoinSessionResponse.builder()
