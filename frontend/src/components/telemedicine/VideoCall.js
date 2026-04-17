@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import { Client as StompClient } from '@stomp/stompjs';
+import './VideoCall.css';
 
 const tokenUrl = 'http://localhost:8085/api/video/token/generate';
 const wsUrl = 'http://localhost:8085/ws';
@@ -61,9 +62,30 @@ const VideoCallComponent = () => {
         };
     }, [channelName, uid]);
 
-    if (isLoading) return <div>Connecting to video service...</div>;
-    if (error) return <div style={{ color: 'red' }}>{error}</div>;
-    if (!token || !appId) return <div style={{ color: 'red' }}>Missing Agora token/appId</div>;
+    if (isLoading) {
+        return (
+            <div className="vcStatusPage">
+                <h2 className="vcStatusTitle">Connecting…</h2>
+                <div className="vcStatusText">Setting up the video consultation room.</div>
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div className="vcStatusPage" role="alert">
+                <h2 className="vcStatusTitle">Unable to connect</h2>
+                <div className="vcStatusText">{error}</div>
+            </div>
+        );
+    }
+    if (!token || !appId) {
+        return (
+            <div className="vcStatusPage" role="alert">
+                <h2 className="vcStatusTitle">Missing credentials</h2>
+                <div className="vcStatusText">Backend didn’t return an Agora token/appId.</div>
+            </div>
+        );
+    }
 
     return (
         <AgoraRTCProvider client={client}>
@@ -112,18 +134,14 @@ const RemoteVideoTile = ({ user }) => {
         : 'remote video: off (camera not shared / blocked / in use)';
 
     return (
-        <div style={{ width: '340px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-            <div style={{ width: '100%', height: '260px', backgroundColor: '#2d2d2d', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div ref={containerRef} style={{ width: '100%', height: '260px', backgroundColor: '#2d2d2d' }} />
-                {!user?.videoTrack ? (
-                    <div style={{ position: 'absolute', color: '#fff', opacity: 0.85, padding: '10px', textAlign: 'center' }}>
-                        Waiting for remote camera…
-                    </div>
-                ) : null}
+        <div className="vcTile">
+            <div className="vcVideoFrame">
+                <div ref={containerRef} className="vcVideoSurface" />
+                {!user?.videoTrack ? <div className="vcOverlay">Waiting for remote camera…</div> : null}
             </div>
-            <div style={{ padding: '8px', textAlign: 'center', backgroundColor: '#333', color: '#fff' }}>
-                Remote user {user?.uid}
-                <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>{remoteStatusText}</div>
+            <div className="vcTileFooter">
+                <div className="vcTileTitle">Remote user {user?.uid}</div>
+                <div className="vcTileMeta">{remoteStatusText}</div>
             </div>
         </div>
     );
@@ -191,32 +209,28 @@ const ChatBox = ({ channelName, senderId }) => {
     };
 
     return (
-        <div style={{ width: '340px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', backgroundColor: '#1f1f1f', display: 'flex', flexDirection: 'column', height: '340px' }}>
-            <div style={{ padding: '10px 12px', backgroundColor: '#333', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontWeight: 600 }}>Chat</div>
-                <div style={{ fontSize: '12px', opacity: 0.8 }}>{status}</div>
+        <div className="vcSidebar" aria-label="Chat">
+            <div className="vcSidebarHeader">
+                <div className="vcSidebarTitle">Chat</div>
+                <span className={`vcPill ${status === 'connected' ? 'vcPillStrong' : ''}`}>{status}</span>
             </div>
 
-            <div style={{ flex: 1, padding: '10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {messages.length === 0 ? (
-                    <div style={{ color: '#bbb', fontSize: '13px' }}>No messages yet.</div>
-                ) : null}
+            <div className="vcMessages">
+                {messages.length === 0 ? <div className="vcEmpty">No messages yet.</div> : null}
                 {messages.map((m, idx) => {
                     const mine = Number(m?.senderId) === Number(senderId);
                     return (
-                        <div key={idx} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
-                            <div style={{ fontSize: '11px', color: '#aaa', marginBottom: '2px', textAlign: mine ? 'right' : 'left' }}>
+                        <div key={idx} className={`vcMessage ${mine ? 'vcMessageMine' : 'vcMessageOther'}`}>
+                            <div className="vcMessageLabel" style={{ textAlign: mine ? 'right' : 'left' }}>
                                 {mine ? 'You' : `User ${m?.senderId ?? ''}`}
                             </div>
-                            <div style={{ backgroundColor: mine ? '#2ecc71' : '#444', color: mine ? '#0b1a10' : '#fff', padding: '8px 10px', borderRadius: '10px', whiteSpace: 'pre-wrap' }}>
-                                {m?.message}
-                            </div>
+                            <div className={`vcMessageBubble ${mine ? 'vcMessageBubbleMine' : ''}`}>{m?.message}</div>
                         </div>
                     );
                 })}
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', padding: '10px', borderTop: '1px solid #2a2a2a' }}>
+            <div className="vcComposer">
                 <input
                     value={text}
                     onChange={(e) => setText(e.target.value)}
@@ -224,13 +238,10 @@ const ChatBox = ({ channelName, senderId }) => {
                         if (e.key === 'Enter') send();
                     }}
                     placeholder="Type a message…"
-                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#111', color: '#fff' }}
+                    className="vcComposerInput"
+                    aria-label="Message"
                 />
-                <button
-                    onClick={send}
-                    disabled={status !== 'connected' || !text.trim()}
-                    style={{ padding: '10px 14px', borderRadius: '8px', border: 'none', cursor: status === 'connected' ? 'pointer' : 'not-allowed', backgroundColor: '#3498db', color: '#fff', opacity: status === 'connected' ? 1 : 0.6 }}
-                >
+                <button onClick={send} disabled={status !== 'connected' || !text.trim()}>
                     Send
                 </button>
             </div>
@@ -331,58 +342,87 @@ const VideoCall = ({ channelName, token, appId, uid }) => {
         : null;
 
     return (
-        <div className="video-call-container" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', flexWrap: 'wrap', flex: 1, gap: '20px', padding: '20px', backgroundColor: '#1a1a1a' }}>
-                {/* Local Video */}
-                <div style={{ width: '340px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-                    <div style={{ width: '100%', height: '260px', backgroundColor: '#2d2d2d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {localCameraTrack ? (
-                            <div
-                                ref={localVideoContainerRef}
-                                style={{ width: '100%', height: '260px', backgroundColor: '#2d2d2d' }}
-                            />
-                        ) : (
-                            <div style={{ color: '#fff', padding: '12px', textAlign: 'center' }}>
-                                <div style={{ fontWeight: 600, marginBottom: '6px' }}>Local video</div>
-                                {cameraStatusText && <div style={{ opacity: 0.85 }}>{cameraStatusText}</div>}
-                                <button
-                                    onClick={requestPermissions}
-                                    style={{ marginTop: '10px', padding: '8px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
-                                >
-                                    Grant camera access
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                    <div style={{ padding: '8px', textAlign: 'center', backgroundColor: '#333', color: '#fff' }}>
-                        You (ID: {uid})
-                        {micStatusText ? <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>{micStatusText}</div> : null}
-                        {cameraDebugText ? <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>{cameraDebugText}</div> : null}
-                    </div>
+        <div className="vcPage">
+            <div className="vcHeader">
+                <div>
+                    <h1 className="vcTitle">Video Consultation</h1>
+                    <div className="vcSubtitle">Channel: {channelName} • Your ID: {uid}</div>
                 </div>
-
-                {/* Remote Video */}
-                {remoteUsers.length === 0 ? (
-                    <div style={{ color: '#fff', opacity: 0.85, paddingTop: '20px' }}>Waiting for the other person to join…</div>
-                ) : null}
-                {remoteUsers.map(user => (
-                    <RemoteVideoTile key={user.uid} user={user} />
-                ))}
-
-                {/* Chat */}
-                <ChatBox channelName={channelName} senderId={uid} />
             </div>
 
-            {/* Controls */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', padding: '16px', backgroundColor: '#2c3e50' }}>
-                <button onClick={toggleCamera} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', backgroundColor: cameraOn ? '#e74c3c' : '#2ecc71', color: 'white' }}>
-                    {cameraOn ? 'Turn Off Camera' : 'Turn On Camera'}
+            <div className="vcMainGrid">
+                <section className="vcStage" aria-label="Video stage">
+                    <div className="vcStageHeader">
+                        <div className="vcStageHeaderTitle">Participants</div>
+                        <span className={`vcPill ${remoteUsers.length > 0 ? 'vcPillStrong' : ''}`}>
+                            {remoteUsers.length > 0 ? `${remoteUsers.length} remote` : 'Waiting for others'}
+                        </span>
+                    </div>
+
+                    <div className="vcTileGrid">
+                        <div className="vcTile">
+                            <div className="vcVideoFrame">
+                                {localCameraTrack ? (
+                                    <div ref={localVideoContainerRef} className="vcVideoSurface" />
+                                ) : (
+                                    <div className="vcPlaceholder">
+                                        <div className="vcPlaceholderTitle">Your camera</div>
+                                        <div className="vcPlaceholderText">
+                                            {cameraStatusText || 'Camera is currently unavailable.'}
+                                        </div>
+                                        <button onClick={requestPermissions} className="vcButtonSecondary">
+                                            Grant camera access
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="vcTileFooter">
+                                <div className="vcTileTitle">You (ID: {uid})</div>
+                                {micStatusText ? <div className="vcTileMeta">{micStatusText}</div> : null}
+                                {cameraDebugText ? <div className="vcTileMeta">{cameraDebugText}</div> : null}
+                            </div>
+                        </div>
+
+                        {remoteUsers.map((user) => (
+                            <RemoteVideoTile key={user.uid} user={user} />
+                        ))}
+
+                        {remoteUsers.length === 0 ? (
+                            <div className="vcTile">
+                                <div className="vcVideoFrame">
+                                    <div className="vcOverlay">Waiting for the other person to join…</div>
+                                </div>
+                                <div className="vcTileFooter">
+                                    <div className="vcTileTitle">Remote participant</div>
+                                    <div className="vcTileMeta">They’ll appear here once connected.</div>
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                </section>
+
+                <aside aria-label="Chat">
+                    <ChatBox channelName={channelName} senderId={uid} />
+                </aside>
+            </div>
+
+            <div className="vcControls" aria-label="Call controls">
+                <button
+                    onClick={toggleCamera}
+                    className={cameraOn ? 'vcButtonSecondary' : ''}
+                    aria-pressed={!cameraOn}
+                >
+                    {cameraOn ? 'Turn off camera' : 'Turn on camera'}
                 </button>
-                <button onClick={toggleMic} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', backgroundColor: micOn ? '#e74c3c' : '#2ecc71', color: 'white' }}>
-                    {micOn ? 'Mute Mic' : 'Unmute Mic'}
+                <button
+                    onClick={toggleMic}
+                    className={micOn ? 'vcButtonSecondary' : ''}
+                    aria-pressed={!micOn}
+                >
+                    {micOn ? 'Mute mic' : 'Unmute mic'}
                 </button>
-                <button onClick={endCall} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', backgroundColor: '#e74c3c', color: 'white' }}>
-                    End Call
+                <button onClick={endCall} className="vcButtonOutline">
+                    Leave call
                 </button>
             </div>
         </div>

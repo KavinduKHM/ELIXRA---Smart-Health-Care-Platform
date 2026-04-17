@@ -162,6 +162,14 @@ textarea {
   gap: 0.7rem;
 }
 
+.appLogo {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 10px 24px rgba(26, 163, 154, 0.18);
+}
+
 .appBrandText {
   display: grid;
   gap: 0.1rem;

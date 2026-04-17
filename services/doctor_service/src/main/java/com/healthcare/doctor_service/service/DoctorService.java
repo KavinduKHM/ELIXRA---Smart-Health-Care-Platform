@@ -65,7 +65,7 @@ public class DoctorService {
     }
 
     private Long resolveOrGenerateUserId(Long requestedUserId) {
-        if (requestedUserId != null) {
+        if (requestedUserId != null && requestedUserId > 0) {
             return requestedUserId;
         }
 
