@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import DoctorProfile from '../../components/doctor/DoctorProfile';
-import { FiSearch, FiSettings } from 'react-icons/fi';
 import './DoctorProfilePage.css';
 
 const DoctorProfilePage = () => {
@@ -17,7 +16,7 @@ const DoctorProfilePage = () => {
         </div>
         <div className="doctorProfilePageActions">
           <div className="doctorProfilePageSearch">
-            <FiSearch />
+            <span aria-hidden="true">⌕</span>
             <input
               type="text"
               placeholder="Search profile details..."
@@ -26,7 +25,7 @@ const DoctorProfilePage = () => {
             />
           </div>
           <button type="button" className="doctorProfilePageSettingsBtn" disabled>
-            <FiSettings />
+            Settings
           </button>
         </div>
       </section>

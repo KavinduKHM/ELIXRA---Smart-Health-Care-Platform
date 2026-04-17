@@ -60,7 +60,12 @@ const DoctorShell = () => {
       localStorage.setItem('elixra.userName', name);
       localStorage.setItem('elixra.userRole', 'Doctor');
     }
-  }, [doctorDisplayName]);
+
+    if (Number.isFinite(doctorIdNum) && doctorIdNum > 0) {
+      localStorage.setItem('doctorId', String(doctorIdNum));
+      localStorage.setItem('elixra.doctorId', String(doctorIdNum));
+    }
+  }, [doctorDisplayName, doctorIdNum]);
 
   const outletContext = useMemo(
     () => ({ doctorId: doctorIdNum, profile, setProfile }),

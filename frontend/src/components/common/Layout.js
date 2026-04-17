@@ -1,40 +1,69 @@
-// src/components/common/Layout.js
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+
+const getStoredUser = () => ({
+  userName: localStorage.getItem('elixra.userName') || '',
+  userRole: localStorage.getItem('elixra.userRole') || '',
+  patientId: localStorage.getItem('patientId') || localStorage.getItem('elixra.patientId') || '',
+  doctorId: localStorage.getItem('doctorId') || localStorage.getItem('elixra.doctorId') || '',
+});
+
+const getDashboardPath = (user) => {
+  const role = String(user.userRole || '').trim().toLowerCase();
+  const patientId = String(user.patientId || '').trim();
+  const doctorId = String(user.doctorId || '').trim();
+
+  if (role === 'patient') {
+    return patientId ? `/patient/${encodeURIComponent(patientId)}/appointments` : '/patient';
+  }
+
+  if (role === 'doctor') {
+    return doctorId ? `/doctor/${encodeURIComponent(doctorId)}/appointments` : '/doctor';
+  }
+
+  if (role === 'admin') {
+    return '/admin';
+  }
+
+  return '/';
+};
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const pathname = location?.pathname || '';
 
-  const isPatientArea = pathname === '/patient' || pathname.startsWith('/patient/');
-  const isDoctorArea = pathname === '/doctor' || pathname.startsWith('/doctor/');
-
-  const isPortalShellRoute = /^\/(patient|doctor)\/[\w-]+(\/|$)/.test(pathname) && pathname !== '/patient/register';
+  const isPortalShellRoute = /^\/(patient|doctor)\/[^/]+(\/|$)/.test(pathname) && pathname !== '/patient/register';
   const containerClassName = isPortalShellRoute ? 'portalContainer' : 'container';
 
-  const [userName, setUserName] = useState(() => {
-    const stored = localStorage.getItem('elixra.userName');
-    return stored && stored.trim() ? stored : 'Guest';
-  });
+  const [user, setUser] = useState(getStoredUser);
 
   const headerLabel = useMemo(() => {
-    const role = localStorage.getItem('elixra.userRole');
-    const roleText = role && role.trim() ? role.trim() : '';
-    const who = userName && userName.trim() ? userName.trim() : 'Guest';
-    return roleText ? `${who} (${roleText})` : who;
-  }, [userName]);
+    const name = String(user.userName || '').trim() || 'Guest';
+    const role = String(user.userRole || '').trim();
+    return role ? `${name} (${role})` : name;
+  }, [user]);
+
+  const dashboardPath = useMemo(() => getDashboardPath(user), [user]);
 
   useEffect(() => {
-    const refresh = () => {
-      const stored = localStorage.getItem('elixra.userName');
-      setUserName(stored && stored.trim() ? stored.trim() : 'Guest');
-    };
+    const refresh = () => setUser(getStoredUser());
 
     refresh();
 
-    const onStorage = (e) => {
-      if (e.key === 'elixra.userName' || e.key === 'elixra.userRole') refresh();
+    const onStorage = (event) => {
+      if (
+        event.key === 'elixra.userName' ||
+        event.key === 'elixra.userRole' ||
+        event.key === 'patientId' ||
+        event.key === 'doctorId' ||
+        event.key === 'elixra.patientId' ||
+        event.key === 'elixra.doctorId'
+      ) {
+        refresh();
+      }
     };
+
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
   }, [pathname]);
@@ -43,37 +72,50 @@ const Layout = ({ children }) => {
     <div>
       <header className="appHeader" role="banner">
         <div className={`${containerClassName} appHeaderInner`}>
-          <div className="appBrand" aria-label="ELIXRA">
+          <Link to="/" className="appBrand" aria-label="ELIXRA home">
             <div className="brandDot" aria-hidden="true" />
             <div className="appBrandText">
               <div className="appBrandTitle">ELIXRA</div>
               <div className="appBrandSubtitle">Smart Health Care Platform</div>
             </div>
-          </div>
+          </Link>
 
           <nav className="appHeaderNav" aria-label="Primary">
-            <Link to="/patient" className={`appHeaderLink ${isPatientArea ? 'appHeaderLinkActive' : ''}`}>Patient</Link>
-            <Link to="/doctor" className={`appHeaderLink ${isDoctorArea ? 'appHeaderLinkActive' : ''}`}>Doctor</Link>
-            <Link to="/admin" className="appHeaderLink">Admin</Link>
+            <NavLink to="/" end className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
+              Home
+            </NavLink>
+            <NavLink to="/patient" className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
+              Patient
+            </NavLink>
+            <NavLink to="/doctor" className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
+              Doctor
+            </NavLink>
+            <NavLink to="/admin" className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
+              Admin
+            </NavLink>
           </nav>
 
           <div className="appHeaderUser" aria-label="Current user">
-            <div className="appUserChip">
+            <button
+              type="button"
+              className="appUserChip appUserChipLink"
+              onClick={() => navigate(dashboardPath)}
+              aria-label={`Open ${headerLabel} dashboard`}
+              title={headerLabel}
+            >
               <span className="appUserChipAvatar" aria-hidden="true">
-                {(userName || 'G').trim().charAt(0).toUpperCase()}
+                {(user.userName || 'G').trim().charAt(0).toUpperCase()}
               </span>
-              <span className="appUserChipName" title={headerLabel}>{headerLabel}</span>
-            </div>
-          <div className="topNavLinks">
-            <Link to="/patient" className="topNavLink">Patient</Link>
-            <Link to="/doctor" className="topNavLink">Doctor</Link>
-            <Link to="/admin" className="topNavLink">Admin</Link>
+              <span className="appUserChipName">{headerLabel}</span>
+            </button>
           </div>
         </div>
       </header>
 
       <main className={`layoutMain ${isPortalShellRoute ? 'portalMain' : ''}`}>
-        <div className={containerClassName}>{children}</div>
+        <div className={containerClassName}>
+          {children}
+        </div>
       </main>
 
       <footer className="appFooter" role="contentinfo">
