@@ -1,11 +1,9 @@
 package com.healthcare.telemedicine_service.service;
 
+import io.agora.media.RtcTokenBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.security.SecureRandom;
-import java.util.Base64;
 
 /**
  * Token service used by TelemedicineService.
@@ -19,30 +17,45 @@ import java.util.Base64;
 @Slf4j
 public class AgoraTokenService {
 
-    @Value("${agora.app-id:dummy-app-id}")
+    @Value("${agora.app-id:}")
     private String appId;
 
-    private final SecureRandom secureRandom = new SecureRandom();
+    @Value("${agora.app-certificate:}")
+    private String appCertificate;
+
+    @Value("${agora.token-expiration:3600}")
+    private int tokenExpirationSeconds;
 
     public String getAppId() {
         return appId;
     }
 
     public String generatePublisherToken(String channelName, Long userId) {
-        return generateOpaqueToken(channelName, userId, "PUBLISHER");
+        return generateRtcToken(channelName, userId, RtcTokenBuilder.Role.Role_Publisher);
     }
 
     public String generateSubscriberToken(String channelName, Long userId) {
-        return generateOpaqueToken(channelName, userId, "SUBSCRIBER");
+        return generateRtcToken(channelName, userId, RtcTokenBuilder.Role.Role_Subscriber);
     }
 
-    private String generateOpaqueToken(String channelName, Long userId, String role) {
-        // 32 bytes random -> url-safe base64
-        byte[] bytes = new byte[32];
-        secureRandom.nextBytes(bytes);
-        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    private String generateRtcToken(String channelName, Long userId, RtcTokenBuilder.Role role) {
+        if (appId == null || appId.isBlank() || appCertificate == null || appCertificate.isBlank()) {
+            throw new IllegalStateException("Agora app-id/app-certificate not configured");
+        }
 
-        log.debug("Generated opaque video token for channel={}, userId={}, role={}", channelName, userId, role);
+        int uid = Math.toIntExact(userId);
+        int privilegeExpiredTs = (int) (System.currentTimeMillis() / 1000L) + tokenExpirationSeconds;
+
+        String token = new RtcTokenBuilder().buildTokenWithUid(
+                appId,
+                appCertificate,
+                channelName,
+                uid,
+                role,
+                privilegeExpiredTs
+        );
+
+        log.debug("Generated Agora RTC token for channel={}, uid={}, role={}", channelName, uid, role);
         return token;
     }
 
