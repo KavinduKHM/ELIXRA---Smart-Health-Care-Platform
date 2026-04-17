@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDoctorPrescriptions, issuePrescription } from '../../services/doctorService';
 import { getDoctorAppointments } from '../../services/appointmentService';
+import './Prescriptions.css';
 
 const DoctorPrescriptions = ({ doctorId }) => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -142,88 +143,224 @@ const DoctorPrescriptions = ({ doctorId }) => {
     }
   };
 
+  const formatIssuedDate = (value) => {
+    if (!value) return 'N/A';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' });
+  };
+
+  const totalMedicinesIssued = prescriptions.reduce((sum, p) => sum + (p.medicines?.length || 0), 0);
+
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', marginBottom: '2rem' }}>
-      <h2>Prescriptions</h2>
-      <button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : 'Issue New Prescription'}</button>
-      {showForm && (
-        <div style={{ marginTop: '1rem', border: '1px solid #ddd', padding: '1rem' }}>
-          <select
-            value={formData.patientId}
-            onChange={e => {
-              const nextPatientId = e.target.value;
-              // avoid accidental mismatch between patient + appointment
-              const currentAppointment = appointments.find(a => String(a.id) === String(formData.appointmentId));
-              const appointmentMatches = currentAppointment && String(currentAppointment.patientId) === String(nextPatientId);
-              setFormData({
-                ...formData,
-                patientId: nextPatientId,
-                appointmentId: appointmentMatches ? formData.appointmentId : '',
-              });
-            }}
-          >
-            <option value="">Select Patient</option>
-            {[...new Map(appointments.map(a => [String(a.patientId), a.patientId])).values()].map((pid) => (
-              <option key={pid} value={pid}>Patient {pid}</option>
-            ))}
-          </select>
-          <select
-            value={formData.appointmentId}
-            onChange={e => {
-              const nextAppointmentId = e.target.value;
-              const apt = appointments.find(a => String(a.id) === String(nextAppointmentId));
-              setFormData({
-                ...formData,
-                appointmentId: nextAppointmentId,
-                patientId: apt?.patientId != null ? String(apt.patientId) : formData.patientId,
-              });
-            }}
-          >
-            <option value="">Select Appointment</option>
-            {appointments
-              .filter(a => !formData.patientId || String(a.patientId) === String(formData.patientId))
-              .map(apt => (
-                <option key={apt.id} value={apt.id}>
-                  Appointment {apt.id} - {new Date(apt.appointmentTime).toLocaleDateString()}
-                </option>
-              ))}
-          </select>
-          <input type="text" placeholder="Diagnosis" value={formData.diagnosis} onChange={e => setFormData({...formData, diagnosis: e.target.value})} />
-          <textarea placeholder="Notes" value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} />
-          <input
-            type="datetime-local"
-            placeholder="Valid Until"
-            value={formData.validUntil}
-            onChange={e => setFormData({...formData, validUntil: e.target.value})}
-          />
-          <h4>Medicines</h4>
-          {formData.medicines.map((med, idx) => (
-            <div key={idx} style={{ marginBottom: '0.5rem' }}>
-              <input placeholder="Medicine Name" value={med.medicineName} onChange={e => updateMedicine(idx, 'medicineName', e.target.value)} />
-              <input placeholder="Dosage" value={med.dosage} onChange={e => updateMedicine(idx, 'dosage', e.target.value)} />
-              <input placeholder="Frequency" value={med.frequency} onChange={e => updateMedicine(idx, 'frequency', e.target.value)} />
-              <input placeholder="Duration" value={med.duration} onChange={e => updateMedicine(idx, 'duration', e.target.value)} />
-              <input placeholder="Instructions" value={med.instructions} onChange={e => updateMedicine(idx, 'instructions', e.target.value)} />
-            </div>
-          ))}
-          <button onClick={addMedicine}>+ Add Medicine</button>
-          <button onClick={handleSubmit}>Submit Prescription</button>
+    <div className="dp-root">
+      <section className="dp-main">
+        <div className="dp-headerRow">
+          <div>
+            <h1 className="dp-title">Prescriptions</h1>
+            <p className="dp-subtitle">Manage and issue pharmacological treatments for your patients.</p>
+          </div>
+          <button type="button" className="dp-primaryBtn" onClick={() => setShowForm(!showForm)}>
+            {showForm ? 'Cancel' : 'Issue New Prescription'}
+          </button>
         </div>
-      )}
-      {prescriptions.length === 0 ? (
-        <p>No prescriptions issued yet.</p>
-      ) : (
-        <ul>
-          {prescriptions.map(p => (
-            <li key={p.id}>
-              <strong>Patient {p.patientId}</strong> - {p.diagnosis} (Issued: {p.issuedAt})
-              <ul>
-                {p.medicines?.map(m => <li key={m.id}>{m.medicineName} - {m.dosage}</li>)}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      )}
+
+        <div className="dp-topicGrid">
+          <article className="dp-topicStat">
+            <p className="dp-topicLabel">Total Prescriptions</p>
+            <h3>{prescriptions.length}</h3>
+            <span>Issued by your profile</span>
+          </article>
+          <article className="dp-topicStat">
+            <p className="dp-topicLabel">Appointments</p>
+            <h3>{appointments.length}</h3>
+            <span>Available for selection</span>
+          </article>
+          <article className="dp-topicStat">
+            <p className="dp-topicLabel">Medicines Listed</p>
+            <h3>{totalMedicinesIssued}</h3>
+            <span>Across all prescriptions</span>
+          </article>
+        </div>
+
+        <section className="dp-topicContainer">
+          <header className="dp-sectionHeader">
+            <h2>Prescription Actions</h2>
+            <p>Use filters and create prescriptions from one place.</p>
+          </header>
+
+          <div className="dp-toolbar">
+            <div className="dp-tabs">
+              <button type="button" className="dp-chip dp-chipActive">Active</button>
+              <button type="button" className="dp-chip">History</button>
+              <button type="button" className="dp-chip">Flagged</button>
+            </div>
+            <div className="dp-sort">Sorted by: <strong>Recent Issue</strong></div>
+          </div>
+
+          {showForm && (
+            <div className="dp-formCard">
+              <h3 className="dp-formTitle">New Prescription</h3>
+              <p className="dp-formHint">Complete patient, appointment, and medicine details before submission.</p>
+
+              <h4 className="dp-formSubTitle">Patient and Appointment</h4>
+              <div className="dp-grid2">
+                <select
+                  value={formData.patientId}
+                  onChange={e => {
+                    const nextPatientId = e.target.value;
+                    const currentAppointment = appointments.find(a => String(a.id) === String(formData.appointmentId));
+                    const appointmentMatches = currentAppointment && String(currentAppointment.patientId) === String(nextPatientId);
+                    setFormData({
+                      ...formData,
+                      patientId: nextPatientId,
+                      appointmentId: appointmentMatches ? formData.appointmentId : '',
+                    });
+                  }}
+                >
+                  <option value="">Select Patient</option>
+                  {[...new Map(appointments.map(a => [String(a.patientId), a.patientId])).values()].map((pid) => (
+                    <option key={pid} value={pid}>Patient {pid}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={formData.appointmentId}
+                  onChange={e => {
+                    const nextAppointmentId = e.target.value;
+                    const apt = appointments.find(a => String(a.id) === String(nextAppointmentId));
+                    setFormData({
+                      ...formData,
+                      appointmentId: nextAppointmentId,
+                      patientId: apt?.patientId != null ? String(apt.patientId) : formData.patientId,
+                    });
+                  }}
+                >
+                  <option value="">Select Appointment</option>
+                  {appointments
+                    .filter(a => !formData.patientId || String(a.patientId) === String(formData.patientId))
+                    .map(apt => (
+                      <option key={apt.id} value={apt.id}>
+                        Appointment {apt.id} - {new Date(apt.appointmentTime).toLocaleDateString()}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <h4 className="dp-formSubTitle">Clinical Details</h4>
+              <div className="dp-grid2">
+                <input type="text" placeholder="Diagnosis" value={formData.diagnosis} onChange={e => setFormData({...formData, diagnosis: e.target.value})} />
+                <input
+                  type="datetime-local"
+                  placeholder="Valid Until"
+                  value={formData.validUntil}
+                  onChange={e => setFormData({...formData, validUntil: e.target.value})}
+                />
+              </div>
+
+              <textarea placeholder="Notes" value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} rows={3} />
+
+              <h4 className="dp-formSubTitle">Medicines</h4>
+              <div className="dp-medicineList">
+                {formData.medicines.map((med, idx) => (
+                  <div key={idx} className="dp-medicineRow">
+                    <input placeholder="Medicine Name" value={med.medicineName} onChange={e => updateMedicine(idx, 'medicineName', e.target.value)} />
+                    <input placeholder="Dosage" value={med.dosage} onChange={e => updateMedicine(idx, 'dosage', e.target.value)} />
+                    <input placeholder="Frequency" value={med.frequency} onChange={e => updateMedicine(idx, 'frequency', e.target.value)} />
+                    <input placeholder="Duration" value={med.duration} onChange={e => updateMedicine(idx, 'duration', e.target.value)} />
+                    <input placeholder="Instructions" value={med.instructions} onChange={e => updateMedicine(idx, 'instructions', e.target.value)} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="dp-formActions">
+                <button type="button" className="dp-secondaryBtn" onClick={addMedicine}>+ Add Medicine</button>
+                <button type="button" className="dp-primaryBtn" onClick={handleSubmit}>Submit Prescription</button>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <section className="dp-topicContainer">
+          <header className="dp-sectionHeader">
+            <h2>Issued Prescriptions</h2>
+            <p>Review recently generated prescriptions and quick actions.</p>
+          </header>
+
+          <div className="dp-list">
+            {prescriptions.length === 0 ? (
+              <div className="dp-empty">No prescriptions issued yet.</div>
+            ) : (
+              prescriptions.map((p) => {
+                const firstMedicine = p.medicines?.[0];
+                return (
+                  <article key={p.id} className="dp-card">
+                    <div className="dp-cardTop">
+                      <div>
+                        <div className="dp-patient">Patient {p.patientId}</div>
+                        <div className="dp-drugLine">
+                          <span className="dp-drugName">{firstMedicine?.medicineName || 'Prescription'}</span>
+                          <span>{firstMedicine?.dosage || '-'}</span>
+                        </div>
+                      </div>
+                      <div className="dp-issuedWrap">
+                        <span className="dp-issuedLabel">Issued Date</span>
+                        <strong>{formatIssuedDate(p.issuedAt)}</strong>
+                      </div>
+                    </div>
+
+                    <div className="dp-cardBottom">
+                      <div className="dp-metaRow">
+                        <span>{firstMedicine?.frequency || 'As directed'}</span>
+                        <span>{firstMedicine?.duration || 'Duration not set'}</span>
+                      </div>
+                      <div className="dp-actions">
+                        <button type="button" className="dp-iconBtn" aria-label="Print">🖨</button>
+                        <button type="button" className="dp-iconBtn" aria-label="Share">↗</button>
+                        <button type="button" className="dp-detailBtn">View Details</button>
+                      </div>
+                    </div>
+
+                    {p.diagnosis && <p className="dp-note">Diagnosis: {p.diagnosis}</p>}
+                    {p.medicines?.length > 0 && (
+                      <ul className="dp-medicineSummary">
+                        {p.medicines.map((m, idx) => (
+                          <li key={m.id ?? `${p.id}-med-${idx}`}>{m.medicineName} {m.dosage ? `- ${m.dosage}` : ''}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </article>
+                );
+              })
+            )}
+          </div>
+        </section>
+      </section>
+
+      <aside className="dp-sidePanel">
+        <section className="dp-aiCard">
+          <p className="dp-cardTopic">Assistant Insights</p>
+          <h3>Clinical Aura AI</h3>
+          <p className="dp-aiStatus">Analysis Active</p>
+          <div className="dp-aiPrompt">Are there any potential drug interactions for current prescriptions?</div>
+          <div className="dp-aiAnswer">No major direct interactions detected. Monitor high-risk patients and review renal function where relevant.</div>
+        </section>
+
+        <section className="dp-metricCard">
+          <p className="dp-cardTopic dp-cardTopicLight">Performance</p>
+          <p className="dp-metricLabel">Weekly Overview</p>
+          <h2>{prescriptions.length}</h2>
+          <p>Prescriptions Issued</p>
+        </section>
+
+        <section className="dp-sideList">
+          <p className="dp-cardTopic">Operations</p>
+          <p className="dp-metricLabel">Patient Management</p>
+          <div className="dp-sideItem">Renewal Requests</div>
+          <div className="dp-sideItem">Laboratory Results</div>
+          <div className="dp-sideItem">Pharma Directory</div>
+        </section>
+      </aside>
     </div>
   );
 };

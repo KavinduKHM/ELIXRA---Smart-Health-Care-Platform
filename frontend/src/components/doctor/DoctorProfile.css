@@ -1,0 +1,262 @@
+.doctorProfileRoot {
+  margin-bottom: 1.4rem;
+}
+
+.doctorProfileLoading {
+  border: 1px solid #dbe7e9;
+  border-radius: 14px;
+  background: #f7fbfc;
+  padding: 1rem;
+  color: #4f6a70;
+}
+
+.doctorProfileNoResults {
+  border: 1px dashed #c7dadd;
+  border-radius: 14px;
+  background: #f6fbfc;
+  padding: 1.2rem;
+  color: #446065;
+}
+
+.doctorProfileNoResults h3 {
+  margin: 0;
+  color: #1f3b40;
+}
+
+.doctorProfileNoResults p {
+  margin: 0.4rem 0 0;
+}
+
+.doctorProfileGrid {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.doctorProfileCard {
+  background: #f9fcfc;
+  border: 1px solid #dce8ea;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.doctorProfileSummary {
+  background: linear-gradient(180deg, #f7fbfc 0%, #edf5f6 100%);
+  text-align: center;
+}
+
+.doctorProfileAvatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 0.65rem;
+  background: linear-gradient(145deg, #0f7a80, #0d646b);
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.doctorProfileSummary h2 {
+  margin: 0;
+  color: #17383d;
+  font-size: 1.7rem;
+}
+
+.doctorProfileRole {
+  margin: 0.4rem 0 0;
+  color: #5e777c;
+  font-size: 1rem;
+}
+
+.doctorProfileStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 1.1rem 0;
+  padding: 0.7rem;
+  background: #ffffff;
+  border: 1px solid #deeaec;
+  border-radius: 12px;
+}
+
+.doctorProfileStats strong {
+  display: block;
+  color: #0d5f66;
+  font-size: 1rem;
+}
+
+.doctorProfileStats span {
+  color: #6c8489;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.doctorProfilePrimaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  border-radius: 999px;
+  background: #0e767d;
+  border-color: #0e767d;
+}
+
+.doctorProfilePrimaryBtn:hover {
+  background: #0c666c;
+}
+
+.doctorProfileGhostBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  border-radius: 999px;
+  background: #e8eff1;
+  color: #355a60;
+  border-color: #ccdde0;
+  box-shadow: none;
+}
+
+.doctorProfileGhostBtn:hover {
+  background: #dce9ec;
+}
+
+.doctorProfileDetails {
+  display: grid;
+  gap: 1rem;
+}
+
+.doctorProfileCardHeader {
+  margin-bottom: 0.8rem;
+}
+
+.doctorProfileCardHeader h3 {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1f3a3f;
+  font-size: 1.15rem;
+}
+
+.doctorProfileInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.doctorProfileInfoGrid div,
+.doctorProfileInfoList p {
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid #deeaec;
+  border-radius: 12px;
+  padding: 0.7rem;
+}
+
+.doctorProfileInfoGrid span,
+.doctorProfileInfoList span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #6e8589;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.doctorProfileInfoGrid strong,
+.doctorProfileInfoList strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: #18363b;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.doctorProfileTwoCol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.doctorProfileInfoList {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.doctorProfileBio {
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid #deeaec;
+  border-radius: 12px;
+  padding: 0.75rem;
+  color: #435f64;
+  line-height: 1.55;
+  min-height: 208px;
+}
+
+.doctorProfileEditCard {
+  background: #f3f8f9;
+}
+
+.doctorProfileFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.doctorProfileFormGrid label,
+.doctorProfileBioField {
+  display: grid;
+  gap: 0.35rem;
+  color: #35575d;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.doctorProfileBioField {
+  margin-top: 0.75rem;
+}
+
+.doctorProfileBioField textarea {
+  width: 100%;
+  min-height: 130px;
+  margin: 0;
+}
+
+.doctorProfileActions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+@media (max-width: 1100px) {
+  .doctorProfileGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .doctorProfileSummary {
+    text-align: left;
+  }
+
+  .doctorProfileAvatar {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .doctorProfileInfoGrid,
+  .doctorProfileTwoCol,
+  .doctorProfileFormGrid,
+  .doctorProfileActions {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}
+
