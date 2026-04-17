@@ -5,14 +5,14 @@ import BookAppointment from '../../components/patient/BookAppointment';
 import AISymptomCheckerChatbot from '../../components/patient/AISymptomCheckerChatbot';
 
 const PatientAppointmentsBookPage = () => {
-  const { patientId } = useOutletContext();
+  const { patientId, profile } = useOutletContext();
 
   return (
     <div>
       <h1>Appointments</h1>
       <AISymptomCheckerChatbot />
       <PatientAppointments patientId={patientId} />
-      <BookAppointment patientId={patientId} />
+      <BookAppointment patientId={patientId} profile={profile} />
     </div>
   );
 };

@@ -7,6 +7,29 @@ import {
   getPatientMedicalHistory,
 } from '../../services/patientService';
 
+const PROFILE_IMAGE_CANDIDATE_KEYS = [
+  'profilePictureUrl',
+  'profileImageUrl',
+  'imageUrl',
+  'avatarUrl',
+  'photoUrl',
+];
+
+const resolveProfileImage = (profile, patientId) => {
+  for (const key of PROFILE_IMAGE_CANDIDATE_KEYS) {
+    if (profile?.[key]) return profile[key];
+  }
+  return patientId ? `http://localhost:8082/api/patients/${patientId}/profile-picture` : '';
+};
+
+const getPatientDisplayName = (profile) => {
+  const first = String(profile?.firstName || '').trim();
+  const middle = String(profile?.middleName || '').trim();
+  const last = String(profile?.lastName || '').trim();
+  const full = [first, middle, last].filter(Boolean).join(' ');
+  return full || 'Patient';
+};
+
 const PatientShell = () => {
   const { patientId } = useParams();
 
@@ -19,10 +42,17 @@ const PatientShell = () => {
   const [medicalHistory, setMedicalHistory] = useState([]);
 
   const patientIdNum = useMemo(() => Number(patientId), [patientId]);
+  const patientName = useMemo(() => getPatientDisplayName(profile), [profile]);
+  const patientImage = useMemo(() => resolveProfileImage(profile, patientIdNum), [profile, patientIdNum]);
 
   const refreshDocuments = useCallback(async () => {
     const docsRes = await getPatientDocuments(patientIdNum);
     setDocuments(Array.isArray(docsRes.data) ? docsRes.data : []);
+  }, [patientIdNum]);
+
+  const refreshMedicalHistory = useCallback(async () => {
+    const historyRes = await getPatientMedicalHistory(patientIdNum);
+    setMedicalHistory(Array.isArray(historyRes.data) ? historyRes.data : []);
   }, [patientIdNum]);
 
   useEffect(() => {
@@ -74,19 +104,39 @@ const PatientShell = () => {
       profile,
       setProfile,
       documents,
+      setDocuments,
       prescriptions,
       medicalHistory,
+      setMedicalHistory,
       refreshDocuments,
+      refreshMedicalHistory,
     }),
-    [patientIdNum, profile, documents, prescriptions, medicalHistory, refreshDocuments]
+    [patientIdNum, profile, documents, prescriptions, medicalHistory, refreshDocuments, refreshMedicalHistory]
   );
 
   return (
-    <div className="shell">
-      <aside className="sidebar">
-        <div>
-          <h3 className="sidebarTitle">Patient</h3>
-          <div className="sidebarMeta">ID: {patientId}</div>
+    <div className="shell patient-shell">
+      <aside className="sidebar patient-sidebar">
+        <div className="patient-sidebar-head">
+          <div className="patient-sidebar-user">
+            <div className="patient-sidebar-avatar-wrap" aria-hidden="true">
+              <span className="patient-sidebar-avatar-fallback">{patientName.charAt(0).toUpperCase()}</span>
+              {patientImage ? (
+                <img
+                  src={patientImage}
+                  alt=""
+                  className="patient-sidebar-avatar"
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : null}
+            </div>
+            <div>
+              <h3 className="sidebarTitle">{patientName}</h3>
+              <div className="sidebarMeta">Patient Profile • ID: {patientId}</div>
+            </div>
+          </div>
         </div>
         <nav className="sidebarNav">
           <NavLink
@@ -115,12 +165,12 @@ const PatientShell = () => {
             Profile
           </NavLink>
         </nav>
-        <div style={{ marginTop: '1rem' }}>
-          <Link to="/patient" style={{ color: 'white' }}>Switch patient</Link>
+        <div className="patient-sidebar-foot">
+          <Link to="/patient" className="patient-switch-link">Switch patient</Link>
         </div>
       </aside>
 
-      <section className="content">
+      <section className="content patient-content">
         {loading && <p>Loading patient data...</p>}
         {!loading && loadError && (
           <div>
