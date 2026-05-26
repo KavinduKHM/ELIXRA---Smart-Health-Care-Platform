@@ -1,6 +1,6 @@
 # Server Configuration
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
 
 # Spring Application Configuration
 spring:
@@ -9,9 +9,9 @@ spring:
 
   # Database Configuration
   datasource:
-    url: jdbc:mysql://localhost:3306/auth_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: isuri
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql-auth:3306/auth_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # JPA Configuration
@@ -27,14 +27,14 @@ spring:
   # Redis Configuration (for token blacklist)
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_REDIS_HOST:redis}
+      port: ${SPRING_REDIS_PORT:6379}
 
 # Eureka Client Configuration (Service Discovery)
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://service-discovery:8761/eureka/}
     fetch-registry: true
     register-with-eureka: true
   instance:
