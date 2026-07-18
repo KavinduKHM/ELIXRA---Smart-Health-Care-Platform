@@ -1,12 +1,11 @@
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import PatientAppointments from '../../components/patient/PatientAppointments';
-import BookAppointment from '../../components/patient/BookAppointment';
-import AISymptomCheckerChatbot from '../../components/patient/AISymptomCheckerChatbot';
 import './PatientAppointmentsBookPage.css';
 
 const PatientAppointmentsBookPage = () => {
-  const { patientId, profile } = useOutletContext();
+  const { patientId } = useOutletContext();
+  const navigate = useNavigate();
 
   return (
     <div className="appointments-theme">
@@ -18,28 +17,14 @@ const PatientAppointmentsBookPage = () => {
         <button
           type="button"
           className="appointments-theme-cta"
-          onClick={() => {
-            const target = document.getElementById('quick-booking-section');
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
+          onClick={() => navigate(`/patient/${patientId}/book`)}
         >
-          Book New Appointment
+          + Book New Appointment
         </button>
       </header>
 
-      <div className="appointments-theme-layout">
-        <section className="appointments-theme-main" data-fade-card="left">
-          <PatientAppointments patientId={patientId} />
-        </section>
-
-        <aside className="appointments-theme-side" data-fade-card="right">
-          <div id="quick-booking-section">
-            <BookAppointment patientId={patientId} profile={profile} />
-          </div>
-          <div className="appointments-chat-wrap">
-            <AISymptomCheckerChatbot />
-          </div>
-        </aside>
+      <div className="appointments-theme-single" data-fade-card="left">
+        <PatientAppointments patientId={patientId} />
       </div>
     </div>
   );

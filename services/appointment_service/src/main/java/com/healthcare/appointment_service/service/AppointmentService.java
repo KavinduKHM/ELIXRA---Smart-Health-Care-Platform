@@ -129,11 +129,57 @@ public class AppointmentService {
         LocalDate requestedDate = date.toLocalDate();
         List<DoctorAvailabilityDTO> availabilitySlots = doctorServiceClient.getAvailabilitySlots(doctorId, requestedDate.toString());
 
-        List<TimeSlotDTO> slots = availabilitySlots.stream()
-                .map(a -> toTimeSlotDTO(doctorId, requestedDate, a))
-                .filter(s -> s.getStartTime() != null && s.getEndTime() != null)
-                .filter(s -> Boolean.FALSE.equals(s.getIsBooked()))
-                .toList();
+        // Times already taken by active (non-cancelled/non-completed) appointments for this doctor on this date.
+        java.util.Set<LocalDateTime> bookedTimes = appointmentRepository
+                .findAppointmentsByDoctorAndDate(doctorId, requestedDate.atStartOfDay())
+                .stream()
+                .map(Appointment::getAppointmentTime)
+                .collect(Collectors.toSet());
+
+        LocalDateTime now = LocalDateTime.now();
+        List<TimeSlotDTO> slots = new ArrayList<>();
+
+        for (DoctorAvailabilityDTO availability : availabilitySlots) {
+            if (availability.getStartTime() == null || availability.getEndTime() == null) {
+                continue;
+            }
+            String status = availability.getStatus();
+            if (status != null && !"AVAILABLE".equalsIgnoreCase(status)) {
+                continue;
+            }
+
+            // Divide the working window into consecutive slots of the configured duration
+            // (defaults to 30 min when a duration is not set on the availability).
+            int duration = (availability.getSlotDuration() != null && availability.getSlotDuration() > 0)
+                    ? availability.getSlotDuration()
+                    : 30;
+
+            LocalDateTime windowEnd = LocalDateTime.of(requestedDate, availability.getEndTime());
+            LocalDateTime cursor = LocalDateTime.of(requestedDate, availability.getStartTime());
+            int index = 0;
+
+            while (!cursor.plusMinutes(duration).isAfter(windowEnd)) {
+                LocalDateTime slotStart = cursor;
+                LocalDateTime slotEnd = cursor.plusMinutes(duration);
+
+                boolean taken = bookedTimes.contains(slotStart);
+                boolean inPast = slotStart.isBefore(now);
+
+                if (!taken && !inPast) {
+                    TimeSlotDTO slot = new TimeSlotDTO();
+                    // Synthetic but stable id: availabilityId * 1000 + index within the window.
+                    slot.setId(availability.getId() != null ? availability.getId() * 1000L + index : (long) index);
+                    slot.setDoctorId(doctorId);
+                    slot.setStartTime(slotStart);
+                    slot.setEndTime(slotEnd);
+                    slot.setIsBooked(false);
+                    slots.add(slot);
+                }
+
+                cursor = slotEnd;
+                index++;
+            }
+        }
 
         log.info("Returning {} available slots for doctor {}", slots.size(), doctorId);
         return slots;
@@ -166,19 +212,6 @@ public class AppointmentService {
                 .build();
     }
 
-    private TimeSlotDTO toTimeSlotDTO(Long doctorId, LocalDate date, DoctorAvailabilityDTO availability) {
-        TimeSlotDTO slot = new TimeSlotDTO();
-        slot.setId(availability.getId());
-        slot.setDoctorId(doctorId);
-        LocalTime start = availability.getStartTime();
-        LocalTime end = availability.getEndTime();
-        if (start != null) slot.setStartTime(LocalDateTime.of(date, start));
-        if (end != null) slot.setEndTime(LocalDateTime.of(date, end));
-        String status = availability.getStatus();
-        boolean booked = status != null && !"AVAILABLE".equalsIgnoreCase(status);
-        slot.setIsBooked(booked);
-        return slot;
-    }
     /**
      * Book a new appointment
      *

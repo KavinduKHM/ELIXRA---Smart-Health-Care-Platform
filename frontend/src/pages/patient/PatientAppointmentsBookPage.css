@@ -55,6 +55,10 @@
   align-items: start;
 }
 
+.appointments-theme-single {
+  width: 100%;
+}
+
 [data-fade-card="left"] {
   animation: appointmentFadeLeft 420ms ease both;
 }

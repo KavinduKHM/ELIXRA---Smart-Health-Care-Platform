@@ -1,20 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 :root {
-  --bg: #f3fbfb;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-2: #eef7f7;
+  --surface-2: #f1f5f9;
   --text: #0f172a;
-  --muted: #5b6b7f;
-  --border: #dbe9ea;
+  --muted: #64748b;
+  --border: #e2e8f0;
 
-  --primary: #1aa39a;
-  --primary-700: #137a73;
-  --primary-800: #0f5f5a;
+  --primary: #0ea5e9;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
 
-  --shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
-  --shadow-sm: 0 6px 18px rgba(15, 23, 42, 0.10);
+  --shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.12);
+  --shadow-sm: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
 
-  --radius: 16px;
-  --radius-sm: 12px;
+  --radius: 20px;
+  --radius-sm: 14px;
 
   --container: 1400px;
 
@@ -29,14 +31,43 @@ html, body {
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   background:
-    radial-gradient(900px 500px at 20% 0%, rgba(26, 163, 154, 0.16), transparent 60%),
-    radial-gradient(900px 500px at 80% 10%, rgba(19, 122, 115, 0.14), transparent 60%),
+    radial-gradient(900px 500px at 20% 0%, rgba(14, 165, 233, 0.1), transparent 60%),
+    radial-gradient(900px 500px at 80% 10%, rgba(3, 105, 161, 0.08), transparent 60%),
     var(--bg);
+}
+
+/* Accessible, consistent focus ring across interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 img {
@@ -66,50 +97,54 @@ button {
   background-color: var(--primary);
   color: #ffffff;
   border: 1px solid transparent;
-  padding: 0.65rem 1rem;
-  border-radius: 12px;
+  padding: 0.75rem 1.2rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 650;
-  letter-spacing: 0.01em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   box-shadow: var(--shadow-sm);
-  transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 button:hover {
   background-color: var(--primary-700);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
 }
 
 button:active {
   transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 button:disabled {
-  opacity: 0.55;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 input, select, textarea {
   width: auto;
-  padding: 0.65rem 0.85rem;
-  margin: 0.25rem;
+  padding: 0.75rem 1rem;
+  margin: 0.25rem 0;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 0 0 rgba(0,0,0,0);
-  transition: box-shadow 120ms ease, border-color 120ms ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 200ms ease;
+  font-family: inherit;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: rgba(26, 163, 154, 0.65);
-  box-shadow: 0 0 0 4px rgba(26, 163, 154, 0.18);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
 }
 
 textarea {
-  line-height: 1.35;
+  line-height: 1.5;
 }
 
 /* Layout primitives */
@@ -143,9 +178,11 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 60;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(219, 233, 234, 0.85);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px -18px rgba(15, 23, 42, 0.25);
 }
 
 .appHeaderInner {
@@ -160,14 +197,15 @@ textarea {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  text-decoration: none;
 }
 
 .appLogo {
   width: 38px;
   height: 38px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   object-fit: cover;
-  box-shadow: 0 10px 24px rgba(26, 163, 154, 0.18);
+  box-shadow: var(--shadow-sm);
 }
 
 .appBrandText {
@@ -176,12 +214,13 @@ textarea {
 }
 
 .appBrandTitle {
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: -0.02em;
+  color: var(--primary-800);
 }
 
 .appBrandSubtitle {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
@@ -189,28 +228,32 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .appHeaderLink {
-  color: var(--text);
+  color: #334155;
   text-decoration: none;
-  padding: 0.5rem 0.8rem;
+  padding: 0.55rem 1.15rem;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-weight: 750;
+  font-weight: 700;
+  transition: all 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .appHeaderLink:hover {
-  background: rgba(26, 163, 154, 0.10);
-  border-color: rgba(26, 163, 154, 0.16);
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: var(--primary-800);
 }
 
-.appHeaderLinkActive {
-  background: rgba(26, 163, 154, 0.14);
-  border-color: rgba(26, 163, 154, 0.22);
-  color: #0d5660;
+.appHeaderLinkActive,
+.appHeaderLinkActive:hover {
+  background: linear-gradient(135deg, var(--primary), var(--primary-700));
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 8px 18px -6px rgba(14, 165, 233, 0.55);
 }
 
 .appHeaderUser {
@@ -223,25 +266,21 @@ textarea {
   border: 0;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.35rem 0.55rem;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(219, 233, 234, 0.95);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
-}
-
-.appUserChipLink {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
   cursor: pointer;
-  text-align: left;
   color: inherit;
-  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  transition: all 200ms ease;
 }
 
 .appUserChipLink:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
+  background: var(--surface-2);
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.08);
 }
 
 .appUserChipLink:focus-visible {
@@ -275,10 +314,117 @@ textarea {
   align-items: center;
 }
 
+/* Navbar auth actions */
+.appHeaderCta {
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.appHeaderLogout {
+  appearance: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--primary-700);
+  border: 1px solid var(--border);
+  box-shadow: none;
+  white-space: nowrap;
+  transition: all 200ms ease;
+}
+
+.appHeaderLogout:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+/* Logout confirmation modal (global) */
+.app-logout-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.app-logout-modal {
+  width: min(92vw, 440px);
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.28);
+  text-align: center;
+  padding: 2rem 1.75rem;
+  animation: register-success-pop 200ms ease-out;
+}
+
+.app-logout-icon {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.7rem;
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--primary-700);
+}
+
+.app-logout-modal h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.app-logout-modal p {
+  margin: 0.6rem auto 1.4rem;
+  max-width: 40ch;
+  color: var(--muted);
+}
+
+.app-logout-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.app-logout-actions .register-btn-secondary {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: none;
+  font-weight: 700;
+}
+
+.app-logout-actions .register-btn-secondary:hover {
+  background: rgba(14, 165, 233, 0.08);
+  color: var(--primary-800);
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes register-success-pop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 .appFooter {
-  border-top: 1px solid rgba(219, 233, 234, 0.85);
-  background: rgba(255, 255, 255, 0.62);
-  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
 }
 
 .appFooterInner {
@@ -286,41 +432,49 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
 }
 
 .appFooterBrand {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.75rem;
 }
 
 .appFooterTitle {
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: -0.02em;
+  color: var(--primary-800);
 }
 
 .appFooterSubtitle {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
 .appFooterLinks {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  color: #4f667d;
-  font-weight: 700;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
 .appFooterLink {
-  color: #4f667d;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 200ms ease;
+  cursor: pointer;
+}
+
+.appFooterLink:hover {
+  color: var(--primary-700);
 }
 
 .appFooterDot {
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
 .topNavInner {
@@ -328,23 +482,25 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.9rem 0;
+  padding: 1rem 0;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   font-weight: 800;
   letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
 }
 
 .brandDot {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-800));
-  box-shadow: 0 10px 24px rgba(26, 163, 154, 0.22);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--primary-700));
+  box-shadow: 0 8px 16px -4px rgba(14, 165, 233, 0.3);
 }
 
 .topNavLinks {
@@ -355,17 +511,18 @@ textarea {
 }
 
 .topNavLink {
-  color: var(--text);
+  color: var(--muted);
   text-decoration: none;
-  padding: 0.55rem 0.85rem;
-  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
   border: 1px solid transparent;
-  transition: background-color 120ms ease, border-color 120ms ease;
+  font-weight: 600;
+  transition: all 200ms ease;
 }
 
 .topNavLink:hover {
-  background: rgba(26, 163, 154, 0.10);
-  border-color: rgba(26, 163, 154, 0.18);
+  background: rgba(14, 165, 233, 0.08);
+  color: var(--primary-800);
 }
 
 .layoutMain {
@@ -382,73 +539,92 @@ textarea {
 .sidebar {
   width: 280px;
   border-radius: var(--radius);
-  background: linear-gradient(180deg, rgba(19, 122, 115, 0.95), rgba(15, 95, 90, 0.95));
+  background: linear-gradient(180deg, var(--primary-700), var(--primary-800));
   color: #ffffff;
-  padding: 1.1rem;
-  box-shadow: var(--shadow);
+  padding: 1.5rem 1.25rem;
+  box-shadow: 0 10px 25px -5px rgba(3, 105, 161, 0.4);
   position: sticky;
-  top: var(--app-header-offset);
+  top: calc(var(--app-header-offset) + 1rem);
 }
 
 .sidebarTitle {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .sidebarMeta {
-  opacity: 0.88;
-  font-size: 0.9rem;
-  margin-top: 0.2rem;
+  opacity: 0.8;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
 }
 
 .sidebarNav {
   display: grid;
-  gap: 0.55rem;
-  margin-top: 0.95rem;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 }
 
 .sidebarLink {
   display: block;
   text-decoration: none;
-  color: #ffffff;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.06);
-  transition: background-color 120ms ease, border-color 120ms ease;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  font-weight: 600;
+  transition: all 200ms ease;
 }
 
 .sidebarLink:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .sidebarLinkActive {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .content {
   flex: 1;
   min-width: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
 }
 
 /* Cards */
 .card {
   background: var(--surface);
-  border: 1px solid rgba(219, 233, 234, 0.85);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.1rem;
+  padding: 1.25rem;
   box-shadow: var(--shadow-sm);
   margin-bottom: 1.5rem;
+  transition: box-shadow 200ms ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow);
 }
 
 .cardTitle {
-  margin: 0 0 0.75rem;
+  margin: 0 0 1rem;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.2rem;
 }
 
 .cardSubtle {
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--surface-2);
 }
 
 @media (max-width: 920px) {
@@ -498,51 +674,52 @@ textarea {
   }
 }
 
-/* Patient portal look inspired by provided reference */
+/* Patient portal look */
 .patient-portal {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .patient-portal-topbar {
   position: sticky;
   top: 0;
   z-index: 60;
-  background: rgba(243, 251, 251, 0.86);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(219, 233, 234, 0.9);
-  border-radius: 18px;
-  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
   display: grid;
   grid-template-columns: minmax(220px, 320px) minmax(0, 1fr) minmax(220px, 360px);
   align-items: center;
-  gap: 0.85rem;
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+  gap: 1rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .patient-portal-brand {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.75rem;
+  text-decoration: none;
 }
 
 .patient-portal-brand-mark {
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-800));
-  box-shadow: 0 12px 26px rgba(26, 163, 154, 0.22);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--primary-700));
+  box-shadow: 0 8px 16px -4px rgba(14, 165, 233, 0.3);
 }
 
 .patient-portal-brand-title {
-  font-weight: 850;
+  font-weight: 800;
   letter-spacing: -0.02em;
-  color: #0d5660;
+  color: var(--primary-800);
 }
 
 .patient-portal-brand-subtitle {
-  font-size: 0.78rem;
-  color: #5f738b;
+  font-size: 0.8rem;
+  color: var(--muted);
   margin-top: 0.1rem;
 }
 
@@ -551,14 +728,21 @@ textarea {
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   gap: 0.5rem;
-  padding: 0.55rem 0.7rem;
+  padding: 0.6rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(219, 233, 234, 0.95);
-  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  transition: all 200ms ease;
+}
+
+.patient-portal-search:focus-within {
+  background: var(--surface);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
 }
 
 .patient-portal-search-icon {
-  color: #567088;
+  color: var(--muted);
   font-weight: 800;
 }
 
@@ -581,66 +765,74 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.55rem;
+  gap: 0.75rem;
 }
 
 .patient-portal-iconbtn {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #0d5660;
-  border: 1px solid rgba(219, 233, 234, 0.95);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--primary-700);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+  transition: all 200ms ease;
 }
 
 .patient-portal-iconbtn:hover {
-  background: #ffffff;
-  transform: translateY(-1px);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.08);
 }
 
 .patient-portal-userchip {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.35rem 0.45rem;
+  gap: 0.6rem;
+  padding: 0.4rem 0.5rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(219, 233, 234, 0.95);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: all 200ms ease;
+}
+
+.patient-portal-userchip:hover {
+  background: var(--surface-2);
 }
 
 .patient-portal-userchip-avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: linear-gradient(180deg, rgba(26, 163, 154, 0.22), rgba(19, 122, 115, 0.18));
-  color: #0d5660;
-  font-weight: 900;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(3, 105, 161, 0.1));
+  color: var(--primary-700);
+  font-weight: 800;
 }
 
 .patient-portal-userchip-name {
-  font-weight: 750;
-  color: #24495a;
-  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
   max-width: 18ch;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-right: 0.5rem;
 }
 
 .patient-shell {
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
-  gap: 1.1rem;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 1.5rem;
   align-items: flex-start;
   width: 100%;
 }
 
 .patient-shell .patient-sidebar {
-  width: 248px;
+  width: 260px;
   min-height: calc(100vh - 6.4rem);
   height: auto;
   align-self: flex-start;
@@ -648,31 +840,32 @@ textarea {
   top: var(--app-header-offset);
   max-height: calc(100vh - var(--app-header-offset));
   overflow: auto;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(219, 233, 234, 0.95);
-  color: #375064;
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
-  padding: 1rem 0.9rem;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem 1rem;
 }
 
 .patient-shell .patient-sidebar-head {
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
 }
 
 .patient-shell .patient-sidebar-user {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.75rem;
 }
 
 .patient-shell .patient-sidebar-avatar-wrap {
-  width: 46px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
   border-radius: 999px;
   overflow: hidden;
-  border: 2px solid #d1e9eb;
-  background: #dff3f4;
+  border: 2px solid #bae6fd;
+  background: #f0f9ff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -689,99 +882,117 @@ textarea {
 }
 
 .patient-shell .patient-sidebar-avatar-fallback {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 800;
-  color: #0d5f66;
+  color: var(--primary-700);
 }
 
 .patient-shell .sidebarTitle {
-  color: #1b5f67;
-  font-size: 1.04rem;
+  color: var(--primary-800);
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .patient-shell .sidebarMeta {
-  color: #70849a;
-  font-size: 0.78rem;
+  color: var(--muted);
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 .patient-shell .sidebarNav {
-  gap: 0.35rem;
+  display: grid;
+  gap: 0.4rem;
 }
 
 .patient-shell .sidebarLink {
-  color: #496079;
+  color: var(--muted);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 14px;
-  padding: 0.72rem 0.78rem;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
   font-weight: 600;
+  transition: all 200ms ease;
+  text-decoration: none;
 }
 
 .patient-shell .sidebarLink:hover {
-  background: rgba(26, 163, 154, 0.10);
-  color: #153c58;
-  border-color: rgba(26, 163, 154, 0.16);
+  background: rgba(14, 165, 233, 0.08);
+  color: var(--primary-700);
+  border-color: rgba(14, 165, 233, 0.15);
 }
 
 .patient-shell .sidebarLinkActive {
-  background: rgba(26, 163, 154, 0.14);
-  color: #0d5660;
-  border-color: rgba(26, 163, 154, 0.22);
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--primary-700);
+  border-color: rgba(14, 165, 233, 0.25);
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.05);
 }
 
 .patient-shell .patient-sidebar-foot {
-  margin-top: 1rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(219, 233, 234, 0.95);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
   display: grid;
-  gap: 0.55rem;
+  gap: 0.75rem;
 }
 
 .patient-shell .patient-switch-link {
-  color: #44627b;
+  color: var(--muted);
   text-decoration: none;
   font-weight: 600;
+  transition: color 200ms ease;
+}
+
+.patient-shell .patient-switch-link:hover {
+  color: var(--primary-700);
 }
 
 .patient-shell .patient-sidebar-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.7rem 0.9rem;
+  padding: 0.75rem 1rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-800));
+  background: linear-gradient(135deg, var(--primary), var(--primary-700));
   color: #ffffff;
-  border: 1px solid rgba(26, 163, 154, 0.30);
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+  border: 1px solid transparent;
+  box-shadow: 0 8px 16px -4px rgba(14, 165, 233, 0.3);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 200ms ease;
 }
 
 .patient-shell .patient-sidebar-cta:hover {
-  background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -4px rgba(14, 165, 233, 0.4);
 }
 
 .patient-shell .patient-logout-link {
-  color: #b42318;
+  color: #ef4444;
 }
 
 .patient-shell .patient-logout-link:hover {
-  color: #8f1111;
+  color: #dc2626;
 }
 
 .patient-shell .patient-content {
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(219, 233, 234, 0.95);
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
-  padding: 1rem 1.1rem;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  min-height: calc(100vh - 8rem);
 }
 
 .patient-logout-popup-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(2, 6, 23, 0.45);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -789,13 +1000,13 @@ textarea {
 }
 
 .patient-logout-popup-modal {
-  width: min(92vw, 520px);
-  border-radius: 18px;
-  border: 1px solid #b7ebc6;
-  background: linear-gradient(180deg, #ecfff3 0%, #ffffff 100%);
-  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.28);
+  width: min(92vw, 480px);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
   text-align: center;
-  padding: 1.4rem 1.1rem 1.2rem;
+  padding: 2rem;
 }
 
 .patient-logout-popup-icon {

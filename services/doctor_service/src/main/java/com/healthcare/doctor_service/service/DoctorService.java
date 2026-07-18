@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;  // <-- IMPORTANT: Add this for logger
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class DoctorService {
     private final AvailabilityRepository availabilityRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final com.healthcare.doctor_service.client.PatientServiceClient patientServiceClient;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // ==================== Doctor Profile Management ====================
 
@@ -42,11 +45,16 @@ public class DoctorService {
             throw new RuntimeException("Doctor profile already exists for this user");
         }
 
+        if (request.getEmail() != null && doctorRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("A doctor is already registered with this email");
+        }
+
         Doctor doctor = Doctor.builder()
                 .userId(resolvedUserId)
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
+                .password(request.getPassword() != null ? passwordEncoder.encode(request.getPassword()) : null)
                 .phoneNumber(request.getPhoneNumber())
                 .specialty(request.getSpecialty())
                 .qualification(request.getQualification())
@@ -54,7 +62,8 @@ public class DoctorService {
                 .bio(request.getBio())
                 .consultationFee(request.getConsultationFee())
                 .averageConsultationDuration(request.getAverageConsultationDuration())
-                .status(Doctor.DoctorStatus.PENDING)
+                // Auto-verify on registration so the doctor is immediately searchable/bookable by patients.
+                .status(Doctor.DoctorStatus.VERIFIED)
                 .active(true)
                 .build();
 
@@ -62,6 +71,26 @@ public class DoctorService {
         log.info("Doctor registered successfully with ID: {}", savedDoctor.getId());
 
         return DoctorDTO.fromEntity(savedDoctor);
+    }
+
+    // ==================== Doctor Login ====================
+
+    /**
+     * Authenticate a doctor by email + password. Returns the doctor profile on success.
+     */
+    public DoctorDTO login(String email, String rawPassword) {
+        Doctor doctor = doctorRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (doctor.getPassword() == null || !passwordEncoder.matches(rawPassword, doctor.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        if (doctor.getStatus() == Doctor.DoctorStatus.SUSPENDED || !doctor.isActive()) {
+            throw new IllegalArgumentException("This account is not active. Please contact support.");
+        }
+
+        return DoctorDTO.fromEntity(doctor);
     }
 
     private Long resolveOrGenerateUserId(Long requestedUserId) {

@@ -1,0 +1,320 @@
+/* Shared styling for the authentication pages (login + register landing) */
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  min-height: calc(100vh - var(--app-header-offset) - 4rem);
+  gap: 2rem;
+  align-items: stretch;
+  padding: 1rem 0 2.5rem;
+}
+
+.auth-aside {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  /* Fallback gradient; the component layers the team photo under this via inline style. */
+  background:
+    linear-gradient(155deg, var(--primary) 0%, var(--primary-700) 55%, var(--primary-800) 100%);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  padding: 2.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 24px 50px -18px rgba(3, 105, 161, 0.55);
+}
+
+.auth-aside > * { position: relative; z-index: 1; }
+.auth-aside h2,
+.auth-aside p,
+.auth-aside-badge,
+.auth-aside-list-item {
+  text-shadow: 0 2px 14px rgba(2, 20, 40, 0.45);
+}
+
+.auth-aside::after {
+  content: '';
+  position: absolute;
+  right: -80px;
+  bottom: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.auth-aside-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  opacity: 0.9;
+}
+
+.auth-aside-badge .brandDot {
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.auth-aside h2 {
+  font-size: 2.15rem;
+  line-height: 1.15;
+  margin: 1.5rem 0 0.75rem;
+  font-weight: 800;
+}
+
+.auth-aside p {
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 42ch;
+  line-height: 1.6;
+}
+
+.auth-aside-list {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-aside-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.auth-aside-list-item span.tick {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.85rem;
+  flex: 0 0 auto;
+}
+
+.auth-main {
+  display: grid;
+  place-items: center;
+}
+
+.auth-card {
+  width: min(460px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2.25rem;
+}
+
+.auth-card h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.auth-card-sub {
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+}
+
+/* Segmented role toggle */
+.auth-segment {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  margin-bottom: 1.5rem;
+}
+
+.auth-segment button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.auth-segment button:hover {
+  transform: none;
+  color: var(--primary-700);
+  background: transparent;
+}
+
+.auth-segment button.is-active {
+  background: var(--surface);
+  color: var(--primary-700);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.auth-field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.auth-field input {
+  width: 100%;
+  margin: 0;
+}
+
+.auth-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-password-wrap input {
+  width: 100%;
+  padding-right: 3.5rem;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  right: 0.4rem;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  box-shadow: none;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+}
+
+.auth-password-toggle:hover {
+  background: var(--surface-2);
+  color: var(--primary-700);
+  transform: none;
+  box-shadow: none;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+}
+
+.auth-alert {
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  border: 1px solid #f1c3c3;
+  background: #fff4f4;
+  color: #8f1111;
+}
+
+.auth-foot {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.auth-foot a {
+  font-weight: 700;
+  color: var(--primary-700);
+  text-decoration: none;
+}
+
+.auth-foot a:hover {
+  text-decoration: underline;
+}
+
+/* Register landing choice cards */
+.auth-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  width: min(760px, 100%);
+}
+
+.auth-choice-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: all 200ms ease;
+}
+
+.auth-choice-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: rgba(14, 165, 233, 0.35);
+}
+
+.auth-choice-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(3, 105, 161, 0.12));
+  color: var(--primary-700);
+}
+
+.auth-choice-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.auth-choice-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.auth-choice-cta {
+  font-weight: 800;
+  color: var(--primary-700);
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+  .auth-aside {
+    display: none;
+  }
+  .auth-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}

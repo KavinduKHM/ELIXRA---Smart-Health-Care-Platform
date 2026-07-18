@@ -21,6 +21,10 @@ public class DoctorRegistrationRequest {
     @NotBlank(message = "Email is required")
     private String email;
 
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
+    private String password;
+
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
     private String phoneNumber;
 

@@ -1,6 +1,16 @@
 // src/components/patient/AISymptomCheckerChatbot.js
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { analyzeSymptoms } from '../../services/aiSymptomCheckerService';
+import './AISymptomCheckerChatbot.css';
+
+const QUICK_SUGGESTIONS = [
+  'Fever & cough for 3 days',
+  'Persistent headache',
+  'Stomach pain & nausea',
+  'Sore throat',
+];
+
+const formatTime = (ts) => new Date(ts || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 const formatAiResponse = (payload) => {
   const analysis = payload?.analysis || {};
@@ -49,7 +59,7 @@ const extractBackendError = (err) => {
 };
 
 const AISymptomCheckerChatbot = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -72,8 +82,8 @@ const AISymptomCheckerChatbot = () => {
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, open]);
 
-  const send = async () => {
-    const trimmed = input.trim();
+  const send = async (preset) => {
+    const trimmed = (typeof preset === 'string' ? preset : input).trim();
     if (!trimmed || loading) return;
 
     setError('');
@@ -121,55 +131,97 @@ const AISymptomCheckerChatbot = () => {
     ]);
   };
 
-  return (
-    <div className="symptom-chat-card">
-      <div className="symptom-chat-head">
-        <h2>Symptom Checker</h2>
-        <div className="symptom-chat-head-actions">
-          <button onClick={() => setOpen((v) => !v)}>{open ? 'Hide' : 'Show'}</button>
-          <button onClick={clearChat} disabled={loading}>Clear</button>
-        </div>
-      </div>
+  const showSuggestions = messages.length <= 1 && !loading;
 
+  return (
+    <div className="ai-chat-widget">
       {open && (
-        <>
-          <div
-            ref={listRef}
-            className="symptom-chat-log"
-          >
+        <div className="ai-chat" role="dialog" aria-label="AI Symptom Checker">
+          <div className="ai-chat-head">
+            <div className="ai-chat-avatar" aria-hidden="true">🩺</div>
+            <div className="ai-chat-head-text">
+              <h2 className="ai-chat-title">AI Symptom Checker</h2>
+              <span className="ai-chat-status">
+                <span className="ai-chat-status-dot" aria-hidden="true" />
+                Powered by AI · Online
+              </span>
+            </div>
+            <div className="ai-chat-head-actions">
+              <button type="button" className="ai-chat-head-btn" onClick={clearChat} disabled={loading}>
+                Clear
+              </button>
+              <button type="button" className="ai-chat-head-btn" onClick={() => setOpen(false)} aria-label="Minimize chat">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div ref={listRef} className="ai-chat-log">
             {messages.map((m) => (
-              <div key={m.id} className={`symptom-chat-row ${m.role === 'user' ? 'symptom-chat-row-user' : 'symptom-chat-row-bot'}`}>
-                <div
-                  className={`symptom-chat-bubble ${m.role === 'user' ? 'symptom-chat-bubble-user' : 'symptom-chat-bubble-bot'}`}
-                >
-                  {m.text}
+              <div key={m.id} className={`ai-chat-row ${m.role === 'user' ? 'ai-chat-row-user' : 'ai-chat-row-bot'}`}>
+                <div className="ai-chat-mini-avatar" aria-hidden="true">{m.role === 'user' ? '🙂' : '🤖'}</div>
+                <div className="ai-chat-bubble-wrap">
+                  <div className="ai-chat-bubble">{m.text}</div>
+                  <span className="ai-chat-time">{formatTime(m.ts)}</span>
                 </div>
               </div>
             ))}
+
+            {loading && (
+              <div className="ai-chat-row ai-chat-row-bot">
+                <div className="ai-chat-mini-avatar" aria-hidden="true">🤖</div>
+                <div className="ai-chat-bubble-wrap">
+                  <div className="ai-chat-bubble ai-chat-typing" aria-label="AI is typing">
+                    <span /><span /><span />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="symptom-chat-input-row">
+          {showSuggestions && (
+            <div className="ai-chat-suggestions">
+              {QUICK_SUGGESTIONS.map((s) => (
+                <button key={s} type="button" className="ai-chat-suggestion" onClick={() => send(s)}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="ai-chat-input-row">
             <textarea
-              rows={2}
+              rows={1}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Type symptoms and press Enter to send (Shift+Enter for newline)"
-              className="symptom-chat-input"
+              placeholder="Describe your symptoms…"
+              className="ai-chat-input"
               disabled={loading}
             />
-            <button onClick={send} disabled={!canSend} className="symptom-chat-send-btn">
-              {loading ? 'Sending…' : 'Send'}
+            <button type="button" onClick={() => send()} disabled={!canSend} className="ai-chat-send" aria-label="Send">
+              {loading ? '…' : '➤'}
             </button>
           </div>
 
-          {error && (
-            <div className="symptom-chat-error">
-              {error}
-            </div>
-          )}
-        </>
+          {error && <div className="ai-chat-error">{error}</div>}
+
+          <div className="ai-chat-disclaimer">
+            AI guidance only — not a medical diagnosis. Consult a doctor for medical advice.
+          </div>
+        </div>
       )}
+
+      <button
+        type="button"
+        className="ai-chat-fab"
+        onClick={() => setOpen((v) => !v)}
+        aria-label={open ? 'Close symptom checker' : 'Open AI symptom checker'}
+        title={open ? 'Close' : 'AI Symptom Checker'}
+      >
+        {open ? '✕' : '🩺'}
+        {!open && <span className="ai-chat-fab-ping" aria-hidden="true" />}
+      </button>
     </div>
   );
 };

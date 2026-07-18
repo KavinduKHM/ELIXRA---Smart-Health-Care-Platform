@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Link, NavLink, Outlet, useParams } from 'react-router-dom';
 import {
   getPatientProfile,
   getPatientDocuments,
   getPatientPrescriptions,
   getPatientMedicalHistory,
 } from '../../services/patientService';
+import AISymptomCheckerChatbot from '../../components/patient/AISymptomCheckerChatbot';
 
 const PROFILE_IMAGE_CANDIDATE_KEYS = [
   'profilePictureUrl',
@@ -53,11 +54,9 @@ const getPatientDisplayName = (profile) => {
 
 const PatientShell = () => {
   const { patientId } = useParams();
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
-  const [logoutPopup, setLogoutPopup] = useState(null);
   const [sidebarImageSrc, setSidebarImageSrc] = useState('');
   const [triedSidebarFallback, setTriedSidebarFallback] = useState(false);
 
@@ -158,30 +157,6 @@ const PatientShell = () => {
     [patientIdNum, profile, documents, prescriptions, medicalHistory, refreshDocuments, refreshMedicalHistory]
   );
 
-  const handleLogoutClick = (event) => {
-    event.preventDefault();
-    setLogoutPopup({
-      type: 'success',
-      title: 'Success',
-      text: 'Logged out successfully.',
-    });
-  };
-
-  const closeLogoutPopup = () => {
-    setLogoutPopup(null);
-    localStorage.removeItem('elixra.userName');
-    localStorage.removeItem('elixra.userRole');
-    navigate('/patient', {
-      replace: true,
-      state: {
-        flashMessage: {
-          type: 'success',
-          text: 'Logged out successfully.',
-        },
-      },
-    });
-  };
-
   return (
     <div className="shell patient-shell">
       <aside className="sidebar patient-sidebar">
@@ -213,11 +188,17 @@ const PatientShell = () => {
         </div>
         <nav className="sidebarNav">
           <NavLink
+            to="book"
+            className={({ isActive }) => `sidebarLink ${isActive ? 'sidebarLinkActive' : ''}`}
+          >
+            Book Appointment
+          </NavLink>
+          <NavLink
             to="appointments"
             end
             className={({ isActive }) => `sidebarLink ${isActive ? 'sidebarLinkActive' : ''}`}
           >
-            Appointments
+            My Appointments
           </NavLink>
           <NavLink
             to="prescriptions"
@@ -240,18 +221,11 @@ const PatientShell = () => {
         </nav>
         <div className="patient-sidebar-foot">
           <Link
-            to="appointments"
+            to="book"
             className="patient-switch-link patient-sidebar-cta"
             aria-label="Book appointment"
           >
-            Book Appointment
-          </Link>
-          <Link
-            to="/patient"
-            className="patient-switch-link patient-logout-link"
-            onClick={handleLogoutClick}
-          >
-            Logout
+            + Book Appointment
           </Link>
         </div>
       </aside>
@@ -267,18 +241,7 @@ const PatientShell = () => {
         {!loading && !loadError && <Outlet context={outletContext} />}
       </section>
 
-      {logoutPopup && (
-        <div className="patient-logout-popup-overlay" role="dialog" aria-modal="true">
-          <div className="patient-logout-popup-modal patient-logout-popup-success">
-            <div className="patient-logout-popup-icon" aria-hidden="true">✓</div>
-            <h3>{logoutPopup.title}</h3>
-            <p>{logoutPopup.text}</p>
-            <div className="patient-logout-popup-actions">
-              <button type="button" onClick={closeLogoutPopup}>OK</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AISymptomCheckerChatbot />
     </div>
   );
 };

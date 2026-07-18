@@ -156,6 +156,20 @@ const DoctorPrescriptions = ({ doctorId, isVerified = false }) => {
 
   const totalMedicinesIssued = prescriptions.reduce((sum, p) => sum + (p.medicines?.length || 0), 0);
 
+  // Map patientId -> patient name (from the doctor's appointments) for friendly labels.
+  const patientNameById = React.useMemo(() => {
+    const map = new Map();
+    appointments.forEach((a) => {
+      if (a?.patientId != null && a?.patientName) map.set(String(a.patientId), a.patientName);
+    });
+    return map;
+  }, [appointments]);
+
+  const selectedAppointment = appointments.find((a) => String(a.id) === String(formData.appointmentId));
+  const selectedPatientName = selectedAppointment
+    ? (selectedAppointment.patientName || `Patient ${selectedAppointment.patientId}`)
+    : (formData.patientId ? (patientNameById.get(String(formData.patientId)) || `Patient ${formData.patientId}`) : '');
+
   return (
     <div className="dp-root">
       <section className="dp-main">
@@ -210,47 +224,43 @@ const DoctorPrescriptions = ({ doctorId, isVerified = false }) => {
 
               <h4 className="dp-formSubTitle">Patient and Appointment</h4>
               <div className="dp-grid2">
-                <select
-                  value={formData.patientId}
-                  onChange={e => {
-                    const nextPatientId = e.target.value;
-                    const currentAppointment = appointments.find(a => String(a.id) === String(formData.appointmentId));
-                    const appointmentMatches = currentAppointment && String(currentAppointment.patientId) === String(nextPatientId);
-                    setFormData({
-                      ...formData,
-                      patientId: nextPatientId,
-                      appointmentId: appointmentMatches ? formData.appointmentId : '',
-                    });
-                  }}
-                >
-                  <option value="">Select Patient</option>
-                  {[...new Map(appointments.map(a => [String(a.patientId), a.patientId])).values()].map((pid) => (
-                    <option key={pid} value={pid}>Patient {pid}</option>
-                  ))}
-                </select>
-
-                <select
-                  value={formData.appointmentId}
-                  onChange={e => {
-                    const nextAppointmentId = e.target.value;
-                    const apt = appointments.find(a => String(a.id) === String(nextAppointmentId));
-                    setFormData({
-                      ...formData,
-                      appointmentId: nextAppointmentId,
-                      patientId: apt?.patientId != null ? String(apt.patientId) : formData.patientId,
-                    });
-                  }}
-                >
-                  <option value="">Select Appointment</option>
-                  {appointments
-                    .filter(a => !formData.patientId || String(a.patientId) === String(formData.patientId))
-                    .map(apt => (
+                <label className="dp-field">
+                  <span className="dp-fieldLabel">Appointment (patient · date &amp; time)</span>
+                  <select
+                    value={formData.appointmentId}
+                    onChange={e => {
+                      const nextAppointmentId = e.target.value;
+                      const apt = appointments.find(a => String(a.id) === String(nextAppointmentId));
+                      setFormData({
+                        ...formData,
+                        appointmentId: nextAppointmentId,
+                        patientId: apt?.patientId != null ? String(apt.patientId) : '',
+                      });
+                    }}
+                  >
+                    <option value="">Select an appointment…</option>
+                    {appointments.map(apt => (
                       <option key={apt.id} value={apt.id}>
-                        Appointment {apt.id} - {new Date(apt.appointmentTime).toLocaleDateString()}
+                        {(apt.patientName || `Patient ${apt.patientId}`)} · {new Date(apt.appointmentTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                       </option>
                     ))}
-                </select>
+                  </select>
+                </label>
+
+                <label className="dp-field">
+                  <span className="dp-fieldLabel">Patient</span>
+                  <input
+                    type="text"
+                    readOnly
+                    className="dp-readonly"
+                    placeholder="Auto-filled when you pick an appointment"
+                    value={selectedPatientName}
+                  />
+                </label>
               </div>
+              {appointments.length === 0 && (
+                <p className="dp-formHint">No appointments found yet. Prescriptions can be issued once you have patient appointments.</p>
+              )}
 
               <h4 className="dp-formSubTitle">Clinical Details</h4>
               <div className="dp-grid2">
@@ -302,7 +312,7 @@ const DoctorPrescriptions = ({ doctorId, isVerified = false }) => {
                   <article key={p.id} className="dp-card">
                     <div className="dp-cardTop">
                       <div>
-                        <div className="dp-patient">Patient {p.patientId}</div>
+                        <div className="dp-patient">{patientNameById.get(String(p.patientId)) || `Patient ${p.patientId}`}</div>
                         <div className="dp-drugLine">
                           <span className="dp-drugName">{firstMedicine?.medicineName || 'Prescription'}</span>
                           <span>{firstMedicine?.dosage || '-'}</span>

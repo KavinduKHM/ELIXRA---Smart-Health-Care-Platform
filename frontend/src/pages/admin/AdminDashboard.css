@@ -1,6 +1,6 @@
 .adminDashboardRoot {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .adminDashboardHeader {
@@ -15,59 +15,75 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8rem;
-  margin-bottom: 0.8rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .adminDashboardError {
-  border: 1px solid #f3c2c2;
-  background: #fff0f0;
-  color: #912f2f;
-  border-radius: 10px;
-  padding: 0.7rem 0.8rem;
-  margin-bottom: 0.8rem;
+  border: 1px solid #fecdd3;
+  background: #fff1f2;
+  color: #be123c;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 
 .adminDoctorList {
   display: grid;
-  gap: 0.8rem;
-}
-
-.adminDoctorCard {
-  border: 1px solid #dbe8ea;
-  border-radius: 12px;
-  background: #f9fcfc;
-  padding: 0.9rem;
-  display: flex;
-  justify-content: space-between;
   gap: 1rem;
 }
 
+.adminDoctorCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 200ms ease;
+}
+
+.adminDoctorCard:hover {
+  box-shadow: var(--shadow);
+}
+
 .adminDoctorCard h3 {
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  font-weight: 700;
 }
 
 .adminDoctorCard p {
-  margin: 0.2rem 0;
-  color: #2f3e4f;
+  margin: 0.25rem 0;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .adminDoctorActions {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .adminVerifyBtn {
-  background: #0f7d75;
+  background: linear-gradient(135deg, var(--primary), var(--primary-700));
+}
+
+.adminVerifyBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
 }
 
 .adminRejectBtn {
-  background: #c23e3e;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .adminRejectBtn:hover {
-  background: #a53333;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
 @media (max-width: 880px) {
@@ -83,4 +99,3 @@
     flex: 1;
   }
 }
-

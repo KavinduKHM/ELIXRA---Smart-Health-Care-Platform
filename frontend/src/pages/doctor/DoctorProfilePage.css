@@ -1,50 +1,59 @@
 .doctorProfilePage {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .doctorProfilePageTopBar {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid #dce8ea;
-  border-radius: 16px;
-  background: linear-gradient(180deg, #f8fcfc 0%, #eff6f7 100%);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .doctorProfilePageTopBar h1 {
   margin: 0;
-  color: #1b363a;
-  font-size: 1.9rem;
+  color: var(--text);
+  font-size: 1.8rem;
+  font-weight: 800;
 }
 
 .doctorProfilePageTopBar p {
-  margin: 0.35rem 0 0;
-  color: #60797e;
+  margin: 0.5rem 0 0;
+  color: var(--muted);
   max-width: 650px;
 }
 
 .doctorProfilePageActions {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.75rem;
 }
 
 .doctorProfilePageSearch {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  border: 1px solid #d3e3e5;
-  background: #ffffff;
+  gap: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
   border-radius: 999px;
-  padding: 0.25rem 0.55rem;
+  padding: 0.5rem 1rem;
   min-width: 300px;
+  transition: all 200ms ease;
+}
+
+.doctorProfilePageSearch:focus-within {
+  background: var(--surface);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
 }
 
 .doctorProfilePageSearch svg {
-  color: #6e868b;
+  color: var(--muted);
 }
 
 .doctorProfilePageSearch input {
@@ -53,20 +62,33 @@
   border: none;
   background: transparent;
   box-shadow: none;
-  padding: 0.35rem 0.25rem;
+  padding: 0.1rem 0;
+  color: var(--text);
+  font-weight: 500;
 }
 
 .doctorProfilePageSearch input:focus {
+  outline: none;
   box-shadow: none;
 }
 
 .doctorProfilePageSettingsBtn {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   padding: 0;
   display: grid;
   place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--primary-700);
+  transition: all 200ms ease;
+}
+
+.doctorProfilePageSettingsBtn:hover {
+  background: var(--surface-2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.05);
 }
 
 @media (max-width: 940px) {
@@ -79,4 +101,3 @@
     width: 100%;
   }
 }
-

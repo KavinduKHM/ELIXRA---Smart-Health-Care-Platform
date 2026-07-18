@@ -34,6 +34,8 @@ const createInitialForm = () => ({
 	lastName: '',
 	middleName: '',
 	email: '',
+	password: '',
+	confirmPassword: '',
 	phoneNumber: '',
 	dateOfBirth: '',
 	gender: '',
@@ -77,6 +79,16 @@ const validateField = (name, value, fullForm) => {
 	if (name === 'email') {
 		if (!trimmed) return 'Email is required.';
 		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return 'Invalid email format.';
+	}
+
+	if (name === 'password') {
+		if (!value) return 'Password is required.';
+		if (String(value).length < 6) return 'Password must be at least 6 characters.';
+	}
+
+	if (name === 'confirmPassword') {
+		if (!value) return 'Please confirm your password.';
+		if (fullForm && value !== fullForm.password) return 'Passwords do not match.';
 	}
 
 	if (name === 'phoneNumber') {
@@ -137,7 +149,6 @@ const PatientRegister = () => {
 	const [touched, setTouched] = useState({});
 	const [submitting, setSubmitting] = useState(false);
 	const [message, setMessage] = useState({ type: '', text: '' });
-	const [createdPatientId, setCreatedPatientId] = useState(null);
 	const [autoPostalCode, setAutoPostalCode] = useState('');
 
 	const authHeaders = useMemo(() => {
@@ -262,7 +273,6 @@ const PatientRegister = () => {
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		setMessage({ type: '', text: '' });
-		setCreatedPatientId(null);
 
 		if (!validateForm()) {
 			setMessage({ type: 'error', text: 'Please fix validation errors before submitting.' });
@@ -275,6 +285,7 @@ const PatientRegister = () => {
 			const payload = {
 				...form,
 				userId: Number(form.userId),
+				password: form.password,
 				firstName: trimValue(form.firstName),
 				lastName: trimValue(form.lastName),
 				middleName: trimValue(form.middleName),
@@ -296,6 +307,8 @@ const PatientRegister = () => {
 				chronicConditions: trimValue(form.chronicConditions),
 				currentMedications: trimValue(form.currentMedications),
 			};
+
+			delete payload.confirmPassword;
 
 			const response = await axios.post(`${API_BASE_URL}/api/patients/register`, payload, {
 				headers: {
@@ -321,8 +334,6 @@ const PatientRegister = () => {
 					},
 				});
 			}
-
-			setCreatedPatientId(patientId || null);
 			setMessage({
 				type: 'success',
 				text: patientId
@@ -351,15 +362,13 @@ const PatientRegister = () => {
 						<h3>Registration Successful</h3>
 						<p>{message.text}</p>
 						<div className="register-success-actions">
-						{createdPatientId ? (
 							<button
 								type="button"
 								className="register-inline-button"
-								onClick={() => navigate(`/patient/${createdPatientId}/profile`)}
+								onClick={() => navigate('/login', { state: { requiredRole: 'patient' } })}
 							>
-								Open Profile
+								Continue to Login
 							</button>
-						) : null}
 							<button
 								type="button"
 								className="register-inline-button register-inline-button-secondary"
@@ -425,6 +434,9 @@ const PatientRegister = () => {
 				<Field label="Middle Name" name="middleName" value={form.middleName} onChange={handleChange} onBlur={handleBlur} error={touched.middleName ? errors.middleName : ''} />
 				<Field label="Email" name="email" value={form.email} onChange={handleChange} onBlur={handleBlur} error={touched.email ? errors.email : ''} required />
 				<Field label="Phone Number" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} onBlur={handleBlur} error={touched.phoneNumber ? errors.phoneNumber : ''} required />
+
+				<Field label="Password" name="password" type="password" value={form.password} onChange={handleChange} onBlur={handleBlur} error={touched.password ? errors.password : ''} required helperText="Used to sign in. Minimum 6 characters." />
+				<Field label="Confirm Password" name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} onBlur={handleBlur} error={touched.confirmPassword ? errors.confirmPassword : ''} required />
 				<Field label="Date of Birth" name="dateOfBirth" type="date" value={form.dateOfBirth} onChange={handleChange} onBlur={handleBlur} error={touched.dateOfBirth ? errors.dateOfBirth : ''} required />
 
 				<SelectField label="Gender" name="gender" value={form.gender} onChange={handleChange} onBlur={handleBlur} options={['Male', 'Female', 'Other', 'Prefer not to say']} error={touched.gender ? errors.gender : ''} />

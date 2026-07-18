@@ -21,7 +21,7 @@ const DoctorAppointmentsPage = () => {
 
       <div className="doctor-appointments-layout">
         <section className="doctor-appointments-main">
-          <AvailabilityManager doctorId={doctorId} isVerified={isVerified} />
+          <AvailabilityManager doctorId={doctorId} isVerified={isVerified} defaultDuration={profile?.averageConsultationDuration} />
           <AppointmentRequests doctorId={doctorId} />
         </section>
         <aside className="doctor-appointments-side">

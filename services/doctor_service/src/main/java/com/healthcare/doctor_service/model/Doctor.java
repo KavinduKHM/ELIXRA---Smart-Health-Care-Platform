@@ -33,6 +33,10 @@ public class Doctor {
     private String lastName;
 
     private String email;
+
+    // BCrypt-hashed login password. Nullable so pre-existing rows remain valid.
+    private String password;
+
     private String phoneNumber;
     private String profilePicture;
 

@@ -23,9 +23,19 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     Optional<Doctor> findByUserId(Long userId);
 
     /**
+     * Find doctor by email (for login).
+     */
+    Optional<Doctor> findByEmail(String email);
+
+    /**
      * Check if user ID already exists.
      */
     boolean existsByUserId(Long userId);
+
+    /**
+     * Check if email already exists.
+     */
+    boolean existsByEmail(String email);
 
     /**
      * Find doctors by specialty

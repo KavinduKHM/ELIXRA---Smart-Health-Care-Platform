@@ -59,6 +59,21 @@ public class DoctorController {
     }
 
     /**
+     * Authenticate a doctor with email + password.
+     * POST /api/doctors/login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            DoctorDTO doctor = doctorService.login(request.getEmail(), request.getPassword());
+            return ResponseEntity.ok(doctor);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("message", ex.getMessage()));
+        }
+    }
+
+    /**
      * Check if a doctor is available at a specific date and time.
      * Used by Appointment Service to validate slot before booking.
      *

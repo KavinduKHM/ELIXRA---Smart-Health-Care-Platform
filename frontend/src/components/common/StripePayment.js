@@ -76,7 +76,7 @@ const PaymentForm = ({ appointmentId, amount, clientSecret, onSuccess, onError }
       <CardElement options={cardElementOptions} />
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <button type="submit" disabled={!stripe || processing || !clientSecret} style={{ marginTop: '1rem' }}>
-        {processing ? 'Processing...' : `Pay ${amount}`}
+        {processing ? 'Processing...' : `Pay Rs. ${amount}`}
       </button>
     </form>
   );

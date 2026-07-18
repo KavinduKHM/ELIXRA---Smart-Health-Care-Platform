@@ -59,7 +59,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
+      start_period: 120s
 
   mysql-patient:
     image: mysql:8.0
@@ -77,7 +78,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
+      start_period: 120s
 
   mysql-payment:
     image: mysql:8.0
@@ -95,7 +97,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
+      start_period: 120s
 
   mysql-notification:
     image: mysql:8.0
@@ -113,7 +116,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
+      start_period: 120s
 
   mysql-auth:
     image: mysql:8.0
@@ -131,6 +135,20 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
       interval: 10s
       timeout: 5s
+      retries: 15
+      start_period: 120s
+
+  redis:
+    image: redis:7-alpine
+    container_name: healthcare-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
       retries: 5
 
   telemedicine-service:
@@ -166,12 +184,19 @@ services:
         condition: service_healthy
       mysql-auth:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-discovery:8761/eureka/
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-auth:3306/auth_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      # Spring Boot 3.x binds Redis under spring.data.redis.*; set both for safety.
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
     networks:
       - healthcare-network
 
@@ -190,6 +215,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-doctor:3306/doctor_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     networks:
       - healthcare-network
 

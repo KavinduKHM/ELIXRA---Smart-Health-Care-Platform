@@ -1,79 +1,77 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import BrandLogo from './BrandLogo';
 
-const getStoredUser = () => ({
-  userName: localStorage.getItem('elixra.userName') || '',
-  userRole: localStorage.getItem('elixra.userRole') || '',
-  patientId: localStorage.getItem('patientId') || localStorage.getItem('elixra.patientId') || '',
-  doctorId: localStorage.getItem('doctorId') || localStorage.getItem('elixra.doctorId') || '',
-});
+const PUBLIC_LINKS = [
+  { to: '/', label: 'Home', end: true },
+  { to: '/services', label: 'Services' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
+];
 
-const getDashboardPath = (user) => {
-  const role = String(user.userRole || '').trim().toLowerCase();
-  const patientId = String(user.patientId || '').trim();
-  const doctorId = String(user.doctorId || '').trim();
+const getNavLinks = (user) => {
+  if (!user) return [];
 
-  if (role === 'patient') {
-    return patientId ? `/patient/${encodeURIComponent(patientId)}/appointments` : '/patient';
+  if (user.role === 'patient') {
+    const base = `/patient/${user.id}`;
+    return [
+      { to: `${base}/appointments`, label: 'Appointments' },
+      { to: `${base}/book`, label: 'Book' },
+      { to: `${base}/prescriptions`, label: 'Prescriptions' },
+      { to: `${base}/history-documents`, label: 'Reports' },
+      { to: `${base}/profile`, label: 'Profile' },
+    ];
   }
 
-  if (role === 'doctor') {
-    return doctorId ? `/doctor/${encodeURIComponent(doctorId)}/appointments` : '/doctor';
+  if (user.role === 'doctor') {
+    const base = `/doctor/${user.id}`;
+    return [
+      { to: `${base}/appointments`, label: 'Appointments' },
+      { to: `${base}/prescriptions`, label: 'Prescriptions' },
+      { to: `${base}/profile`, label: 'Profile' },
+    ];
   }
 
-  if (role === 'admin') {
-    return '/admin';
-  }
+  return [];
+};
 
+const getHomePath = (user) => {
+  if (!user) return '/';
+  if (user.role === 'patient') return `/patient/${user.id}/appointments`;
+  if (user.role === 'doctor') return `/doctor/${user.id}/appointments`;
   return '/';
 };
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const pathname = location?.pathname || '';
 
   const isPortalShellRoute = /^\/(patient|doctor)\/[^/]+(\/|$)/.test(pathname) && pathname !== '/patient/register';
   const containerClassName = isPortalShellRoute ? 'portalContainer' : 'container';
 
-  const [user, setUser] = useState(getStoredUser);
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
-  const headerLabel = useMemo(() => {
-    const name = String(user.userName || '').trim() || 'Guest';
-    const role = String(user.userRole || '').trim();
-    return role ? `${name} (${role})` : name;
-  }, [user]);
+  const navLinks = useMemo(() => getNavLinks(user), [user]);
+  const homePath = useMemo(() => getHomePath(user), [user]);
 
-  const dashboardPath = useMemo(() => getDashboardPath(user), [user]);
+  const roleLabel = user ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '';
+  const displayName = (user?.name || '').trim() || 'Account';
 
-  useEffect(() => {
-    const refresh = () => setUser(getStoredUser());
-
-    refresh();
-
-    const onStorage = (event) => {
-      if (
-        event.key === 'elixra.userName' ||
-        event.key === 'elixra.userRole' ||
-        event.key === 'patientId' ||
-        event.key === 'doctorId' ||
-        event.key === 'elixra.patientId' ||
-        event.key === 'elixra.doctorId'
-      ) {
-        refresh();
-      }
-    };
-
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, [pathname]);
+  const handleLogout = () => {
+    setConfirmLogout(false);
+    signOut();
+    navigate('/', { replace: true });
+  };
 
   return (
     <div>
       <header className="appHeader" role="banner">
         <div className={`${containerClassName} appHeaderInner`}>
-          <Link to="/" className="appBrand" aria-label="ELIXRA home">
-            <div className="brandDot" aria-hidden="true" />
+          <Link to={homePath} className="appBrand" aria-label="ELIXRA home">
+            <BrandLogo size={42} />
             <div className="appBrandText">
               <div className="appBrandTitle">ELIXRA</div>
               <div className="appBrandSubtitle">Smart Health Care Platform</div>
@@ -81,47 +79,70 @@ const Layout = ({ children }) => {
           </Link>
 
           <nav className="appHeaderNav" aria-label="Primary">
-            <NavLink to="/" end className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
-              Home
-            </NavLink>
-            <NavLink to="/patient" className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
-              Patient
-            </NavLink>
-            <NavLink to="/doctor" className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
-              Doctor
-            </NavLink>
-            <NavLink to="/admin" className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}>
-              Admin
-            </NavLink>
+            {user
+              ? navLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}
+                  >
+                    {link.label}
+                  </NavLink>
+                ))
+              : PUBLIC_LINKS.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    end={link.end}
+                    className={({ isActive }) => `appHeaderLink ${isActive ? 'appHeaderLinkActive' : ''}`}
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
           </nav>
 
-          <div className="appHeaderUser" aria-label="Current user">
-            <button
-              type="button"
-              className="appUserChip appUserChipLink"
-              onClick={() => navigate(dashboardPath)}
-              aria-label={`Open ${headerLabel} dashboard`}
-              title={headerLabel}
-            >
-              <span className="appUserChipAvatar" aria-hidden="true">
-                {(user.userName || 'G').trim().charAt(0).toUpperCase()}
-              </span>
-              <span className="appUserChipName">{headerLabel}</span>
-            </button>
+          <div className="appHeaderUser" aria-label="Account">
+            {user ? (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  className="appUserChip appUserChipLink"
+                  onClick={() => navigate(homePath)}
+                  title={`${displayName} (${roleLabel})`}
+                >
+                  <span className="appUserChipAvatar" aria-hidden="true">
+                    {displayName.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="appUserChipName">
+                    {displayName} · {roleLabel}
+                  </span>
+                </button>
+                <button type="button" className="appHeaderLogout" onClick={() => setConfirmLogout(true)}>
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
+                <NavLink to="/login" className="appHeaderLink">
+                  Sign in
+                </NavLink>
+                <button type="button" className="appHeaderCta" onClick={() => navigate('/register')}>
+                  Get Started
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       <main className={`layoutMain ${isPortalShellRoute ? 'portalMain' : ''}`}>
-        <div className={containerClassName}>
-          {children}
-        </div>
+        <div className={containerClassName}>{children}</div>
       </main>
 
       <footer className="appFooter" role="contentinfo">
         <div className={`${containerClassName} appFooterInner`}>
           <div className="appFooterBrand">
-            <div className="brandDot" aria-hidden="true" />
+            <BrandLogo size={38} />
             <div>
               <div className="appFooterTitle">ELIXRA</div>
               <div className="appFooterSubtitle">© {new Date().getFullYear()} ELIXRA. All rights reserved.</div>
@@ -129,14 +150,32 @@ const Layout = ({ children }) => {
           </div>
 
           <div className="appFooterLinks" aria-label="Footer">
-            <span className="appFooterLink">Privacy</span>
+            <Link to="/services" className="appFooterLink">Services</Link>
             <span className="appFooterDot" aria-hidden="true">•</span>
-            <span className="appFooterLink">Terms</span>
+            <Link to="/about" className="appFooterLink">About</Link>
             <span className="appFooterDot" aria-hidden="true">•</span>
-            <span className="appFooterLink">Support</span>
+            <Link to="/contact" className="appFooterLink">Contact</Link>
           </div>
         </div>
       </footer>
+
+      {confirmLogout && (
+        <div className="app-logout-overlay" role="dialog" aria-modal="true" aria-label="Confirm logout">
+          <div className="app-logout-modal">
+            <div className="app-logout-icon" aria-hidden="true">⏻</div>
+            <h3>Sign out of ELIXRA?</h3>
+            <p>You’ll need to sign in again to access your portal.</p>
+            <div className="app-logout-actions">
+              <button type="button" className="register-btn-secondary" onClick={() => setConfirmLogout(false)}>
+                Cancel
+              </button>
+              <button type="button" onClick={handleLogout}>
+                Yes, sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -13,6 +13,8 @@ import com.healthcare.patient_service.repository.MedicalHistoryRepository;
 import com.healthcare.patient_service.repository.PatientRepository;
 import com.healthcare.patient_service.repository.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +34,8 @@ public class PatientService {
     private final PrescriptionRepository prescriptionRepository;
     private final FileStorageService fileStorageService;
     private final CloudinaryService cloudinaryService;
-    
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Value("${app.base-url}")
     private String baseUrl;
     
@@ -75,6 +78,7 @@ public class PatientService {
             .lastName(request.getLastName())
             .middleName(request.getMiddleName())
             .email(request.getEmail())
+            .password(request.getPassword() != null ? passwordEncoder.encode(request.getPassword()) : null)
             .phoneNumber(request.getPhoneNumber())
             .dateOfBirth(request.getDateOfBirth())
             .gender(request.getGender())
@@ -99,7 +103,28 @@ public class PatientService {
         
         return mapToPatientDTO(savedPatient);
     }
-    
+
+    // ==================== PATIENT LOGIN ====================
+
+    /**
+     * Authenticate a patient by email + password.
+     * Returns the patient profile (without password) on success.
+     */
+    public PatientDTO login(String email, String rawPassword) {
+        Patient patient = patientRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (patient.getPassword() == null || !passwordEncoder.matches(rawPassword, patient.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        if (!patient.isActive()) {
+            throw new IllegalArgumentException("This account has been deactivated. Please contact support.");
+        }
+
+        return mapToPatientDTO(patient);
+    }
+
     // ==================== PATIENT PROFILE METHODS ====================
     
     public PatientDTO getPatientProfile(Long patientId) {

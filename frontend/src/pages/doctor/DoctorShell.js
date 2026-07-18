@@ -100,18 +100,6 @@ const DoctorShell = () => {
             Profile
           </NavLink>
         </nav>
-        <div style={{ marginTop: '1rem' }}>
-          <Link
-            to="/doctor"
-            style={{ color: 'white' }}
-            onClick={() => {
-              localStorage.removeItem('elixra.userName');
-              localStorage.removeItem('elixra.userRole');
-            }}
-          >
-            Switch doctor
-          </Link>
-        </div>
       </aside>
 
       <section className="content">

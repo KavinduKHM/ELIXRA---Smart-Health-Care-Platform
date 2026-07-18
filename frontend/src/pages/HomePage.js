@@ -1,10 +1,18 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './HomePage.css';
 
 const HomePage = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const flashMessage = location?.state?.flashMessage;
+
+  const dashboardPath = user
+    ? user.role === 'doctor'
+      ? `/doctor/${user.id}/appointments`
+      : `/patient/${user.id}/appointments`
+    : null;
 
   return (
     <div className="home-page">
@@ -24,12 +32,20 @@ const HomePage = () => {
           </p>
 
           <div className="home-hero-actions">
-            <Link to="/patient" className="home-btn home-btn-primary">
-              Patient Portal
-            </Link>
-            <Link to="/doctor" className="home-btn home-btn-secondary">
-              Doctor Portal
-            </Link>
+            {user ? (
+              <Link to={dashboardPath} className="home-btn home-btn-primary">
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="home-btn home-btn-primary">
+                  Sign In
+                </Link>
+                <Link to="/register" className="home-btn home-btn-secondary">
+                  Create Account
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="home-hero-notes">
@@ -39,15 +55,21 @@ const HomePage = () => {
           </div>
         </div>
 
-        <div className="home-hero-visual" aria-hidden="true">
+        <div className="home-hero-visual">
           <div className="home-hero-card">
-            <div className="home-hero-orb" />
-            <div className="home-hero-device">
-              <span />
-            </div>
+            <img
+              src={`${process.env.PUBLIC_URL}/health-hero.jpg`}
+              alt="A patient and doctor shaking hands, surrounded by connected care icons"
+              className="home-hero-image"
+              loading="eager"
+            />
             <div className="home-hero-stat">
               <strong>98%</strong>
               <span>Patient satisfaction</span>
+            </div>
+            <div className="home-hero-badge">
+              <span className="home-hero-badge-dot" aria-hidden="true" />
+              Trusted care, online
             </div>
           </div>
         </div>
@@ -116,26 +138,40 @@ const HomePage = () => {
           </ol>
         </div>
 
-        <div className="home-journey-visual" aria-hidden="true">
-          <div className="home-video-panel">
-            <span className="home-video-ring" />
-            <span className="home-video-label">How it works</span>
+        <div className="home-journey-visual">
+          <div className="home-journey-frame">
+            <img
+              src={`${process.env.PUBLIC_URL}/health-lab.jpg`}
+              alt="A clinician reviewing secure patient data on an interactive screen"
+              loading="lazy"
+            />
+            <div className="home-journey-tag">
+              <span className="home-hero-badge-dot" aria-hidden="true" />
+              Secure &amp; encrypted
+            </div>
           </div>
         </div>
       </section>
 
       <section className="home-cta">
-        <div>
+        <div className="home-cta-copy">
           <h2>Ready to prioritize your wellness?</h2>
           <p>Begin with the portal that matches your role and continue from your dashboard.</p>
+          <div className="home-cta-actions">
+            <Link to="/patient/register" className="home-btn home-btn-light">
+              Register as Patient
+            </Link>
+            <Link to="/doctor/register" className="home-btn home-btn-outline">
+              Register as Doctor
+            </Link>
+          </div>
         </div>
-        <div className="home-cta-actions">
-          <Link to="/patient/register" className="home-btn home-btn-light">
-            Register as Patient
-          </Link>
-          <Link to="/doctor/register" className="home-btn home-btn-outline">
-            Register as Doctor
-          </Link>
+        <div className="home-cta-visual" aria-hidden="true">
+          <img
+            src={`${process.env.PUBLIC_URL}/health-records.jpg`}
+            alt=""
+            loading="lazy"
+          />
         </div>
       </section>
     </div>

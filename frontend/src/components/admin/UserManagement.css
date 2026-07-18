@@ -1,19 +1,19 @@
 .um-page {
-  --um-bg: #f1f6f7;
+  --um-bg: #f8fafc;
   --um-card: #ffffff;
-  --um-text: #153c58;
-  --um-subtle: #5f738b;
-  --um-border: #d9e6ea;
-  --um-primary: #0d7179;
-  --um-primary-strong: #0d5f5a;
-  --um-primary-soft: #d6f2ee;
-  --um-success: #1b9b70;
-  --um-warning: #d19749;
-  --um-danger: #c45656;
+  --um-text: #0f172a;
+  --um-subtle: #64748b;
+  --um-border: #e2e8f0;
+  --um-primary: #0ea5e9;
+  --um-primary-strong: #0369a1;
+  --um-primary-soft: #e0f2fe;
+  --um-success: #10b981;
+  --um-warning: #f59e0b;
+  --um-danger: #ef4444;
   min-height: 100vh;
   padding: 26px;
   color: var(--um-text);
-  background: radial-gradient(circle at 8% 0%, #e7f0f2 0%, rgba(231, 240, 242, 0) 34%), radial-gradient(circle at 95% 100%, #edf4f5 0%, rgba(237, 244, 245, 0) 30%), var(--um-bg);
+  background: var(--um-bg);
 }
 
 .um-hero {
@@ -430,25 +430,22 @@
   .um-hero h1 { font-size: 24px; }
 }
 .um-page {
-  --um-bg: #f1f6f7;
+  --um-bg: #f8fafc;
   --um-card: #ffffff;
-  --um-text: #153c58;
-  --um-subtle: #5f738b;
-  --um-border: #d9e6ea;
-  --um-primary: #0d7179;
-  --um-primary-strong: #0d5f5a;
-  --um-primary-soft: #d6f2ee;
-  --um-success: #1b9b70;
-  --um-warning: #d19749;
-  --um-danger: #c45656;
+  --um-text: #0f172a;
+  --um-subtle: #64748b;
+  --um-border: #e2e8f0;
+  --um-primary: #0ea5e9;
+  --um-primary-strong: #0369a1;
+  --um-primary-soft: #e0f2fe;
+  --um-success: #10b981;
+  --um-warning: #f59e0b;
+  --um-danger: #ef4444;
 
   min-height: 100vh;
   padding: 26px;
   color: var(--um-text);
-  background:
-    radial-gradient(circle at 8% 0%, #e7f0f2 0%, rgba(231, 240, 242, 0) 34%),
-    radial-gradient(circle at 95% 100%, #edf4f5 0%, rgba(237, 244, 245, 0) 30%),
-    var(--um-bg);
+  background: var(--um-bg);
 }
 
 .um-hero {

@@ -29,6 +29,20 @@ public class PatientController {
         PatientDTO patient = patientService.registerPatient(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(patient);
     }
+
+    // ==================== PATIENT LOGIN ====================
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        System.out.println("POST /api/patients/login for " + request.getEmail());
+        try {
+            PatientDTO patient = patientService.login(request.getEmail(), request.getPassword());
+            return ResponseEntity.ok(patient);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(java.util.Map.of("message", ex.getMessage()));
+        }
+    }
     
     // ==================== PATIENT PROFILE ENDPOINTS ====================
     
