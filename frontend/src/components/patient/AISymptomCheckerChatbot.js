@@ -117,8 +117,8 @@ const AISymptomCheckerChatbot = () => {
     }
   };
 
-  const clearChat = () => {
-    if (!window.confirm('Clear symptom checker chat?')) return;
+  const clearChat = async () => {
+    if (!await window.confirm('Clear symptom checker chat?')) return;
     setError('');
     setInput('');
     setMessages([

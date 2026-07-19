@@ -148,7 +148,7 @@ const MedicalHistory = ({ history, patientId, onHistoryAdded, profile }) => {
       showError('Patient profile is deactive (0). Please activate from Profile before deleting history.');
       return;
     }
-    const confirmed = window.confirm(`Delete history record "${item.title || 'Untitled'}"?`);
+    const confirmed = await window.confirm(`Delete history record "${item.title || 'Untitled'}"?`);
     if (!confirmed) return;
 
     try {

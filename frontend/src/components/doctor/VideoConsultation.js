@@ -65,7 +65,7 @@ const VideoConsultation = ({ doctorId }) => {
   };
 
   const handleComplete = async (aptId) => {
-    if (window.confirm('Mark this consultation as completed?')) {
+    if (await window.confirm('Mark this consultation as completed?')) {
       try {
         await updateAppointmentStatus(aptId, { status: 'COMPLETED', notes: 'Consultation done' });
         alert('Appointment marked completed');

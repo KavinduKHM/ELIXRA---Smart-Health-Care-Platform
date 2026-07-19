@@ -139,7 +139,7 @@ const Documents = ({ documents, patientId, onDocumentUploaded, profile }) => {
       showError('Patient profile is deactive (0). Please activate from Profile before deleting documents.');
       return;
     }
-    const confirmed = window.confirm(`Delete document "${doc.fileName || 'Document'}"?`);
+    const confirmed = await window.confirm(`Delete document "${doc.fileName || 'Document'}"?`);
     if (!confirmed) return;
 
     try {

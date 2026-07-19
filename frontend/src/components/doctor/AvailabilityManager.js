@@ -130,7 +130,7 @@ const AvailabilityManager = ({ doctorId, isVerified = false, defaultDuration }) 
   };
 
   const handleDelete = async (availabilityId) => {
-    if (!window.confirm('Remove this availability window?')) return;
+    if (!await window.confirm('Remove this availability window?')) return;
     try {
       await deleteAvailability(doctorId, availabilityId);
       setToast({ type: 'success', text: 'Availability removed.' });

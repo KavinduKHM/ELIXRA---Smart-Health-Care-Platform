@@ -238,7 +238,7 @@ const Profile = ({
 
   const handleToggleActivation = async () => {
     const targetActive = !active;
-    const confirmed = window.confirm(
+    const confirmed = await window.confirm(
       targetActive
         ? 'Activate this patient profile?'
         : 'Deactivate this patient profile? While inactive, booking and document/history actions will be disabled.'
@@ -271,7 +271,7 @@ const Profile = ({
   };
 
   const handleDeleteProfile = async () => {
-    const confirmed = window.confirm(
+    const confirmed = await window.confirm(
       'Delete profile permanently? This will also delete all medical history and uploaded documents for this patient.'
     );
     if (!confirmed) return;
